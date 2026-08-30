@@ -48,14 +48,16 @@ function PetunjukPemasangan() {
 
 function Kerangka() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pt-8 sm:px-6 sm:pt-12 lg:px-8">
-      <div className="h-8 w-72 max-w-full animate-pulse rounded-lg bg-line" />
-      <div className="mt-6 h-64 animate-pulse rounded-2xl border border-line bg-card" />
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-80 animate-pulse rounded-2xl border border-line bg-card" />
-        ))}
+    <>
+      <div className="-mt-[68px] h-[420px] bg-gradient-to-br from-[#0d2a6b] via-brand to-[#3f7bff]" />
+      <div className="mx-auto w-full max-w-6xl px-4 pt-8 sm:px-6 lg:px-8">
+        <div className="h-7 w-56 max-w-full animate-pulse rounded-lg bg-line" />
+        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-80 animate-pulse rounded-2xl bg-card ring-1 ring-line" />
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

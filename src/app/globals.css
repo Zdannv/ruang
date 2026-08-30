@@ -1,25 +1,35 @@
 @import "tailwindcss";
 
 /**
- * Palet demo: netral hangat + satu aksen teal.
+ * Palet dan tipografi.
  *
- * Sengaja tanpa mode gelap otomatis. Prototipe ini dipakai untuk presentasi ke
- * calon partner, sering lewat laptop atau proyektor orang lain — tampilannya
- * harus sama persis di mana pun dibuka, bukan mengikuti setelan sistem yang
- * tidak kita kendalikan.
+ * Arahnya mengikuti acuan yang diberikan: latar biru-abu pucat, kartu putih
+ * melayang, satu biru primer yang dipakai hemat (tombol dan tautan saja), dan
+ * heading serif di atas teks antarmuka sans. Kombinasi itu yang membuat
+ * marketplace terasa rapi tanpa perlu ilustrasi mahal.
+ *
+ * Sengaja tanpa mode gelap otomatis: prototipe ini dipresentasikan lewat
+ * laptop atau proyektor orang lain, jadi tampilannya harus sama di mana pun
+ * dibuka, bukan mengikuti setelan sistem yang tidak kita kendalikan.
  */
 @theme inline {
-  --color-paper: #faf9f7;
+  --color-paper: #eef2f9;
   --color-card: #ffffff;
-  --color-line: #e7e5e4;
-  --color-ink: #1c1917;
-  --color-muted: #78716c;
-  --color-brand: #0f766e;
-  --color-brand-dark: #115e59;
-  --color-brand-soft: #ecfdf5;
+  --color-line: #e2e8f2;
+  --color-ink: #0f1729;
+  --color-muted: #64748b;
+
+  --color-brand: #1f5fff;
+  --color-brand-dark: #1747cc;
+  --color-brand-soft: #e8f0ff;
+
+  --color-good: #0f7a52;
+  --color-good-soft: #e6f5ec;
   --color-warn: #b45309;
   --color-warn-soft: #fffbeb;
-  --font-sans: var(--font-geist-sans);
+
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-serif);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -28,8 +38,17 @@ body {
   color: var(--color-ink);
 }
 
-/* Angka jarak dan harga dibandingkan antar kartu, jadi lebarnya dibuat tetap
+/* Harga dan jarak dibandingkan antar kartu, jadi lebar angkanya dibuat tetap
    supaya kolomnya tidak bergoyang saat hasil berganti. */
 .angka {
   font-variant-numeric: tabular-nums;
+}
+
+/* Baris yang digeser di layar kecil: batang gulirnya disembunyikan supaya
+   tidak memotong kartu, gesturnya tetap jalan. */
+.geser-x {
+  scrollbar-width: none;
+}
+.geser-x::-webkit-scrollbar {
+  display: none;
 }
