@@ -56,7 +56,6 @@ const AWAL: IsiRuang = {
   pengawasan: [],
   fasilitas: [],
   kategori_diterima: ["kardus"],
-  jendela_akses: "Sen-Sab 08.00-17.00",
   kuota_akses_bulanan: 4,
   durasi_min_hari: 30,
   harga_bulanan: 300000,
@@ -424,7 +423,7 @@ export default function FormRuang({
 
       <Bagian
         judul="Aturan"
-        keterangan="Manifes penyewa dicocokkan dengan kategori di bawah sebelum permintaannya sampai ke kamu. Kategori yang tidak dicentang otomatis ditolak sistem."
+        keterangan="Manifes penyewa dicocokkan dengan kategori di bawah sebelum permintaannya sampai ke kamu. Kategori yang tidak dicentang otomatis ditolak sistem. Jam aksesnya diatur terpisah di bagian Jendela akses."
       >
         <div className="sm:col-span-2">
           <KotakCentangGanda
@@ -434,15 +433,6 @@ export default function FormRuang({
             onChange={(v) => ubah("kategori_diterima", v)}
           />
         </div>
-        <Kolom
-          id="jendela"
-          label="Jendela akses"
-          required
-          value={isi.jendela_akses}
-          onChange={(e) => ubah("jendela_akses", e.target.value)}
-          placeholder="Sen-Sab 08.00-17.00"
-          bantuan="Jam saat penyewa boleh datang, setelah dijanjikan lewat aplikasi."
-        />
         <Kolom
           id="kuota"
           label="Kuota kunjungan per bulan"

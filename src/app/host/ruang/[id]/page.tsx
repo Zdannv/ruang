@@ -4,10 +4,12 @@ import type { Metadata } from "next";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import FormRuang from "@/components/host/FormRuang";
 import KelolaFoto from "@/components/host/KelolaFoto";
+import KelolaJendela from "@/components/host/KelolaJendela";
 import LencanaStatus from "@/components/LencanaStatus";
 import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { daftarFoto, getRuangSaya, type IsiRuang } from "@/lib/host";
+import { daftarJendela } from "@/lib/jendela";
 
 export const metadata: Metadata = { title: "Kelola ruang — Ruang" };
 
@@ -18,7 +20,11 @@ export default async function KelolaRuang({ params }: PageProps<"/host/ruang/[id
   if (!sesi.profil) redirect("/host");
 
   const db = await klienServer();
-  const [ruang, foto] = await Promise.all([getRuangSaya(db, id), daftarFoto(db, id)]);
+  const [ruang, foto, jendela] = await Promise.all([
+    getRuangSaya(db, id),
+    daftarFoto(db, id),
+    daftarJendela(db, id),
+  ]);
   // `null` berarti ruangnya tidak ada ATAU bukan milik pemanggil — RLS
   // menyaringnya lebih dulu. Dua-duanya dijawab 404 yang sama.
   if (!ruang) notFound();
@@ -53,7 +59,6 @@ export default async function KelolaRuang({ params }: PageProps<"/host/ruang/[id
     pengawasan: ruang.pengawasan,
     fasilitas: ruang.fasilitas,
     kategori_diterima: ruang.kategori_diterima,
-    jendela_akses: ruang.jendela_akses,
     kuota_akses_bulanan: ruang.kuota_akses_bulanan,
     durasi_min_hari: ruang.durasi_min_hari,
     harga_bulanan: ruang.harga_bulanan,
@@ -96,6 +101,7 @@ export default async function KelolaRuang({ params }: PageProps<"/host/ruang/[id
 
       <div className="mt-6 space-y-5">
         <KelolaFoto hostId={sesi.profil.id} ruangId={ruang.id} foto={foto} />
+        <KelolaJendela ruangId={ruang.id} jendela={jendela} />
         <FormRuang hostId={sesi.profil.id} ruangId={ruang.id} awal={isi} />
       </div>
     </div>

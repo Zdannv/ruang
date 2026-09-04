@@ -11,8 +11,8 @@ pihak luar, bukan karena sengaja dipalsukan.
 
 1. Buat project Supabase baru (region **Southeast Asia / Singapore**).
 2. SQL Editor → jalankan berurutan: `01_schema.sql`, `02_seed.sql`,
-   `03_auth_rls.sql`, `04_pesan.sql`, `05_host.sql`, `06_akses.sql`.
-   **Keenamnya wajib.**
+   `03_auth_rls.sql`, `04_pesan.sql`, `05_host.sql`, `06_akses.sql`,
+   `07_advisor.sql`, `08_jendela.sql`. **Kedelapannya wajib.**
    Aplikasi membaca lewat view yang dibuat di `03`–`05` dan menulis lewat
    fungsi di `04`; tanpa itu layarnya menjawab "relation does not exist".
    `05` juga membuat bucket Storage `ruang-foto` beserta policy-nya.
@@ -113,6 +113,11 @@ Daftar lengkap utang teknis ada di CLAUDE.md bagian "Utang yang diketahui".
   fungsi kalah balapan kalau dua host menekan "Terima" bersamaan.
 - **`lat_publik`/`lng_publik` tidak bisa ditulis klien.** Trigger menimpanya di
   setiap insert dan update, jadi host tidak bisa menerbitkan titik aslinya.
+- **Tiap migrasi yang menambah view atau mengubah hak akses diakhiri
+  `select periksa_permukaan_publik();`** — penjaga yang menggagalkan migrasi
+  kalau anon bisa membaca kolom rahasia atau punya hak ke tabel dasar. Perlu,
+  karena Supabase memberi `all on tables to anon` ke setiap tabel baru lewat
+  default privileges.
 - **Klien tidak punya hak tulis apa pun ke tabel bukti.** `manifes_item`,
   `pemesanan_transisi`, `akses_log`, `serah_terima`, dan `pemesanan` cuma
   SELECT untuk `authenticated`; semua penulisan lewat fungsi SECURITY DEFINER.

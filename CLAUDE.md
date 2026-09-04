@@ -151,13 +151,27 @@ Kerjakan berurutan. Jangan lompat.
    pembayaran. Penyewa mengajukan jadwal, host menjawab, kedatangan dicatat;
    kuota bulanan ditegakkan database.
 
+10. **Temuan Supabase Advisor — ditangani** (4 Sep 2026). Lihat
+    `07_advisor.sql`. Yang diperbaiki: `search_path` empat fungsi, policy yang
+    memanggil `auth.uid()`/`profil_saya()` per baris, dan `btree_gist` yang
+    mendarat di skema `public`. Yang sengaja tidak diperbaiki — "Security
+    Definer View" pada kelima view publik — alasannya ditulis di bagian 5
+    berkas itu.
+11. **Jendela akses jadi data terstruktur — selesai** (4 Sep 2026). Lihat
+    `08_jendela.sql`. Menutup utang no. 1: aturan produk nomor satu akhirnya
+    ditegakkan database, bukan cuma ditampilkan.
+
 ### Berikutnya, selama pembayaran belum ada
 
-Yang tersisa tanpa jalur pembayaran tinggal pekerjaan bentuk data, bukan fitur
-baru: jadikan `jendela_akses` data terstruktur (utang no. 1), dan pisahkan dua
-tanda tangan serah terima jadi baris sendiri (utang no. 3). Fitur sungguhan
-berikutnya — serah terima, pengakhiran lebih awal, kontrak PDF — semuanya
-menunggu `menunggu_pembayaran` bisa dilewati.
+Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris
+sendiri), dan itu pun lebih baik dikerjakan bersamaan dengan serah terimanya.
+Fitur sungguhan berikutnya — serah terima, pengakhiran lebih awal, kontrak
+PDF — semuanya menunggu `menunggu_pembayaran` bisa dilewati.
+
+Yang bisa dikerjakan tanpa menunggu apa pun dan belum dikerjakan: layar lupa
+sandi (utang no. 6), halaman profil untuk mengubah nama/kota/nomor, dan
+notifikasi in-app supaya host tahu ada permintaan masuk tanpa harus membuka
+`/pemesanan` sendiri.
 
 ## Yang masih menunggu pihak luar
 
@@ -200,6 +214,19 @@ diubah: versi pertama memakai `update of lat, lng` dan bisa dilewati dengan
 `update ruang set lat_publik = lat`, yang membatalkan seluruh aturan
 penyamaran alamat tanpa jejak.
 
+**Setiap migrasi yang menambah view atau mengubah hak akses WAJIB diakhiri
+`select periksa_permukaan_publik();`.** Fungsi itu menggagalkan migrasi kalau
+ada kolom rahasia yang bisa dibaca anon, atau anon punya hak ke tabel dasar mana
+pun. Ia bukan hiasan: saat `08_jendela.sql` ditulis, ia menangkap bahwa tabel
+`jendela_akses` yang baru langsung bisa **ditulis anon**, karena Supabase
+memasang `alter default privileges ... grant all on tables to anon`. Jadi tiap
+tabel baru butuh `revoke all ... from anon` eksplisit — jangan pernah
+mengandalkan "kan saya tidak memberi grant".
+
+**Jendela akses adalah data, bukan teks.** Tabel `jendela_akses` yang jadi
+sumber kebenaran; `ruang.jendela_akses` cuma label tampilan yang dihasilkan
+trigger dari baris-baris itu. Jangan pernah menulis label itu dari aplikasi.
+
 Policy yang saling menyebut wajib lewat helper `SECURITY DEFINER`
 (`saya_host_ruang`, `saya_penyewa_terbayar`, `saya_pihak_pemesanan`,
 `boleh_ulas`). Versi pertama menulisnya sebagai `exists (select ...)` biasa dan
@@ -208,20 +235,13 @@ satu pun kueri yang jalan.
 
 ## Utang yang diketahui
 
-1. **`jendela_akses` masih teks bebas**, jadi aturan "kunjungan hanya di dalam
-   jendela akses" tidak bisa ditegakkan database. `minta_akses` menegakkan
-   kuota bulanan, batas 90 hari, dan tanggal akhir sewa — tapi jamnya
-   diserahkan ke penilaian host, karena menguraikan "Sen-Sab 08.00-17.00"
-   dengan regex akan salah menolak permintaan yang sah, dan salah menolak lebih
-   buruk daripada tidak memeriksa. Perlu jadi data terstruktur: hari + jam
-   mulai + jam selesai.
-2. **Keterbukaan alamat tingkat 2 belum bisa ditegakkan.** Tingkat 1 (publik)
+1. **Keterbukaan alamat tingkat 2 belum bisa ditegakkan.** Tingkat 1 (publik)
    dan 3 (setelah dibayar) sudah jalan. Tingkat 2 — "penyewa yang jadwal
    surveinya disetujui host" — butuh tabel permintaan survei yang belum ada:
    `akses_log` menempel ke pemesanan yang sudah jadi, sedangkan survei terjadi
    sebelum pemesanan ada. Sampai tabel itu ada, alamat hanya terbuka di
    tingkat 3.
-3. **Dua tanda tangan serah terima masih satu baris.** Masalah keamanannya sudah
+2. **Dua tanda tangan serah terima masih satu baris.** Masalah keamanannya sudah
    ditutup — klien tidak punya UPDATE, dan penandatanganan lewat fungsi yang
    hanya bisa menyalakan tanda tangan pemanggil. Yang belum: bentuk datanya
    belum append-only sungguhan. Pisah jadi baris sendiri saat serah terima

@@ -53,7 +53,6 @@ export type IsiRuang = {
   pengawasan: string[];
   fasilitas: string[];
   kategori_diterima: string[];
-  jendela_akses: string;
   kuota_akses_bulanan: number;
   durasi_min_hari: number;
   harga_bulanan: number;
@@ -63,6 +62,11 @@ export type IsiRuang = {
 
 export type RuangSaya = IsiRuang & {
   id: string;
+  /**
+   * Label tampilan yang DIHASILKAN dari tabel `jendela_akses` oleh trigger.
+   * Jangan pernah dikirim balik saat menyimpan — ia akan ditimpa.
+   */
+  jendela_akses: string;
   luas_m2: number;
   volume_m3: number;
   lat_publik: number;

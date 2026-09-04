@@ -27,7 +27,8 @@ export default async function RuangBaru() {
       </h1>
       <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
         Simpan sebagai draf dulu kalau belum yakin — draf tidak terlihat siapa pun.
-        Fotonya bisa ditambahkan setelah ini.
+        Foto dan jendela aksesnya diatur setelah ruangnya tersimpan, karena keduanya
+        menempel ke ruang yang sudah punya id.
       </p>
 
       <div className="mt-6">

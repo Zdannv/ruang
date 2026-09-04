@@ -16,6 +16,7 @@ import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { getDetailPemesanan } from "@/lib/pemesanan";
 import { daftarKunjungan, sisaKuota, waktuJakarta } from "@/lib/akses";
+import { daftarJendelaPublik } from "@/lib/jendela";
 import {
   LABEL_KATEGORI,
   LABEL_STATUS,
@@ -62,9 +63,13 @@ export default async function HalamanDetailPemesanan({
   const hariIni = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(
     new Date()
   );
-  const [kunjungan, sisa] = bolehAkses
-    ? await Promise.all([daftarKunjungan(db, p.id), sisaKuota(db, p.id, hariIni)])
-    : [[], 0];
+  const [kunjungan, sisa, jendela] = bolehAkses
+    ? await Promise.all([
+        daftarKunjungan(db, p.id),
+        sisaKuota(db, p.id, hariIni),
+        daftarJendelaPublik(db, p.ruang_id),
+      ])
+    : [[], 0, []];
 
   // Dihitung di server: memanggil jam dari dalam komponen klien melanggar
   // aturan kemurnian React, dan hasilnya juga akan mengikuti zona peramban
@@ -201,6 +206,7 @@ export default async function HalamanDetailPemesanan({
               sayaHost={sayaHost}
               waktuAwal={waktuJakarta(besok)}
               waktuMin={waktuJakarta(sekarang)}
+              jendela={jendela}
             />
           )}
 

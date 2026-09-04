@@ -12,6 +12,12 @@ import {
   type Kunjungan,
 } from "@/lib/akses";
 import { LABEL_STATUS_AKSES, tanggalJam } from "@/lib/label";
+import {
+  HARI_URUT,
+  NAMA_HARI_PENDEK,
+  jam,
+  type JendelaPublik,
+} from "@/lib/jendela";
 
 const warna: Record<string, string> = {
   diminta: "bg-brand-soft text-brand-dark",
@@ -38,6 +44,7 @@ export default function JadwalKunjungan({
   sayaHost,
   waktuAwal,
   waktuMin,
+  jendela,
 }: {
   pemesananId: string;
   jendelaAkses: string;
@@ -49,6 +56,7 @@ export default function JadwalKunjungan({
   /** Isian awal dan batas bawah, keduanya waktu Jakarta, dihitung di server. */
   waktuAwal: string;
   waktuMin: string;
+  jendela: JendelaPublik[];
 }) {
   const router = useRouter();
   const [waktu, setWaktu] = useState(waktuAwal);
@@ -87,9 +95,29 @@ export default function JadwalKunjungan({
       </div>
       <p className="mt-1 text-xs leading-relaxed text-muted">
         Jendela akses yang ditetapkan host: <strong className="text-ink">{jendelaAkses}</strong>.
-        Setiap kunjungan tercatat di sini — itu yang menggantikan segel pada penitipan
-        biasa.
+        Permintaan di luar jadwal itu ditolak sistem, bukan diteruskan ke host. Setiap
+        kunjungan tercatat di sini — itu yang menggantikan segel pada penitipan biasa.
       </p>
+
+      {/* Jadwalnya dijabarkan per hari, bukan cuma sebagai label. Label
+          "Rab-Sab 07.00-19.00; Min 13.00-16.00" benar tapi harus dibaca dua kali;
+          daftar per hari langsung bisa dicocokkan dengan rencana orangnya. */}
+      {jendela.length > 0 && (
+        <ul className="mt-3 flex flex-wrap gap-1.5">
+          {HARI_URUT.filter((h) => jendela.some((j) => j.hari === h)).map((h) => (
+            <li
+              key={h}
+              className="angka rounded-full bg-paper px-2.5 py-1 text-[11px] font-medium text-ink"
+            >
+              {NAMA_HARI_PENDEK[h]}{" "}
+              {jendela
+                .filter((j) => j.hari === h)
+                .map((j) => `${jam(j.mulai)}–${jam(j.selesai)}`)
+                .join(", ")}
+            </li>
+          ))}
+        </ul>
+      )}
 
       {sayaPenyewa && (
         <form onSubmit={minta} className="mt-4 rounded-xl bg-paper p-3.5">
