@@ -11,9 +11,11 @@ import {
 } from "lucide-react";
 import LencanaStatus from "@/components/LencanaStatus";
 import AksiPemesanan from "../AksiPemesanan";
+import JadwalKunjungan from "./JadwalKunjungan";
 import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { getDetailPemesanan } from "@/lib/pemesanan";
+import { daftarKunjungan, sisaKuota, waktuJakarta } from "@/lib/akses";
 import {
   LABEL_KATEGORI,
   LABEL_STATUS,
@@ -50,6 +52,26 @@ export default async function HalamanDetailPemesanan({
   const sayaId = sesi.profil?.id ?? null;
   const sayaHost = sayaId === p.host_id;
   const sayaPenyewa = sayaId === p.penyewa_id;
+
+  // Kunjungan hanya relevan setelah barang ada di dalam ruangan. Daftar status
+  // ini harus sama dengan `status_boleh_akses()` di database — di sana yang
+  // ditegakkan, di sini yang menentukan bagiannya muncul atau tidak.
+  const bolehAkses = ["aktif", "menunggu_serah_terima_keluar", "tunggakan"].includes(
+    p.status
+  );
+  const hariIni = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jakarta" }).format(
+    new Date()
+  );
+  const [kunjungan, sisa] = bolehAkses
+    ? await Promise.all([daftarKunjungan(db, p.id), sisaKuota(db, p.id, hariIni)])
+    : [[], 0];
+
+  // Dihitung di server: memanggil jam dari dalam komponen klien melanggar
+  // aturan kemurnian React, dan hasilnya juga akan mengikuti zona peramban
+  // alih-alih WIB.
+  const sekarang = new Date();
+  const besok = new Date(sekarang.getTime() + 86_400_000);
+  besok.setUTCHours(3, 0, 0, 0); // 10.00 WIB
 
   const nilaiManifes = manifes.reduce((t, m) => t + m.taksiran_nilai, 0);
   const versiTerbaru = manifes.length > 0 ? Math.max(...manifes.map((m) => m.versi)) : 1;
@@ -167,6 +189,20 @@ export default async function HalamanDetailPemesanan({
               memberi ganti rugi — tidak ada asuransi barang.
             </p>
           </section>
+
+          {bolehAkses && (
+            <JadwalKunjungan
+              pemesananId={p.id}
+              jendelaAkses={p.jendela_akses}
+              sisaKuotaBulanIni={sisa}
+              kuotaBulanan={p.kuota_akses_bulanan}
+              kunjungan={kunjungan}
+              sayaPenyewa={sayaPenyewa}
+              sayaHost={sayaHost}
+              waktuAwal={waktuJakarta(besok)}
+              waktuMin={waktuJakarta(sekarang)}
+            />
+          )}
 
           <section className="rounded-2xl bg-card p-5 ring-1 ring-line">
             <h2 className="font-display text-lg font-bold tracking-tight">Alamat</h2>

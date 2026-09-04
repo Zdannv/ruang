@@ -42,6 +42,26 @@ Konsekuensi yang sudah diputuskan:
   dideklarasikan penyewa dan dicocokkan sistem dengan kebijakan host
   sebelum permintaan sampai ke host.
 
+## Kebijakan pembatalan — dikunci 4 September 2026
+
+| Keadaan | Boleh dibatalkan? | Uang | Status |
+|---|---|---|---|
+| Host belum menjawab | ya, bebas | belum ada yang berpindah | **berjalan** |
+| Diterima, belum dibayar | ya, bebas | belum ada yang berpindah | **berjalan** |
+| Sudah dibayar, belum serah terima | ya | sewa penuh + deposit penuh kembali | menunggu jalur pengembalian dana |
+| Sewa berjalan / menunggak | **tidak** | — | menunggu serah terima |
+
+Dua baris terakhir bukan lubang yang lupa ditutup. Yang sudah dibayar
+dikembalikan penuh karena barang belum masuk dan yang hilang dari host cuma
+waktu — sama seperti baris kedua. Sewa yang sudah berjalan tidak punya
+"pembatalan" sama sekali: yang ada **pengakhiran lebih awal**, dan itu wajib
+lewat serah terima keluar, karena barang harus keluar dulu dan keluarnya harus
+tercatat. Sisa bulan yang belum dijalani dikembalikan; bulan yang sedang
+berjalan tidak.
+
+`batalkan_pemesanan` menolak dua keadaan terakhir dengan pesan yang menyebut
+alasannya. Jangan menambahkan jalan pintas sebelum jalur pembayaran ada.
+
 ## Aturan teknis yang tidak boleh dilanggar
 
 - **Uang**: `bigint`, rupiah penuh. Tidak pernah float, tidak pernah numeric.
@@ -111,8 +131,11 @@ Kerjakan berurutan. Jangan lompat.
    tanpa uang sungguhan adalah kebohongan, bukan demo.
 5. **Serah terima — TERHALANG pembayaran.** Statusnya hanya bisa dicapai
    setelah `menunggu_pembayaran` bisa dilewati, dan itu menunggu payment
-   gateway. Yang bisa dikerjakan lebih dulu tanpa menunggu: memisahkan dua
-   tanda tangan jadi baris sendiri supaya UPDATE-nya bisa dicabut (utang no. 2).
+   gateway. Yang sudah bisa dikerjakan sudah dikerjakan: hak UPDATE klien atas
+   `serah_terima` dicabut, dan penandatanganannya lewat
+   `tandatangani_serah_terima()` yang hanya bisa menyalakan tanda tangan milik
+   pemanggil — host tidak bisa menandatangani atas nama penyewa. Sisanya, fungsi
+   pembuat berita acaranya, menunggu.
 6. **Dasbor host — selesai** (4 Sep 2026). Daftar ruang, tambah/ubah/hapus,
    unggah foto ke Supabase Storage. Lihat `05_host.sql`. Kotak masuk
    permintaannya tidak diduplikasi di sini — sudah ada di `/pemesanan`, yang
@@ -122,6 +145,19 @@ Kerjakan berurutan. Jangan lompat.
    `permintaan_di_wilayah_saya()`.
 8. **Landing page — selesai** (4 Sep 2026). `/` jadi halaman depan; pencarian
    pindah ke `/cari`.
+9. **Jadwal kunjungan — selesai** (4 Sep 2026). Lihat `06_akses.sql`. Ini
+   keputusan produk nomor satu ("akses bebas terjadwal") sekaligus pengganti
+   segel tamper-evident, dan satu-satunya alur inti yang tidak terhalang
+   pembayaran. Penyewa mengajukan jadwal, host menjawab, kedatangan dicatat;
+   kuota bulanan ditegakkan database.
+
+### Berikutnya, selama pembayaran belum ada
+
+Yang tersisa tanpa jalur pembayaran tinggal pekerjaan bentuk data, bukan fitur
+baru: jadikan `jendela_akses` data terstruktur (utang no. 1), dan pisahkan dua
+tanda tangan serah terima jadi baris sendiri (utang no. 3). Fitur sungguhan
+berikutnya — serah terima, pengakhiran lebih awal, kontrak PDF — semuanya
+menunggu `menunggu_pembayaran` bisa dilewati.
 
 ## Yang masih menunggu pihak luar
 
@@ -172,27 +208,31 @@ satu pun kueri yang jalan.
 
 ## Utang yang diketahui
 
-1. **Keterbukaan alamat tingkat 2 belum bisa ditegakkan.** Tingkat 1 (publik)
+1. **`jendela_akses` masih teks bebas**, jadi aturan "kunjungan hanya di dalam
+   jendela akses" tidak bisa ditegakkan database. `minta_akses` menegakkan
+   kuota bulanan, batas 90 hari, dan tanggal akhir sewa — tapi jamnya
+   diserahkan ke penilaian host, karena menguraikan "Sen-Sab 08.00-17.00"
+   dengan regex akan salah menolak permintaan yang sah, dan salah menolak lebih
+   buruk daripada tidak memeriksa. Perlu jadi data terstruktur: hari + jam
+   mulai + jam selesai.
+2. **Keterbukaan alamat tingkat 2 belum bisa ditegakkan.** Tingkat 1 (publik)
    dan 3 (setelah dibayar) sudah jalan. Tingkat 2 — "penyewa yang jadwal
    surveinya disetujui host" — butuh tabel permintaan survei yang belum ada:
    `akses_log` menempel ke pemesanan yang sudah jadi, sedangkan survei terjadi
    sebelum pemesanan ada. Sampai tabel itu ada, alamat hanya terbuka di
    tingkat 3.
-2. **`serah_terima` dan `akses_log` masih bisa di-UPDATE klien.** Keduanya
-   tabel bukti dan seharusnya append-only, tapi dua tanda tangan ditulis ke
-   satu baris dan status akses berpindah di tempat. Pisah jadi baris sendiri,
-   lalu cabut UPDATE-nya.
-3. **Pembatalan setelah pembayaran belum ada aturannya.**
-   `batalkan_pemesanan` sengaja menolak pemesanan yang sudah dibayar, karena
-   pengembalian uang tidak bisa diputuskan tanpa jalur pembayaran. Perlu
-   kebijakan produk, bukan cuma kode.
+3. **Dua tanda tangan serah terima masih satu baris.** Masalah keamanannya sudah
+   ditutup — klien tidak punya UPDATE, dan penandatanganan lewat fungsi yang
+   hanya bisa menyalakan tanda tangan pemanggil. Yang belum: bentuk datanya
+   belum append-only sungguhan. Pisah jadi baris sendiri saat serah terima
+   dibangun.
 4. **Properti dan ruang masih satu tabel.** Satu properti dengan tiga ruang sewa
    sekarang harus jadi tiga baris `ruang` dengan alamat yang diulang.
 5. **Foto isi seed masih `picsum.photos`.** Unggahan host sudah masuk Supabase
    Storage (bucket `ruang-foto`) dan EXIF-nya dibuang di peramban lewat canvas —
    penting, karena EXIF foto HP hampir selalu memuat GPS. Yang belum: kamera
-   in-app untuk foto serah terima, dan bucket terpisah untuk foto bukti (yang
-   tidak boleh publik).
+   in-app untuk foto serah terima, dan bucket terpisah untuk foto bukti, yang
+   tidak boleh publik.
 6. **Belum ada lupa sandi.** Supabase menyediakannya; layarnya belum dibuat.
 7. **Nomor HP belum diverifikasi.** Diisi saat daftar dan disimpan apa adanya;
    verifikasinya menunggu jalur WhatsApp/SMS.

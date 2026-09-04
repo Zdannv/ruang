@@ -158,6 +158,13 @@ export function banjirPerluPerhatian(nilai: RiwayatBanjir): boolean {
   return nilai === "dalam_5_tahun";
 }
 
+export const LABEL_STATUS_AKSES: Record<string, string> = {
+  diminta: "Menunggu jawaban host",
+  disetujui: "Disetujui",
+  ditolak: "Ditolak",
+  selesai: "Sudah datang",
+};
+
 export const LABEL_FREKUENSI: Record<string, string> = {
   jarang: "Jarang — beberapa bulan sekali",
   bulanan: "Bulanan",
