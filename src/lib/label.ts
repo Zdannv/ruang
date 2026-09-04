@@ -158,6 +158,13 @@ export function banjirPerluPerhatian(nilai: RiwayatBanjir): boolean {
   return nilai === "dalam_5_tahun";
 }
 
+export const LABEL_FREKUENSI: Record<string, string> = {
+  jarang: "Jarang — beberapa bulan sekali",
+  bulanan: "Bulanan",
+  mingguan: "Mingguan",
+  harian: "Hampir setiap hari",
+};
+
 export const LABEL_STATUS: Record<string, string> = {
   draf: "Draf",
   menunggu_konfirmasi: "Menunggu konfirmasi host",

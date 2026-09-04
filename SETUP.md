@@ -11,9 +11,10 @@ pihak luar, bukan karena sengaja dipalsukan.
 
 1. Buat project Supabase baru (region **Southeast Asia / Singapore**).
 2. SQL Editor → jalankan berurutan: `01_schema.sql`, `02_seed.sql`,
-   `03_auth_rls.sql`, `04_pesan.sql`. **Keempatnya wajib.** Aplikasi membaca
-   lewat view yang dibuat di `03`–`04` dan menulis lewat fungsi di `04`; tanpa
-   itu layarnya menjawab "relation does not exist".
+   `03_auth_rls.sql`, `04_pesan.sql`, `05_host.sql`. **Kelimanya wajib.**
+   Aplikasi membaca lewat view yang dibuat di `03`–`05` dan menulis lewat
+   fungsi di `04`; tanpa itu layarnya menjawab "relation does not exist".
+   `05` juga membuat bucket Storage `ruang-foto` beserta policy-nya.
 3. Isi Malang siap pakai: 6 host, 4 penyewa, 14 ruang, 84 foto,
    6 pemesanan di lima status berbeda, manifes, log akses, ulasan,
    dan 5 permintaan ruang.
@@ -109,3 +110,9 @@ Daftar lengkap utang teknis ada di CLAUDE.md bagian "Utang yang diketahui".
 - **Tumpang tindih tanggal mustahil di level database**, lewat constraint
   `exclude using gist` — bukan cuma diperiksa di fungsi, karena pemeriksaan di
   fungsi kalah balapan kalau dua host menekan "Terima" bersamaan.
+- **`lat_publik`/`lng_publik` tidak bisa ditulis klien.** Trigger menimpanya di
+  setiap insert dan update, jadi host tidak bisa menerbitkan titik aslinya.
+- **Foto host diunggah langsung ke Storage dari peramban**, setelah digambar
+  ulang lewat canvas — itu yang membuang EXIF berisi GPS. Berkasnya disimpan di
+  `<profil_id>/<ruang_id>/`, dan policy Storage mengikat folder pertama ke
+  pemiliknya.

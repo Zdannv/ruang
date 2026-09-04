@@ -17,14 +17,31 @@ export default async function Header() {
   return (
     <header className="sticky top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 rounded-2xl bg-card/95 px-4 py-3 shadow-sm ring-1 ring-line backdrop-blur">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-white">
-            <House className="h-4.5 w-4.5" />
-          </span>
-          <span className="font-display text-xl font-bold tracking-tight text-ink">
-            Ruang
-          </span>
-        </Link>
+        <div className="flex items-center gap-1 sm:gap-6">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-white">
+              <House className="h-4.5 w-4.5" />
+            </span>
+            <span className="font-display text-xl font-bold tracking-tight text-ink">
+              Ruang
+            </span>
+          </Link>
+
+          <nav className="hidden items-center gap-1 sm:flex">
+            <Link
+              href="/cari"
+              className="rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-paper hover:text-ink"
+            >
+              Cari ruang
+            </Link>
+            <Link
+              href="/host"
+              className="rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-paper hover:text-ink"
+            >
+              Sewakan ruang
+            </Link>
+          </nav>
+        </div>
 
         {sesi ? (
           <div className="flex items-center gap-2 sm:gap-3">

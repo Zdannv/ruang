@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { klienServer } from "@/lib/supabase/server";
 import { supabaseSiap } from "@/lib/supabase/env";
 
@@ -19,6 +20,12 @@ export type Sesi = {
 /**
  * Siapa yang sedang masuk, dilihat dari server.
  *
+ * Dibungkus `cache` karena satu request memanggilnya beberapa kali — layout
+ * untuk bilah navigasi, header untuk nama, dan halamannya sendiri untuk
+ * penjagaan. Tanpa itu, satu pemuatan halaman berarti tiga verifikasi token dan
+ * tiga kueri profil. Cakupannya per request, jadi sesi orang tidak pernah
+ * terbawa ke request berikutnya.
+ *
  * Memakai `getUser()`, bukan `getSession()`. `getSession()` membaca cookie apa
  * adanya tanpa memverifikasi tanda tangannya — cukup untuk menghias tampilan,
  * tapi tidak boleh dipakai memutuskan siapa yang berhak melihat apa.
@@ -27,7 +34,7 @@ export type Sesi = {
  * trigger `handle_new_user`, dan kalau trigger itu belum terpasang di database
  * yang dipakai, layar harus tetap jalan alih-alih rusak.
  */
-export async function sesiSaya(): Promise<Sesi | null> {
+export const sesiSaya = cache(async (): Promise<Sesi | null> => {
   if (!supabaseSiap) return null;
 
   const db = await klienServer();
@@ -45,4 +52,4 @@ export async function sesiSaya(): Promise<Sesi | null> {
     email: data.user.email ?? null,
     profil: (profil as ProfilSaya | null) ?? null,
   };
-}
+});

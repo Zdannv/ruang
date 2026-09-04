@@ -109,14 +109,19 @@ Kerjakan berurutan. Jangan lompat.
    Alurnya **berhenti di `menunggu_pembayaran`** dan tidak ada satu pun fungsi
    yang bisa menaikkannya dari sana. Itu disengaja: menulis "sudah dibayar"
    tanpa uang sungguhan adalah kebohongan, bukan demo.
-5. **Serah terima — berikutnya.** Checklist manifes, foto, dua tanda tangan,
-   status jadi aktif. Terhalang pembayaran: statusnya baru bisa dicapai setelah
-   `menunggu_pembayaran` bisa dilewati. Yang bisa dikerjakan lebih dulu:
-   memisahkan tanda tangan jadi baris sendiri (lihat utang nomor 2).
-6. Dasbor host — daftar ruang, tambah/ubah ruang, unggah foto. Kotak masuk
-   permintaannya sudah ada di `/pemesanan`.
-7. Permintaan ruang (waitlist) + "7 orang mencari ruang di kecamatan Anda"
-   (view `permintaan_kecamatan` sudah ada).
+5. **Serah terima — TERHALANG pembayaran.** Statusnya hanya bisa dicapai
+   setelah `menunggu_pembayaran` bisa dilewati, dan itu menunggu payment
+   gateway. Yang bisa dikerjakan lebih dulu tanpa menunggu: memisahkan dua
+   tanda tangan jadi baris sendiri supaya UPDATE-nya bisa dicabut (utang no. 2).
+6. **Dasbor host — selesai** (4 Sep 2026). Daftar ruang, tambah/ubah/hapus,
+   unggah foto ke Supabase Storage. Lihat `05_host.sql`. Kotak masuk
+   permintaannya tidak diduplikasi di sini — sudah ada di `/pemesanan`, yang
+   menampilkan dua sisi sekaligus.
+7. **Permintaan ruang — selesai** (4 Sep 2026). `/permintaan`: penyewa
+   menitipkan kriteria, host melihat hitungannya per kecamatan lewat
+   `permintaan_di_wilayah_saya()`.
+8. **Landing page — selesai** (4 Sep 2026). `/` jadi halaman depan; pencarian
+   pindah ke `/cari`.
 
 ## Yang masih menunggu pihak luar
 
@@ -151,6 +156,14 @@ Permukaan baca publik: `ruang_publik`, `ruang_foto_publik`, `ulasan_publik`,
 Anon **tidak punya hak select ke satu pun tabel dasar**. Kalau butuh data baru
 di layar publik, tambahkan kolomnya ke view — jangan memberi anon akses tabel.
 
+Dua kolom **tidak boleh ditulis klien sama sekali**: `lat_publik` dan
+`lng_publik`. Keduanya dihitung trigger `ruang_pin_publik` dari hash id
+ruangnya — tetap selamanya per ruang, 120-200 m dari titik asli. Triggernya
+menyala di **setiap** insert dan update, bukan hanya saat `lat`/`lng` ikut
+diubah: versi pertama memakai `update of lat, lng` dan bisa dilewati dengan
+`update ruang set lat_publik = lat`, yang membatalkan seluruh aturan
+penyamaran alamat tanpa jejak.
+
 Policy yang saling menyebut wajib lewat helper `SECURITY DEFINER`
 (`saya_host_ruang`, `saya_penyewa_terbayar`, `saya_pihak_pemesanan`,
 `boleh_ulas`). Versi pertama menulisnya sebagai `exists (select ...)` biasa dan
@@ -175,8 +188,11 @@ satu pun kueri yang jalan.
    kebijakan produk, bukan cuma kode.
 4. **Properti dan ruang masih satu tabel.** Satu properti dengan tiga ruang sewa
    sekarang harus jadi tiga baris `ruang` dengan alamat yang diulang.
-5. **Foto masih `picsum.photos`.** Unggah ke Supabase Storage lewat signed URL
-   belum ada, begitu juga pembuangan EXIF dan kamera in-app.
+5. **Foto isi seed masih `picsum.photos`.** Unggahan host sudah masuk Supabase
+   Storage (bucket `ruang-foto`) dan EXIF-nya dibuang di peramban lewat canvas —
+   penting, karena EXIF foto HP hampir selalu memuat GPS. Yang belum: kamera
+   in-app untuk foto serah terima, dan bucket terpisah untuk foto bukti (yang
+   tidak boleh publik).
 6. **Belum ada lupa sandi.** Supabase menyediakannya; layarnya belum dibuat.
 7. **Nomor HP belum diverifikasi.** Diisi saat daftar dan disimpan apa adanya;
    verifikasinya menunggu jalur WhatsApp/SMS.

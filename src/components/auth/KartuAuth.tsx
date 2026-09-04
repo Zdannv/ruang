@@ -21,7 +21,7 @@ export default function KartuAuth({
       </div>
       <p className="mt-4 text-center text-sm text-muted">{kaki}</p>
       <p className="mt-6 text-center text-xs text-muted">
-        <Link href="/" className="hover:text-ink">
+        <Link href="/cari" className="hover:text-ink">
           Kembali ke pencarian ruang
         </Link>
       </p>

@@ -104,7 +104,7 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
       <Link
-        href="/"
+        href="/cari"
         className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted transition-colors hover:text-ink"
       >
         <ArrowLeft className="h-4 w-4" />

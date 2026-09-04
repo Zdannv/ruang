@@ -147,8 +147,12 @@ export default function PencarianRuang() {
   // padahal tidak ada satu pun di sekitar situ cuma memancing hasil kosong.
   const tipeTersedia = useMemo(() => {
     const ada = new Set(semua.map((r) => r.tipe));
+    // Tipe yang sedang dipilih ikut ditampilkan meski tidak ada hasilnya di
+    // radius ini. Kalau tidak, filternya aktif tapi tombol untuk mematikannya
+    // hilang dari layar.
+    if (tipe) ada.add(tipe);
     return TIPE_URUT.filter((t) => ada.has(t));
-  }, [semua]);
+  }, [semua, tipe]);
 
   const bersihkan = () => router.replace(pathname, { scroll: false });
 

@@ -42,7 +42,7 @@ export default async function HalamanPemesanan() {
         {sebagaiPenyewa.length === 0 ? (
           <p className="mt-3 rounded-2xl bg-card p-5 text-sm text-muted ring-1 ring-line">
             Belum ada.{" "}
-            <Link href="/" className="font-semibold text-brand hover:text-brand-dark">
+            <Link href="/cari" className="font-semibold text-brand hover:text-brand-dark">
               Cari ruang
             </Link>{" "}
             dulu.
