@@ -27,8 +27,14 @@ export default async function Header() {
         </Link>
 
         {sesi ? (
-          <div className="flex items-center gap-3">
-            <span className="hidden max-w-40 truncate text-sm font-medium text-ink sm:block">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              href="/pemesanan"
+              className="rounded-full px-3.5 py-2 text-sm font-semibold text-ink transition-colors hover:bg-paper"
+            >
+              Pemesanan
+            </Link>
+            <span className="hidden max-w-32 truncate text-sm font-medium text-muted sm:block">
               {nama}
             </span>
             {/* Form POST, bukan tautan: lihat alasannya di app/keluar/route.ts */}

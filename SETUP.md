@@ -11,8 +11,9 @@ pihak luar, bukan karena sengaja dipalsukan.
 
 1. Buat project Supabase baru (region **Southeast Asia / Singapore**).
 2. SQL Editor → jalankan berurutan: `01_schema.sql`, `02_seed.sql`,
-   `03_auth_rls.sql`. **Ketiganya wajib.** Aplikasi membaca lewat view yang
-   dibuat di `03`; tanpa itu setiap layar menjawab "relation does not exist".
+   `03_auth_rls.sql`, `04_pesan.sql`. **Keempatnya wajib.** Aplikasi membaca
+   lewat view yang dibuat di `03`–`04` dan menulis lewat fungsi di `04`; tanpa
+   itu layarnya menjawab "relation does not exist".
 3. Isi Malang siap pakai: 6 host, 4 penyewa, 14 ruang, 84 foto,
    6 pemesanan di lima status berbeda, manifes, log akses, ulasan,
    dan 5 permintaan ruang.
@@ -99,6 +100,12 @@ Daftar lengkap utang teknis ada di CLAUDE.md bagian "Utang yang diketahui".
   sudah membayar bisa membaca alamat ruang yang ia sewa dan tidak bisa membaca
   yang lain, host tidak bisa menandai pemesanannya sendiri sudah dibayar, dan
   ulasan hanya bisa ditulis atas sewa yang sudah selesai.
-- **`pemesanan` belum punya jalur tulis dari klien** — itu disengaja, bukan
-  kelupaan. Perpindahan statusnya akan lewat fungsi SECURITY DEFINER di langkah
-  alur pesan.
+- **`pemesanan` tidak punya policy INSERT/UPDATE** — itu disengaja. Semua
+  perpindahan status lewat fungsi di `04_pesan.sql`, yang memeriksa pemanggil
+  dan transisinya. Diuji: host yang meng-UPDATE `pemesanan.status` langsung
+  ditolak `permission denied`.
+- **Tidak ada jalan ke status "sudah dibayar".** Alur pesan berhenti di
+  `menunggu_pembayaran`; tidak ada `bayar_pemesanan()` bahkan sebagai simulasi.
+- **Tumpang tindih tanggal mustahil di level database**, lewat constraint
+  `exclude using gist` — bukan cuma diperiksa di fungsi, karena pemeriksaan di
+  fungsi kalah balapan kalau dua host menekan "Terima" bersamaan.

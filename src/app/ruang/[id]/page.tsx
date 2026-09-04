@@ -388,19 +388,18 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
               </p>
             )}
 
-            {/* Tombol ini belum bisa berfungsi: alur pesan adalah langkah 4 dan
-                auth langkah 3 — pemesanan tidak bisa dimiliki siapa-siapa sebelum
-                ada identitas. Dibiarkan mati dan diberi keterangan, bukan
-                disambungkan ke alur bohongan. */}
-            <button
-              type="button"
-              disabled
-              className="mt-4 w-full cursor-not-allowed rounded-full bg-brand/40 px-5 py-3 text-sm font-semibold text-white"
+            {/* Halaman /pesan yang mengurus "belum masuk": ia mengalihkan ke
+                /masuk dengan `lanjut`, jadi orang kembali ke formulir ini setelah
+                login. Tombolnya tidak perlu tahu keadaan sesi, dan halaman ini
+                tetap bisa dirender tanpa membaca cookie. */}
+            <Link
+              href={`/ruang/${ruang.id}/pesan`}
+              className="mt-4 block w-full rounded-full bg-brand px-5 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
             >
               Ajukan sewa
-            </button>
+            </Link>
             <p className="mt-2 text-center text-xs text-muted">
-              Alur pemesanan belum dibangun — masuk akun dulu, menyusul.
+              Belum ada pembayaran di langkah ini. Host menerima atau menolak dulu.
             </p>
 
             <p className="mt-4 border-t border-line pt-4 text-xs leading-relaxed text-muted">

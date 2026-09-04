@@ -158,6 +158,49 @@ export function banjirPerluPerhatian(nilai: RiwayatBanjir): boolean {
   return nilai === "dalam_5_tahun";
 }
 
+export const LABEL_STATUS: Record<string, string> = {
+  draf: "Draf",
+  menunggu_konfirmasi: "Menunggu konfirmasi host",
+  menunggu_pembayaran: "Menunggu pembayaran",
+  menunggu_serah_terima: "Menunggu serah terima",
+  aktif: "Sewa berjalan",
+  menunggu_serah_terima_keluar: "Menunggu serah terima keluar",
+  selesai: "Selesai",
+  dibatalkan: "Dibatalkan",
+  tunggakan: "Tunggakan",
+  sengketa: "Sengketa",
+};
+
+/** Warna lencana status. Hanya yang perlu ditindaki yang diberi warna. */
+export function nadaStatus(status: string): "netral" | "proses" | "baik" | "waspada" {
+  if (status === "aktif") return "baik";
+  if (status === "tunggakan" || status === "sengketa") return "waspada";
+  if (status.startsWith("menunggu")) return "proses";
+  return "netral";
+}
+
+/** "11 Sep 2026" — lebih pendek dari `tanggal()`, untuk baris rapat. */
+export function tanggalPendek(iso: string): string {
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Jakarta",
+  }).format(new Date(iso));
+}
+
+/** "11 Sep 2026, 14.05" — untuk jejak transisi, yang butuh jamnya. */
+export function tanggalJam(iso: string): string {
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Jakarta",
+  }).format(new Date(iso));
+}
+
 /** "Rp450.000". Rupiah penuh, tanpa desimal — uang disimpan bigint. */
 export function rupiah(nilai: number): string {
   return new Intl.NumberFormat("id-ID", {

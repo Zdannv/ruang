@@ -96,14 +96,27 @@ Kerjakan berurutan. Jangan lompat.
 3. **Auth — selesai** (4 Sep 2026). Supabase Auth email + sandi dengan
    konfirmasi email, `profil` diikat ke `auth.users` lewat trigger, dan seluruh
    RLS permisif ditulis ulang. Lihat `03_auth_rls.sql`.
-4. **Alur pesan — berikutnya.** Tanggal, manifes, konfirmasi host. `pemesanan`
-   sengaja belum punya jalur tulis dari klien sama sekali (tidak ada policy
-   INSERT/UPDATE): perpindahan statusnya harus lewat fungsi SECURITY DEFINER
-   yang memvalidasi transisi, bukan lewat policy. Kalau klien boleh menulis
-   `status` langsung, siapa pun bisa menandai dirinya sudah membayar.
-5. Serah terima — checklist manifes, foto, dua tanda tangan, status jadi aktif.
-6. Dasbor host — daftar ruang, pemesanan masuk, terima/tolak.
-7. Permintaan ruang (waitlist) + "7 orang mencari ruang di kecamatan Anda".
+4. **Alur pesan — selesai** (4 Sep 2026). Tanggal, manifes, konfirmasi host,
+   penolakan, pembatalan. Lihat `04_pesan.sql`.
+
+   `pemesanan` tetap **tanpa policy INSERT/UPDATE**: setiap perpindahan status
+   lewat fungsi SECURITY DEFINER (`buat_pemesanan`, `konfirmasi_pemesanan`,
+   `tolak_pemesanan`, `batalkan_pemesanan`) yang memeriksa siapa pemanggilnya,
+   apakah status asalnya benar, dan apakah syarat isinya terpenuhi. Kalau
+   menambah status baru, tambahkan fungsinya — jangan pernah memberi klien
+   hak tulis ke kolom `status`.
+
+   Alurnya **berhenti di `menunggu_pembayaran`** dan tidak ada satu pun fungsi
+   yang bisa menaikkannya dari sana. Itu disengaja: menulis "sudah dibayar"
+   tanpa uang sungguhan adalah kebohongan, bukan demo.
+5. **Serah terima — berikutnya.** Checklist manifes, foto, dua tanda tangan,
+   status jadi aktif. Terhalang pembayaran: statusnya baru bisa dicapai setelah
+   `menunggu_pembayaran` bisa dilewati. Yang bisa dikerjakan lebih dulu:
+   memisahkan tanda tangan jadi baris sendiri (lihat utang nomor 2).
+6. Dasbor host — daftar ruang, tambah/ubah ruang, unggah foto. Kotak masuk
+   permintaannya sudah ada di `/pemesanan`.
+7. Permintaan ruang (waitlist) + "7 orang mencari ruang di kecamatan Anda"
+   (view `permintaan_kecamatan` sudah ada).
 
 ## Yang masih menunggu pihak luar
 
@@ -156,12 +169,16 @@ satu pun kueri yang jalan.
    tabel bukti dan seharusnya append-only, tapi dua tanda tangan ditulis ke
    satu baris dan status akses berpindah di tempat. Pisah jadi baris sendiri,
    lalu cabut UPDATE-nya.
-3. **Properti dan ruang masih satu tabel.** Satu properti dengan tiga ruang sewa
+3. **Pembatalan setelah pembayaran belum ada aturannya.**
+   `batalkan_pemesanan` sengaja menolak pemesanan yang sudah dibayar, karena
+   pengembalian uang tidak bisa diputuskan tanpa jalur pembayaran. Perlu
+   kebijakan produk, bukan cuma kode.
+4. **Properti dan ruang masih satu tabel.** Satu properti dengan tiga ruang sewa
    sekarang harus jadi tiga baris `ruang` dengan alamat yang diulang.
-4. **Foto masih `picsum.photos`.** Unggah ke Supabase Storage lewat signed URL
+5. **Foto masih `picsum.photos`.** Unggah ke Supabase Storage lewat signed URL
    belum ada, begitu juga pembuangan EXIF dan kamera in-app.
-5. **Belum ada lupa sandi.** Supabase menyediakannya; layarnya belum dibuat.
-6. **Nomor HP belum diverifikasi.** Diisi saat daftar dan disimpan apa adanya;
+6. **Belum ada lupa sandi.** Supabase menyediakannya; layarnya belum dibuat.
+7. **Nomor HP belum diverifikasi.** Diisi saat daftar dan disimpan apa adanya;
    verifikasinya menunggu jalur WhatsApp/SMS.
 
 ## Stack
