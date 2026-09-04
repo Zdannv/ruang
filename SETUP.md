@@ -28,6 +28,45 @@ pihak luar, bukan karena sengaja dipalsukan.
    memakai Site URL — tautan konfirmasinya jadi mendarat di tempat yang salah.
 7. `npm install && npm run dev`.
 
+## Kalau tautan konfirmasi email berakhir ERR_CONNECTION_REFUSED
+
+Ini kegagalan yang paling sering terjadi saat pengembangan, dan urutan
+kejadiannya penting untuk dipahami sebelum menebak penyebabnya.
+
+Tautan di email TIDAK langsung menunjuk ke aplikasi. Ia menunjuk ke
+`https://<ref>.supabase.co/auth/v1/verify?...&redirect_to=<alamat aplikasi>`.
+Jadi saat diklik:
+
+1. Supabase memverifikasi tokennya di servernya sendiri — **akun sudah aktif
+   di titik ini**, dan tokennya sudah terpakai.
+2. Baru kemudian peramban dialihkan ke aplikasi.
+
+Kalau dev server mati, yang gagal cuma langkah 2. **Akunnya sudah terkonfirmasi.**
+Jangan minta email baru — coba masuk saja di `/masuk`. Kalau pesannya bukan
+"Emailnya belum dikonfirmasi", berarti memang sudah beres.
+
+Supaya tidak terulang:
+
+- Isi `NEXT_PUBLIC_SITE_URL` di `.env.local`. Tanpa itu nilainya diambil dari
+  alamat yang sedang dibuka, dan alamat itu **dibekukan ke dalam email** pada
+  detik tombol daftar ditekan.
+- Daftarkan alamat yang sama di Supabase Dashboard → Authentication → URL
+  Configuration → **Redirect URLs**. Kalau tidak terdaftar, Supabase
+  mengabaikannya dan diam-diam memakai Site URL.
+- Biarkan `npm run dev` jalan saat mengklik tautannya, dan buka emailnya di
+  komputer yang sama. `localhost` di HP berarti HP itu sendiri.
+- Selama masih di tahap pengembangan, mematikan *Confirm email* di Supabase
+  Dashboard → Authentication → Sign In / Providers menghilangkan langkah ini
+  sepenuhnya. Nyalakan lagi sebelum ada pengguna sungguhan.
+- Begitu sudah deploy ke Vercel, isi `NEXT_PUBLIC_SITE_URL` dengan domain
+  Vercel-nya. Itu yang menyelesaikan masalah ini secara permanen, termasuk
+  untuk email yang dibuka di HP.
+
+Halaman `/auth/konfirmasi` menangani ketiga bentuk balasan Supabase
+(`token_hash`, `code` PKCE, dan token di fragment URL) dan menyebutkan
+alasannya kalau gagal — termasuk memberi tahu bahwa tautan yang sudah terpakai
+memang akan gagal, dan menyarankan mencoba masuk lebih dulu.
+
 ## Masuk sebagai host isi seed
 
 14 ruang di seed dimiliki profil yang belum punya akun. Untuk mengelolanya,

@@ -13,6 +13,10 @@ const SANDI_MIN = 8;
 
 export default function FormDaftar() {
   const router = useRouter();
+  const tujuanKonfirmasi = siteUrl("/auth/konfirmasi");
+  const tautanLokal = /^https?:\/\/(localhost|127\.0\.0\.1|\[?::1\]?)(:|\/|$)/.test(
+    tujuanKonfirmasi
+  );
   const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
   const [kota, setKota] = useState("Malang");
@@ -94,6 +98,20 @@ export default function FormDaftar() {
             Tautannya berlaku sekali pakai dan ada batas waktunya. Kalau emailnya tidak
             sampai dalam beberapa menit, periksa folder spam dulu.
           </p>
+
+          {/* Peringatan ini muncul HANYA saat tautannya menunjuk ke komputer ini.
+              Di production alamatnya domain sungguhan, dan menampilkan peringatan
+              yang sama di sana justru membingungkan. */}
+          {tautanLokal && (
+            <p className="rounded-xl bg-warn-soft px-3.5 py-2.5 text-left text-xs leading-relaxed text-warn">
+              Tautan konfirmasinya menunjuk ke{" "}
+              <code className="font-mono">{tujuanKonfirmasi}</code> — komputer ini. Buka
+              emailnya di komputer yang sama, dan pastikan{" "}
+              <code className="font-mono">npm run dev</code> masih jalan saat kamu
+              mengkliknya. Kalau servernya mati, peramban akan menjawab
+              ERR_CONNECTION_REFUSED meski akunnya sudah terkonfirmasi.
+            </p>
+          )}
           <button
             type="button"
             onClick={ulangi}
