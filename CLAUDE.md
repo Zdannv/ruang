@@ -12,8 +12,11 @@ Catatan penamaan: nama aplikasi `Ruang` dan tabel `ruang` sama. Di kode aplikasi
 pakai istilah yang lebih spesifik untuk tipe dan rute — `Listing` / `/ruang/[id]`
 — supaya tidak tertukar dengan nama produk.
 
-**Tahap saat ini: prototipe untuk dipresentasikan ke calon partner.**
-Bukan produk transaksi. Jangan bangun pembayaran asli, e-KYC, atau escrow.
+**Tahap saat ini: pengembangan produk sungguhan.** Diputuskan 4 September 2026,
+menggantikan tahap "prototipe untuk dipresentasikan ke calon partner". Fitur
+dibangun untuk dipakai orang: auth sungguhan, RLS per pemilik, alur yang
+benar-benar mengubah status. Kalau sesuatu belum bisa dibangun, biarkan kosong
+dan catat di "Utang yang diketahui" — jangan dipalsukan supaya terlihat jalan.
 
 ---
 
@@ -83,35 +86,61 @@ Di produk sebenarnya terpisah (satu properti, banyak ruang sewa).
 
 ## Urutan bangun
 
-1. Halaman pencarian — titik + radius + filter, kartu hasil. **Kerjakan pertama**,
-   ini layar yang paling menjual ide.
-2. Detail ruang — foto, rubrik kondisi lengkap, ulasan. Jangan ringkas
-   rubriknya; kelengkapan itu yang membedakan dari OLX.
-3. Alur pesan — tanggal, manifes, konfirmasi, tombol "Bayar (simulasi)".
-4. Serah terima — checklist manifes, foto, dua tanda tangan, status jadi aktif.
-   Ini momen paling meyakinkan saat presentasi.
-5. Dasbor host.
-6. Permintaan ruang (waitlist) + "7 orang mencari ruang di kecamatan Anda".
+Kerjakan berurutan. Jangan lompat.
 
-Kalau waktu mepet: nomor 1 dan 4 saja sudah cukup untuk presentasi.
+1. **Halaman pencarian — selesai** (4 Sep 2026). Titik + radius + tipe + ukuran
+   + harga; seluruh keadaan filter ada di URL.
+2. **Detail ruang — selesai** (4 Sep 2026). Foto berketerangan, rubrik kondisi
+   lengkap, kebijakan, host, ulasan. Rubriknya jangan pernah diringkas;
+   kelengkapan itu yang membedakan dari OLX.
+3. **Auth — berikutnya.** Supabase Auth, `profil` diikat ke `auth.users`, RLS
+   permisif ditulis ulang jadi per pemilik. Harus mendahului nomor 4: pemesanan
+   tidak bisa dimiliki siapa-siapa selama tidak ada identitas.
+4. Alur pesan — tanggal, manifes, konfirmasi host.
+5. Serah terima — checklist manifes, foto, dua tanda tangan, status jadi aktif.
+6. Dasbor host — daftar ruang, pemesanan masuk, terima/tolak.
+7. Permintaan ruang (waitlist) + "7 orang mencari ruang di kecamatan Anda".
 
-## Yang sengaja palsu di demo
+## Yang masih menunggu pihak luar
 
-| Bagian | Demo | Produk nanti |
+Bukan keputusan produk: hal-hal ini butuh akun atau lisensi yang belum kita
+punya. Jangan menirunya dengan tempelan yang terlihat berfungsi — layar yang
+mengaku "sudah dibayar" tanpa uang sungguhan adalah kebohongan, bukan demo.
+
+| Bagian | Kenapa belum | Yang boleh dikerjakan sekarang |
 |---|---|---|
-| Login | **Switcher peran di pojok layar** | OTP WhatsApp |
-| Pembayaran | Tombol simulasi | Payment gateway berlisensi |
-| Verifikasi | Lencana statis | Vendor e-KYC |
-| Notifikasi | Toast | WhatsApp Business API |
-| Kontrak | PDF contoh | Dibuat dari data pemesanan |
+| Pembayaran | payment gateway berlisensi + akun bisnis | model pemesanan & transisi status |
+| Verifikasi identitas | vendor e-KYC | kolom rujukan id vendor; jangan simpan foto KTP sendiri |
+| Notifikasi WhatsApp | WhatsApp Business API provider | notifikasi in-app, email lewat Supabase |
+| Kontrak PDF | menunggu alur pesan | dibuat dari data pemesanan, bukan berkas contoh |
 
-Switcher peran, bukan auth asli — saat presentasi harus bisa lompat antara
-sisi host dan penyewa dalam sedetik.
+**Login tidak lagi masuk daftar ini.** Switcher peran dibuang; yang dipakai
+auth Supabase sungguhan (lihat nomor 3 di urutan bangun).
+
+## Utang yang diketahui
+
+1. **RLS masih permisif** (`01_schema.sql` bagian akhir: semua boleh baca, semua
+   boleh tulis). Ini yang paling mendesak, dibereskan bersama auth.
+2. **Keterbukaan alamat belum ditegakkan di database.** `ruang.alamat`,
+   `patokan`, `lat`, dan `lng` ikut terbaca siapa pun yang menembak REST API
+   langsung; yang menahannya sekarang cuma pilihan kolom di kode frontend.
+   Perbaikan yang benar: view `ruang_publik` tanpa kolom itu, `ruang_terdekat()`
+   jadi `security definer`, lalu cabut select tabel `ruang` dari anon.
+3. **Properti dan ruang masih satu tabel.** Satu properti dengan tiga ruang sewa
+   sekarang harus jadi tiga baris `ruang` dengan alamat yang diulang.
+4. **`profil` belum terikat `auth.users`** — dikerjakan di langkah auth.
+5. **Foto masih `picsum.photos`.** Unggah ke Supabase Storage lewat signed URL
+   belum ada, begitu juga pembuangan EXIF dan kamera in-app.
 
 ## Stack
 
-Next.js (App Router) di Vercel · Supabase (Postgres + Storage) region Singapura ·
-Railway untuk worker & penjadwal (belum dibutuhkan di tahap demo).
+Next.js (App Router) di Vercel · Supabase (Postgres + Storage) region Singapura.
+
+**Vercel saja — tidak ada Railway.** Diputuskan 4 September 2026: satu-satunya
+backend adalah API Supabase, jadi tidak ada worker atau penjadwal yang butuh
+proses hidup terus. Kalau nanti perlu kerja terjadwal (mis. mengingatkan jadwal
+akses sehari sebelumnya), pakai Vercel Cron + Route Handler, atau `pg_cron` di
+Supabase — jangan menambah platform ketiga sebelum jelas keduanya tidak cukup.
 
 Unggah foto lewat signed URL langsung ke Supabase Storage, jangan lewat
 API route — mahal di bandwidth dan kena batas waktu fungsi.

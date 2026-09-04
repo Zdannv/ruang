@@ -1,7 +1,11 @@
-# Ruang — starter demo
+# Ruang — cara memasang
 
-Fondasi untuk prototipe yang bisa ditunjukkan ke calon partner.
-Bukan produk transaksi. Tidak ada pembayaran, e-KYC, atau escrow di sini.
+Panduan menyiapkan lingkungan pengembangan.
+
+Sejak 4 September 2026 repo ini bukan lagi prototipe presentasi, melainkan
+pengembangan produk sungguhan — lihat "Tahap saat ini" di CLAUDE.md. Pembayaran,
+e-KYC, dan notifikasi WhatsApp masih belum ada karena menunggu lisensi dan akun
+pihak luar, bukan karena sengaja dipalsukan.
 
 ## Cara pasang
 
@@ -31,33 +35,21 @@ dimuat, titik aslinya bisa ditebak dari beberapa kali reload.
 
 ## Urutan bangun
 
-Kerjakan berurutan. Jangan lompat.
+Urutan dan statusnya dipelihara di CLAUDE.md supaya tidak ada dua daftar yang
+saling bertentangan. Ringkasnya: pencarian dan detail ruang **selesai**,
+berikutnya **auth**, lalu alur pesan, serah terima, dasbor host, dan
+permintaan ruang.
 
-1. **Halaman pencarian** — input titik + radius, panggil `ruang_terdekat`,
-   tampilkan kartu. Ini layar yang paling menjual ide, kerjakan pertama.
-2. **Detail ruang** — foto, rubrik kondisi lengkap, ulasan. Rubriknya jangan
-   diringkas; justru kelengkapan itu yang membedakan dari OLX.
-3. **Alur pesan** — pilih tanggal, isi manifes, konfirmasi. Pembayaran cukup
-   tombol "Bayar (simulasi)" yang langsung mengubah status.
-4. **Serah terima** — checklist manifes, ambil foto, dua tanda tangan,
-   status jadi `aktif`. Ini momen "oh, gitu" saat presentasi.
-5. **Dasbor host** — daftar ruang, pemesanan masuk, tombol terima/tolak.
-6. **Permintaan ruang** — form waitlist + tampilan "7 orang mencari ruang di
-   kecamatan Anda". Cepat dibuat, dan langsung menjelaskan strategi suplai.
+## Yang belum ada
 
-## Yang sengaja palsu
-
-| Bagian | Di demo | Di produk |
+| Bagian | Kenapa | Rencana |
 |---|---|---|
-| Login | Switcher peran di pojok layar | OTP WhatsApp |
-| Pembayaran | Tombol simulasi | Payment gateway berlisensi |
-| Verifikasi identitas | Lencana statis | Vendor e-KYC |
-| Notifikasi | Toast di layar | WhatsApp Business API |
-| Kontrak | PDF contoh | Dibuat dari data pemesanan |
+| Pembayaran | butuh payment gateway berlisensi + akun bisnis | model pemesanan dulu; status "sudah dibayar" tidak pernah ditulis tanpa uang sungguhan |
+| Verifikasi identitas | butuh vendor e-KYC | simpan id rujukan vendor, bukan foto KTP |
+| Notifikasi WhatsApp | butuh WhatsApp Business API provider | in-app + email Supabase lebih dulu |
 
-**Switcher peran, bukan auth.** Waktu presentasi Anda perlu lompat antara
-sisi host dan sisi penyewa dalam sedetik. Auth asli menghabiskan dua sampai
-tiga hari dan tidak menjelaskan apa pun ke calon partner.
+Login **bukan** lagi switcher peran: yang dipakai auth Supabase sungguhan.
+Daftar lengkap utang teknis ada di CLAUDE.md bagian "Utang yang diketahui".
 
 ## Catatan
 
@@ -68,4 +60,6 @@ tiga hari dan tidak menjelaskan apa pun ke calon partner.
   tabel ini dan tabel bukti lainnya di-`REVOKE` update/delete-nya.
 - Foto pakai `picsum.photos`. Tambahkan ke `images.remotePatterns` di
   `next.config.js`, atau pakai `<img>` biasa untuk demo.
-- RLS aktif tapi permisif — demo saja. Pemisahan publik/privat menyusul.
+- **RLS aktif tapi masih permisif** (semua boleh baca dan tulis). Ini utang
+  paling mendesak dan dibereskan bersama auth — jangan menaruh data sungguhan
+  di database ini sebelum itu selesai.

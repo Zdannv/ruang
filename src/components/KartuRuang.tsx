@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { IKON_TIPE } from "@/components/IkonTipe";
 import type { RuangDenganFoto } from "@/lib/ruang";
@@ -30,10 +31,10 @@ export default function KartuRuang({ ruang }: { ruang: RuangDenganFoto }) {
   const banjirWaspada = banjirPerluPerhatian(ruang.riwayat_banjir);
 
   return (
-    /* TODO(langkah 2): bungkus dengan <Link href={`/ruang/${ruang.id}`}>
-       begitu halaman detail ada. Sekarang belum, supaya tidak ada tautan
-       yang mendarat di 404 saat demo. */
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-line transition-shadow hover:shadow-lg hover:shadow-ink/5">
+    <Link
+      href={`/ruang/${ruang.id}`}
+      className="group flex h-full flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-line transition-shadow hover:shadow-lg hover:shadow-ink/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+    >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-line">
         {ruang.foto ? (
           <Image
@@ -91,6 +92,6 @@ export default function KartuRuang({ ruang }: { ruang: RuangDenganFoto }) {
           </li>
         </ul>
       </div>
-    </article>
+    </Link>
   );
 }
