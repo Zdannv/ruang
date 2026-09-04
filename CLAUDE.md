@@ -93,10 +93,14 @@ Kerjakan berurutan. Jangan lompat.
 2. **Detail ruang — selesai** (4 Sep 2026). Foto berketerangan, rubrik kondisi
    lengkap, kebijakan, host, ulasan. Rubriknya jangan pernah diringkas;
    kelengkapan itu yang membedakan dari OLX.
-3. **Auth — berikutnya.** Supabase Auth, `profil` diikat ke `auth.users`, RLS
-   permisif ditulis ulang jadi per pemilik. Harus mendahului nomor 4: pemesanan
-   tidak bisa dimiliki siapa-siapa selama tidak ada identitas.
-4. Alur pesan — tanggal, manifes, konfirmasi host.
+3. **Auth — selesai** (4 Sep 2026). Supabase Auth email + sandi dengan
+   konfirmasi email, `profil` diikat ke `auth.users` lewat trigger, dan seluruh
+   RLS permisif ditulis ulang. Lihat `03_auth_rls.sql`.
+4. **Alur pesan — berikutnya.** Tanggal, manifes, konfirmasi host. `pemesanan`
+   sengaja belum punya jalur tulis dari klien sama sekali (tidak ada policy
+   INSERT/UPDATE): perpindahan statusnya harus lewat fungsi SECURITY DEFINER
+   yang memvalidasi transisi, bukan lewat policy. Kalau klien boleh menulis
+   `status` langsung, siapa pun bisa menandai dirinya sudah membayar.
 5. Serah terima — checklist manifes, foto, dua tanda tangan, status jadi aktif.
 6. Dasbor host — daftar ruang, pemesanan masuk, terima/tolak.
 7. Permintaan ruang (waitlist) + "7 orang mencari ruang di kecamatan Anda".
@@ -117,20 +121,48 @@ mengaku "sudah dibayar" tanpa uang sungguhan adalah kebohongan, bukan demo.
 **Login tidak lagi masuk daftar ini.** Switcher peran dibuang; yang dipakai
 auth Supabase sungguhan (lihat nomor 3 di urutan bangun).
 
+## Bentuk keamanannya sekarang
+
+Seluruh bacaan publik lewat **view**, bukan lewat policy di tabel — dan ini
+keputusan, bukan kebetulan. Dua alasannya:
+
+1. Yang perlu disembunyikan dari publik adalah **kolom** (`alamat`, `patokan`,
+   `lat`, `lng`), dan RLS tidak menyaring kolom. View yang tidak memuat kolom
+   itu menegakkannya.
+2. Policy yang menyebut tabel lain ikut terkena RLS tabel itu. Policy "foto
+   boleh dibaca kalau ruangnya tayang" selalu kosong untuk anon, karena anon
+   tidak boleh membaca `ruang`.
+
+Permukaan baca publik: `ruang_publik`, `ruang_foto_publik`, `ulasan_publik`,
+`ruang_ketersediaan`, `permintaan_kecamatan`, dan fungsi `ruang_terdekat()`.
+Anon **tidak punya hak select ke satu pun tabel dasar**. Kalau butuh data baru
+di layar publik, tambahkan kolomnya ke view — jangan memberi anon akses tabel.
+
+Policy yang saling menyebut wajib lewat helper `SECURITY DEFINER`
+(`saya_host_ruang`, `saya_penyewa_terbayar`, `saya_pihak_pemesanan`,
+`boleh_ulas`). Versi pertama menulisnya sebagai `exists (select ...)` biasa dan
+Postgres menolak dengan "infinite recursion detected in policy" — tidak ada
+satu pun kueri yang jalan.
+
 ## Utang yang diketahui
 
-1. **RLS masih permisif** (`01_schema.sql` bagian akhir: semua boleh baca, semua
-   boleh tulis). Ini yang paling mendesak, dibereskan bersama auth.
-2. **Keterbukaan alamat belum ditegakkan di database.** `ruang.alamat`,
-   `patokan`, `lat`, dan `lng` ikut terbaca siapa pun yang menembak REST API
-   langsung; yang menahannya sekarang cuma pilihan kolom di kode frontend.
-   Perbaikan yang benar: view `ruang_publik` tanpa kolom itu, `ruang_terdekat()`
-   jadi `security definer`, lalu cabut select tabel `ruang` dari anon.
+1. **Keterbukaan alamat tingkat 2 belum bisa ditegakkan.** Tingkat 1 (publik)
+   dan 3 (setelah dibayar) sudah jalan. Tingkat 2 — "penyewa yang jadwal
+   surveinya disetujui host" — butuh tabel permintaan survei yang belum ada:
+   `akses_log` menempel ke pemesanan yang sudah jadi, sedangkan survei terjadi
+   sebelum pemesanan ada. Sampai tabel itu ada, alamat hanya terbuka di
+   tingkat 3.
+2. **`serah_terima` dan `akses_log` masih bisa di-UPDATE klien.** Keduanya
+   tabel bukti dan seharusnya append-only, tapi dua tanda tangan ditulis ke
+   satu baris dan status akses berpindah di tempat. Pisah jadi baris sendiri,
+   lalu cabut UPDATE-nya.
 3. **Properti dan ruang masih satu tabel.** Satu properti dengan tiga ruang sewa
    sekarang harus jadi tiga baris `ruang` dengan alamat yang diulang.
-4. **`profil` belum terikat `auth.users`** — dikerjakan di langkah auth.
-5. **Foto masih `picsum.photos`.** Unggah ke Supabase Storage lewat signed URL
+4. **Foto masih `picsum.photos`.** Unggah ke Supabase Storage lewat signed URL
    belum ada, begitu juga pembuangan EXIF dan kamera in-app.
+5. **Belum ada lupa sandi.** Supabase menyediakannya; layarnya belum dibuat.
+6. **Nomor HP belum diverifikasi.** Diisi saat daftar dan disimpan apa adanya;
+   verifikasinya menunggu jalur WhatsApp/SMS.
 
 ## Stack
 

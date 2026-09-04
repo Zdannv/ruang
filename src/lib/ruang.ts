@@ -1,11 +1,20 @@
 /**
- * Lapisan data untuk pencarian ruang.
+ * Lapisan data untuk ruang.
  *
- * Semua tabel demo berstatus public-read lewat RLS, jadi pencarian jalan
- * dengan anon key tanpa login — sesuai keputusan "switcher peran, bukan auth".
+ * Semua bacaan publik lewat view (`ruang_publik`, `ruang_foto_publik`,
+ * `ulasan_publik`, `ruang_ketersediaan`) dan satu fungsi (`ruang_terdekat`),
+ * bukan langsung ke tabel. Itu yang menegakkan keterbukaan alamat tiga
+ * tingkat: `alamat`, `patokan`, `lat`, dan `lng` tidak ada di view mana pun,
+ * dan anon tidak punya hak select ke tabel `ruang` sama sekali. Jadi bukan
+ * kode ini yang menahannya — kode ini bahkan tidak bisa mengambilnya.
+ *
+ * Setiap fungsi menerima klien secara eksplisit: `klienBrowser()` dari
+ * komponen klien, `await klienServer()` dari Server Component. Sengaja tanpa
+ * nilai bawaan — klien browser yang terpakai di server akan gagal dengan
+ * pesan yang membingungkan.
  */
 
-import { klien } from "@/lib/supabase";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type TipeRuang =
   | "kamar"
@@ -27,13 +36,17 @@ export type Berbagi = "eksklusif" | "dengan_penyewa_lain" | "dengan_barang_host"
 export type Kelembapan = "kering_ventilasi" | "kering_tanpa_ventilasi" | "cenderung_lembap";
 export type Kepemilikan = "milik_sendiri" | "menyewa";
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Pencarian
+// ─────────────────────────────────────────────────────────────────────────────
+
 /**
  * Satu baris hasil `ruang_terdekat()`.
  *
- * Perhatikan yang TIDAK ada di sini: `alamat`, `patokan`, `lat`, `lng`. Fungsi
- * di database memang tidak mengembalikannya — keterbukaan alamat tingkat 2
- * baru terbuka setelah jadwal survei disetujui host, dan aturan itu ditegakkan
- * di sisi database, bukan dengan berjanji tidak merendernya di sini.
+ * `jarak_km` dihitung dari koordinat asli di dalam fungsi (yang berjalan
+ * SECURITY DEFINER), sedangkan yang dikembalikan cuma titik publik yang sudah
+ * digeser ±200 m. Penyamaran lokasi tidak mengurangi kualitas pencarian
+ * terdekat, tapi juga tidak bisa dibalik dari hasilnya.
  */
 export type HasilRuang = {
   id: string;
@@ -41,7 +54,6 @@ export type HasilRuang = {
   tipe: TipeRuang;
   kecamatan: string;
   kota: string;
-  /** Titik yang digeser tetap ±200 m — ini yang boleh dipetakan. */
   lat_publik: number;
   lng_publik: number;
   volume_m3: number;
@@ -49,10 +61,6 @@ export type HasilRuang = {
   akses_masuk: AksesMasuk;
   riwayat_banjir: RiwayatBanjir;
   penguncian: Penguncian;
-  /**
-   * Dihitung dari koordinat asli, bukan dari titik publik. Penyamaran lokasi
-   * tidak boleh mengurangi kualitas pencarian terdekat.
-   */
   jarak_km: number;
 };
 
@@ -74,14 +82,14 @@ export type RuangDenganFoto = HasilRuang & { foto: string | null };
 /**
  * Cari ruang terdekat, lalu lengkapi dengan satu foto per ruang.
  *
- * `ruang_terdekat()` sengaja tidak ikut mengembalikan foto — ia mengembalikan
- * satu baris per ruang, sedangkan foto ada banyak per ruang. Menggabungkannya
- * di SQL berarti mengulang tiap baris hasil sebanyak jumlah fotonya. Jadi
- * fotonya diambil di kueri kedua, sekali untuk seluruh halaman hasil.
+ * Fotonya diambil di kueri kedua, bukan digabung di SQL: `ruang_terdekat()`
+ * mengembalikan satu baris per ruang sedangkan fotonya banyak per ruang, jadi
+ * join-nya akan mengulang tiap baris hasil sebanyak jumlah fotonya.
  */
-export async function cariRuang(filter: FilterPencarian): Promise<RuangDenganFoto[]> {
-  const db = klien();
-
+export async function cariRuang(
+  db: SupabaseClient,
+  filter: FilterPencarian
+): Promise<RuangDenganFoto[]> {
   const { data, error } = await db.rpc("ruang_terdekat", {
     p_lat: filter.lat,
     p_lng: filter.lng,
@@ -94,7 +102,7 @@ export async function cariRuang(filter: FilterPencarian): Promise<RuangDenganFot
   const hasil = (data ?? []) as HasilRuang[];
   if (hasil.length === 0) return [];
 
-  const foto = await fotoPertama(hasil.map((r) => r.id));
+  const foto = await fotoPertama(db, hasil.map((r) => r.id));
   return hasil.map((r) => ({ ...r, foto: foto.get(r.id) ?? null }));
 }
 
@@ -103,12 +111,14 @@ export async function cariRuang(filter: FilterPencarian): Promise<RuangDenganFot
  *
  * Diambil semua lalu dipilih yang pertama per ruang di sini: PostgREST tidak
  * punya "ambil satu baris per grup", dan `urutan = 0` tidak dijamin ada kalau
- * nanti foto pertama dihapus host.
+ * foto pertamanya dihapus host.
  */
-async function fotoPertama(ruangIds: string[]): Promise<Map<string, string>> {
-  const db = klien();
+async function fotoPertama(
+  db: SupabaseClient,
+  ruangIds: string[]
+): Promise<Map<string, string>> {
   const { data, error } = await db
-    .from("ruang_foto")
+    .from("ruang_foto_publik")
     .select("ruang_id, url, urutan")
     .in("ruang_id", ruangIds)
     .order("urutan");
@@ -148,21 +158,11 @@ export type UlasanRuang = {
   akurasi: number | null;
   komentar: string | null;
   pada: string;
-  penulis: { nama: string; foto_url: string | null } | null;
+  penulis_nama: string;
+  penulis_foto_url: string | null;
 };
 
-/**
- * Satu ruang, kolom publik saja.
- *
- * `alamat`, `patokan`, `lat`, dan `lng` sengaja tidak ikut: keduanya baru
- * terbuka di tingkat 2 (setelah jadwal survei disetujui) dan tingkat 3
- * (setelah dibayar).
- *
- * PERINGATAN: sekarang yang menahannya cuma daftar kolom di kueri ini, bukan
- * database. RLS masih permisif, jadi siapa pun yang menembak REST API langsung
- * masih bisa membaca alamatnya. Tercatat sebagai utang nomor 2 di CLAUDE.md dan
- * ditutup bersamaan dengan langkah auth.
- */
+/** Satu baris `ruang_publik` — kolom publik, plus data host yang sudah ikut. */
 export type RuangPublik = {
   id: string;
   judul: string;
@@ -199,93 +199,71 @@ export type RuangPublik = {
   terbuka_alamat: boolean;
   status: string;
   dibuat_pada: string;
+  host_id: string;
+  host_nama: string;
+  host_foto_url: string | null;
+  host_terverifikasi: boolean;
+  host_bergabung: string;
+  host_kota: string;
 };
 
 export type DetailRuang = {
   ruang: RuangPublik;
-  host: HostRingkas | null;
+  host: HostRingkas;
   foto: FotoRuang[];
   ulasan: UlasanRuang[];
-  /** Pemesanan yang sedang berjalan, kalau ada — menentukan tanggal kosongnya. */
+  /** Tanggal ruangnya kosong lagi, kalau sedang tersewa. Tanpa menyebut siapa. */
   tersewaSampai: string | null;
 };
-
-const KOLOM_PUBLIK = [
-  "id", "judul", "tipe", "kelurahan", "kecamatan", "kota",
-  "lat_publik", "lng_publik",
-  "panjang_m", "lebar_m", "tinggi_m", "luas_m2", "volume_m3",
-  "akses_masuk", "posisi_lantai", "lebar_pintu_cm", "jarak_parkir",
-  "kondisi_bangunan", "penguncian", "berbagi", "kelembapan",
-  "riwayat_banjir", "tinggi_lantai_cm", "pengawasan", "fasilitas",
-  "kategori_diterima", "jendela_akses", "kuota_akses_bulanan",
-  "durasi_min_hari", "harga_bulanan", "deposit", "kepemilikan",
-  "terbuka_alamat", "status", "dibuat_pada",
-].join(", ");
-
-/** Status pemesanan yang berarti ruangnya sedang tidak bisa disewa orang lain. */
-const STATUS_TERPAKAI = [
-  "menunggu_pembayaran",
-  "menunggu_serah_terima",
-  "aktif",
-  "menunggu_serah_terima_keluar",
-];
 
 /**
  * Semua yang dibutuhkan halaman detail, dalam empat kueri paralel.
  *
- * Mengembalikan `null` kalau ruangnya tidak ada atau tidak tayang — halaman
- * memakai itu untuk `notFound()`. Ruang berstatus draf atau ditangguhkan tidak
- * boleh bisa dibuka lewat menebak URL.
+ * Mengembalikan `null` kalau ruangnya tidak ada — termasuk kalau statusnya draf
+ * atau ditangguhkan, karena `ruang_publik` sudah menyaring `status = 'tayang'`
+ * di dalam view. Jadi ruang yang belum siap tidak bisa dibuka lewat menebak
+ * URL, dan itu ditegakkan di database, bukan di sini.
  */
-export async function getDetailRuang(id: string): Promise<DetailRuang | null> {
-  const db = klien();
-
-  const [r, f, u, p] = await Promise.all([
+export async function getDetailRuang(
+  db: SupabaseClient,
+  id: string
+): Promise<DetailRuang | null> {
+  const [r, f, u, k] = await Promise.all([
+    db.from("ruang_publik").select("*").eq("id", id).maybeSingle(),
     db
-      .from("ruang")
-      .select(`${KOLOM_PUBLIK}, host:profil(nama, foto_url, terverifikasi, bergabung, kota)`)
-      .eq("id", id)
-      .eq("status", "tayang")
-      .maybeSingle(),
-    db
-      .from("ruang_foto")
+      .from("ruang_foto_publik")
       .select("id, url, urutan, keterangan")
       .eq("ruang_id", id)
       .order("urutan"),
-    // Ulasan menempel ke pemesanan, bukan ke ruang, jadi penyaringannya lewat
-    // embed `!inner` — tanpa `!inner` PostgREST mengembalikan seluruh ulasan.
     db
-      .from("ulasan")
-      .select("id, skor, akurasi, komentar, pada, penulis:profil(nama, foto_url), pemesanan!inner(ruang_id)")
-      .eq("pemesanan.ruang_id", id)
+      .from("ulasan_publik")
+      .select("id, skor, akurasi, komentar, pada, penulis_nama, penulis_foto_url")
+      .eq("ruang_id", id)
       .eq("arah", "untuk_host")
       .order("pada", { ascending: false }),
-    db
-      .from("pemesanan")
-      .select("selesai, status")
-      .eq("ruang_id", id)
-      .in("status", STATUS_TERPAKAI)
-      .order("selesai", { ascending: false })
-      .limit(1),
+    db.from("ruang_ketersediaan").select("tersewa_sampai").eq("ruang_id", id).maybeSingle(),
   ]);
 
   if (r.error) throw r.error;
   if (f.error) throw f.error;
   if (u.error) throw u.error;
-  if (p.error) throw p.error;
+  if (k.error) throw k.error;
   if (!r.data) return null;
 
-  const { host, ...ruang } = r.data as unknown as RuangPublik & {
-    host: HostRingkas | HostRingkas[] | null;
-  };
+  const ruang = r.data as unknown as RuangPublik;
 
   return {
     ruang,
-    // PostgREST mengembalikan objek untuk relasi many-to-one, tapi bentuknya
-    // pernah berupa array di versi lama — dua-duanya ditangani.
-    host: Array.isArray(host) ? (host[0] ?? null) : host,
+    host: {
+      nama: ruang.host_nama,
+      foto_url: ruang.host_foto_url,
+      terverifikasi: ruang.host_terverifikasi,
+      bergabung: ruang.host_bergabung,
+      kota: ruang.host_kota,
+    },
     foto: (f.data ?? []) as FotoRuang[],
     ulasan: (u.data ?? []) as unknown as UlasanRuang[],
-    tersewaSampai: (p.data?.[0] as { selesai: string } | undefined)?.selesai ?? null,
+    tersewaSampai:
+      (k.data as { tersewa_sampai: string | null } | null)?.tersewa_sampai ?? null,
   };
 }

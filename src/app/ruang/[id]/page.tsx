@@ -27,7 +27,8 @@ import GaleriFoto from "@/components/GaleriFoto";
 import BarisRubrik from "@/components/BarisRubrik";
 import { IKON_TIPE } from "@/components/IkonTipe";
 import { getDetailRuang } from "@/lib/ruang";
-import { supabaseSiap } from "@/lib/supabase";
+import { klienServer } from "@/lib/supabase/server";
+import { supabaseSiap } from "@/lib/supabase/env";
 import {
   LABEL_AKSES,
   LABEL_BANGUNAN,
@@ -56,7 +57,7 @@ import {
  * keduanya dijalankan untuk satu request. `cache` membuat pemanggilan kedua
  * memakai hasil yang pertama, jadi tidak ada empat kueri yang berjalan dua kali.
  */
-const ambilDetail = cache(getDetailRuang);
+const ambilDetail = cache(async (id: string) => getDetailRuang(await klienServer(), id));
 
 export async function generateMetadata({ params }: PageProps<"/ruang/[id]">) {
   if (!supabaseSiap) return { title: "Ruang" };
@@ -332,9 +333,7 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
                 {ulasan.map((u) => (
                   <li key={u.id} className="rounded-2xl bg-card p-5 ring-1 ring-line">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold">
-                        {u.penulis?.nama ?? "Penyewa"}
-                      </p>
+                      <p className="text-sm font-semibold">{u.penulis_nama}</p>
                       <p className="angka flex items-center gap-1 text-sm font-semibold">
                         <Star className="h-4 w-4 fill-current text-amber-500" />
                         {u.skor}

@@ -6,6 +6,7 @@ import { AlertCircle, ChevronDown, Crosshair, MapPin, Search, SearchX } from "lu
 import KartuRuang from "@/components/KartuRuang";
 import { IKON_TIPE } from "@/components/IkonTipe";
 import { cariRuang, type RuangDenganFoto, type TipeRuang } from "@/lib/ruang";
+import { klienBrowser } from "@/lib/supabase/browser";
 import { LABEL_TIPE } from "@/lib/label";
 import {
   HARGA_PILIHAN,
@@ -113,7 +114,7 @@ export default function PencarianRuang() {
 
   useEffect(() => {
     const id = ++permintaan.current;
-    cariRuang(filter)
+    cariRuang(klienBrowser(), filter)
       .then((daftar) => {
         if (id === permintaan.current) setHasil({ kunci, daftar, galat: null });
       })

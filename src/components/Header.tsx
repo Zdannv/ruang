@@ -1,15 +1,19 @@
 import Link from "next/link";
 import { House } from "lucide-react";
+import { sesiSaya } from "@/lib/auth";
 
 /**
  * Bilah atas yang melayang di atas isi halaman — kartu putih membulat dengan
  * jarak dari tepi layar, bukan bilah yang menempel penuh selebar viewport.
  *
- * Isinya sengaja tipis. Demo ini belum punya login (keputusan "switcher peran,
- * bukan auth"), jadi tidak ada tombol Masuk/Daftar yang tidak ke mana-mana.
- * Yang ada di kanan justru penanda jujur bahwa ini prototipe berdata contoh.
+ * Server Component supaya keadaan masuk sudah benar pada render pertama. Kalau
+ * sesinya dibaca di klien, tombol "Masuk" sempat berkedip muncul untuk orang
+ * yang sebetulnya sudah masuk.
  */
-export default function Header() {
+export default async function Header() {
+  const sesi = await sesiSaya();
+  const nama = sesi?.profil?.nama ?? sesi?.email ?? null;
+
   return (
     <header className="sticky top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 rounded-2xl bg-card/95 px-4 py-3 shadow-sm ring-1 ring-line backdrop-blur">
@@ -22,9 +26,37 @@ export default function Header() {
           </span>
         </Link>
 
-        <p className="hidden text-xs text-muted sm:block">
-          Prototipe · data contoh kota Malang
-        </p>
+        {sesi ? (
+          <div className="flex items-center gap-3">
+            <span className="hidden max-w-40 truncate text-sm font-medium text-ink sm:block">
+              {nama}
+            </span>
+            {/* Form POST, bukan tautan: lihat alasannya di app/keluar/route.ts */}
+            <form action="/keluar" method="post">
+              <button
+                type="submit"
+                className="cursor-pointer rounded-full px-3.5 py-2 text-sm font-semibold text-muted transition-colors hover:bg-paper hover:text-ink"
+              >
+                Keluar
+              </button>
+            </form>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1">
+            <Link
+              href="/masuk"
+              className="rounded-full px-3.5 py-2 text-sm font-semibold text-ink transition-colors hover:bg-paper"
+            >
+              Masuk
+            </Link>
+            <Link
+              href="/daftar"
+              className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+            >
+              Daftar
+            </Link>
+          </div>
+        )}
       </div>
     </header>
   );

@@ -10,10 +10,43 @@ pihak luar, bukan karena sengaja dipalsukan.
 ## Cara pasang
 
 1. Buat project Supabase baru (region **Southeast Asia / Singapore**).
-2. SQL Editor → jalankan `01_schema.sql`, lalu `02_seed.sql`.
+2. SQL Editor → jalankan berurutan: `01_schema.sql`, `02_seed.sql`,
+   `03_auth_rls.sql`. **Ketiganya wajib.** Aplikasi membaca lewat view yang
+   dibuat di `03`; tanpa itu setiap layar menjawab "relation does not exist".
 3. Isi Malang siap pakai: 6 host, 4 penyewa, 14 ruang, 84 foto,
    6 pemesanan di lima status berbeda, manifes, log akses, ulasan,
    dan 5 permintaan ruang.
+4. `cp .env.example .env.local`, lalu isi URL + **anon key**.
+5. Authentication → Sign In / Providers → pastikan **Email** aktif dan
+   *Confirm email* menyala.
+6. Authentication → URL Configuration → **Redirect URLs**: tambahkan
+   `http://localhost:3000/auth/konfirmasi` (dan alamat production-nya nanti).
+   Kalau tidak terdaftar, Supabase mengabaikan `emailRedirectTo` dan diam-diam
+   memakai Site URL — tautan konfirmasinya jadi mendarat di tempat yang salah.
+7. `npm install && npm run dev`.
+
+## Masuk sebagai host isi seed
+
+14 ruang di seed dimiliki profil yang belum punya akun. Untuk mengelolanya,
+daftar lewat aplikasi lalu **pindahkan** akunmu ke profil seed. Urutannya
+penting — mendaftar sudah membuat satu baris profil sendiri lewat trigger, dan
+`profil.user_id` UNIQUE, jadi langsung meng-UPDATE profil seed akan gagal
+"duplicate key":
+
+```sql
+begin;
+  delete from profil
+   where user_id = (select id from auth.users where email = 'kamu@contoh.com')
+     and nama <> 'Pak Slamet Riyadi';
+
+  update profil
+     set user_id = (select id from auth.users where email = 'kamu@contoh.com')
+   where nama = 'Pak Slamet Riyadi';
+commit;
+```
+
+Aman karena profil yang dibuang belum punya ruang, pemesanan, atau ulasan apa
+pun. Petunjuk lengkapnya juga ada di akhir `03_auth_rls.sql`.
 
 Sudah diuji jalan bersih di Postgres 16, tanpa error.
 
@@ -60,6 +93,12 @@ Daftar lengkap utang teknis ada di CLAUDE.md bagian "Utang yang diketahui".
   tabel ini dan tabel bukti lainnya di-`REVOKE` update/delete-nya.
 - Foto pakai `picsum.photos`. Tambahkan ke `images.remotePatterns` di
   `next.config.js`, atau pakai `<img>` biasa untuk demo.
-- **RLS aktif tapi masih permisif** (semua boleh baca dan tulis). Ini utang
-  paling mendesak dan dibereskan bersama auth — jangan menaruh data sungguhan
-  di database ini sebelum itu selesai.
+- **RLS sudah sungguhan** sejak `03_auth_rls.sql`. Anon tidak punya hak select
+  ke satu pun tabel dasar; seluruh bacaan publik lewat lima view. Diuji dari
+  database kosong di Postgres 16: anon ditolak di sepuluh tabel, penyewa yang
+  sudah membayar bisa membaca alamat ruang yang ia sewa dan tidak bisa membaca
+  yang lain, host tidak bisa menandai pemesanannya sendiri sudah dibayar, dan
+  ulasan hanya bisa ditulis atas sewa yang sudah selesai.
+- **`pemesanan` belum punya jalur tulis dari klien** — itu disengaja, bukan
+  kelupaan. Perpindahan statusnya akan lewat fungsi SECURITY DEFINER di langkah
+  alur pesan.

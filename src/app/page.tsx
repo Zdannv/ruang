@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { supabaseSiap } from "@/lib/supabase";
+import { supabaseSiap } from "@/lib/supabase/env";
 import PencarianRuang from "@/components/PencarianRuang";
 
 /**
