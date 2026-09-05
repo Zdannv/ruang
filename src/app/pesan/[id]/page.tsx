@@ -6,6 +6,8 @@ import Utas from "./Utas";
 import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { getPercakapan, tandaiUtasDibaca } from "@/lib/percakapan";
+import { tabelBelumAda } from "@/lib/galat";
+import MigrasiKurang from "@/components/MigrasiKurang";
 import {
   balasanDariRuang,
   daftarBalasan,
@@ -21,7 +23,21 @@ export default async function HalamanUtas({ params }: PageProps<"/pesan/[id]">) 
   if (!sesi) redirect(`/masuk?lanjut=/pesan/${id}`);
 
   const db = await klienServer();
-  const data = await getPercakapan(db, id);
+
+  let data: Awaited<ReturnType<typeof getPercakapan>>;
+  try {
+    data = await getPercakapan(db, id);
+  } catch (e: unknown) {
+    if (tabelBelumAda(e)) {
+      return (
+        <MigrasiKurang
+          fitur="Pesan"
+          berkas={["11_pesan_chat.sql", "12_balasan_cepat.sql"]}
+        />
+      );
+    }
+    throw e;
+  }
   // `null` berarti utasnya tidak ada ATAU bukan milik pemanggil — RLS
   // menyaringnya lebih dulu, dan dua-duanya dijawab 404 yang sama.
   if (!data) notFound();

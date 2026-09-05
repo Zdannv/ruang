@@ -5,7 +5,9 @@ import type { Metadata } from "next";
 import { MessagesSquare } from "lucide-react";
 import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
-import { daftarPercakapan } from "@/lib/percakapan";
+import { daftarPercakapan, type PercakapanRingkas } from "@/lib/percakapan";
+import { tabelBelumAda } from "@/lib/galat";
+import MigrasiKurang from "@/components/MigrasiKurang";
 import { tanggalPendek } from "@/lib/label";
 
 export const metadata: Metadata = { title: "Pesan — Ruang" };
@@ -15,7 +17,25 @@ export default async function HalamanPesan() {
   if (!sesi) redirect("/masuk?lanjut=/pesan");
 
   const db = await klienServer();
-  const daftar = await daftarPercakapan(db);
+
+  let daftar: PercakapanRingkas[];
+  try {
+    daftar = await daftarPercakapan(db);
+  } catch (e: unknown) {
+    // Migrasi dijalankan tangan dan terpisah dari deploy, jadi "kode sudah
+    // tayang, tabelnya belum ada" pasti terjadi lagi. Sebutkan berkasnya
+    // alih-alih melempar dan berakhir di layar 500 tanpa penjelasan.
+    if (tabelBelumAda(e)) {
+      return (
+        <MigrasiKurang
+          fitur="Pesan"
+          berkas={["11_pesan_chat.sql", "12_balasan_cepat.sql"]}
+        />
+      );
+    }
+    throw e;
+  }
+
   const sayaId = sesi.profil?.id ?? null;
 
   return (

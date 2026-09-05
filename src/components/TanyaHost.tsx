@@ -34,6 +34,15 @@ export default function TanyaHost({ ruangId }: { ruangId: string }) {
         router.push(`/masuk?lanjut=/ruang/${ruangId}`);
         return;
       }
+      // Fungsinya belum ada di database — sebutkan penyebabnya, bukan
+      // "Could not find the function public.mulai_percakapan".
+      if (pesan.toLowerCase().includes("could not find the function")) {
+        setGalat(
+          "Fitur pesan belum aktif di database ini. Migrasi 11_pesan_chat.sql " +
+            "perlu dijalankan lebih dulu."
+        );
+        return;
+      }
       setGalat(pesan);
     }
   };
