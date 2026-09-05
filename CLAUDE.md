@@ -81,7 +81,7 @@ alasannya. Jangan menambahkan jalan pintas sebelum jalur pembayaran ada.
 | Tingkat | Untuk siapa | Yang terlihat |
 |---|---|---|
 | 1 | Siapa pun | Kelurahan, kecamatan, **jarak persis**, pin digeser ±200 m |
-| 2 | Penyewa yang jadwal surveinya disetujui host | Alamat lengkap, patokan, titik asli |
+| 2 | Penyewa yang alamatnya dibuka host dari percakapan | Alamat lengkap, patokan |
 | 3 | Setelah dibayar | Nomor kontak langsung |
 
 Host memilih tingkat awalnya. Bawaan: tingkat 1 untuk ruang di rumah tinggal,
@@ -193,6 +193,25 @@ Kerjakan berurutan. Jangan lompat.
     Ini satu-satunya tempat `SUPABASE_SERVICE_ROLE_KEY` dipakai, karena
     pengirim push harus membaca langganan milik orang lain. Jangan
     memperluasnya ke tempat lain.
+16. **Percakapan penyewa & host — selesai** (4 Sep 2026). Lihat
+    `11_pesan_chat.sql`. Satu utas per pasangan ruang dan penyewa, dibuka
+    **sebelum** pemesanan.
+
+    **Sebelum, bukan sesudah** — dan itu keputusan, bukan kelalaian. Rubrik
+    kondisi menjawab banyak hal tapi tidak menjawab "muat motor saya nggak"
+    atau "boleh lihat dulu". Memaksa orang mengisi tanggal dan manifes lengkap
+    hanya untuk bertanya membuat sebagian besar dari mereka pergi, bukan
+    memesan.
+
+    Nomor telepon dan email **disamarkan di database**, bukan di layar:
+    penyamaran di frontend bisa dilewati siapa pun yang memanggil API langsung.
+    Tapi ini menahan di pinggiran saja — kebocoran ke luar aplikasi tidak bisa
+    dicegah secara teknis. Yang benar-benar menahan orang di dalam adalah uang
+    yang dijaga platform dan penengah saat bersengketa. **Jangan menambah
+    rekayasa anti-kebocoran yang lebih berat dari ini sebelum pembayarannya
+    jalan.**
+
+    `pesan` tidak bisa diubah atau dihapus klien — ia bukti saat bersengketa.
 
 ### Berikutnya, selama pembayaran belum ada
 
@@ -282,25 +301,19 @@ satu pun kueri yang jalan.
 
 ## Utang yang diketahui
 
-1. **Keterbukaan alamat tingkat 2 belum bisa ditegakkan.** Tingkat 1 (publik)
-   dan 3 (setelah dibayar) sudah jalan. Tingkat 2 — "penyewa yang jadwal
-   surveinya disetujui host" — butuh tabel permintaan survei yang belum ada:
-   `akses_log` menempel ke pemesanan yang sudah jadi, sedangkan survei terjadi
-   sebelum pemesanan ada. Sampai tabel itu ada, alamat hanya terbuka di
-   tingkat 3.
-2. **Dua tanda tangan serah terima masih satu baris.** Masalah keamanannya sudah
+1. **Dua tanda tangan serah terima masih satu baris.** Masalah keamanannya sudah
    ditutup — klien tidak punya UPDATE, dan penandatanganan lewat fungsi yang
    hanya bisa menyalakan tanda tangan pemanggil. Yang belum: bentuk datanya
    belum append-only sungguhan. Pisah jadi baris sendiri saat serah terima
    dibangun.
-4. **Properti dan ruang masih satu tabel.** Satu properti dengan tiga ruang sewa
+3. **Properti dan ruang masih satu tabel.** Satu properti dengan tiga ruang sewa
    sekarang harus jadi tiga baris `ruang` dengan alamat yang diulang.
-5. **Foto isi seed masih `picsum.photos`.** Unggahan host sudah masuk Supabase
+4. **Foto isi seed masih `picsum.photos`.** Unggahan host sudah masuk Supabase
    Storage (bucket `ruang-foto`) dan EXIF-nya dibuang di peramban lewat canvas —
    penting, karena EXIF foto HP hampir selalu memuat GPS. Yang belum: kamera
    in-app untuk foto serah terima, dan bucket terpisah untuk foto bukti, yang
    tidak boleh publik.
-6. **Nomor HP belum diverifikasi.** Diisi saat daftar dan disimpan apa adanya;
+5. **Nomor HP belum diverifikasi.** Diisi saat daftar dan disimpan apa adanya;
    verifikasinya menunggu jalur WhatsApp/SMS.
 
 ## Stack

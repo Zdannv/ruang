@@ -24,6 +24,7 @@ import {
   Waves,
 } from "lucide-react";
 import GaleriFoto from "@/components/GaleriFoto";
+import TanyaHost from "@/components/TanyaHost";
 import BarisRubrik from "@/components/BarisRubrik";
 import { IKON_TIPE } from "@/components/IkonTipe";
 import { getDetailRuang } from "@/lib/ruang";
@@ -88,7 +89,7 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
   const data = await ambilDetail(id);
   if (!data) notFound();
 
-  const { ruang, host, foto, ulasan, tersewaSampai } = data;
+  const { ruang, host, foto, ulasan, tersewaSampai, alamatLengkap } = data;
   const IkonTipe = IKON_TIPE[ruang.tipe];
 
   const skorRata =
@@ -299,12 +300,24 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
               <p className="text-sm font-medium">
                 {ruang.kelurahan}, {ruang.kecamatan}, {ruang.kota}
               </p>
-              <p className="mt-2 flex items-start gap-2 text-xs leading-relaxed text-muted">
-                <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
-                {ruang.terbuka_alamat
-                  ? "Ruang komersial — alamat lengkap dan patokannya dibuka begitu kamu mengajukan sewa."
-                  : "Ruang di rumah tinggal. Titik di peta digeser sekitar 200 m dan alamat lengkapnya baru dibuka setelah host menyetujui jadwal surveimu."}
-              </p>
+              {alamatLengkap ? (
+                <>
+                  <p className="mt-2 text-sm font-medium">{alamatLengkap.alamat}</p>
+                  {alamatLengkap.patokan && (
+                    <p className="text-sm text-muted">Patokan: {alamatLengkap.patokan}</p>
+                  )}
+                  <p className="mt-2 text-xs leading-relaxed text-muted">
+                    Alamat ini dibuka khusus untukmu. Jangan dibagikan ke orang lain.
+                  </p>
+                </>
+              ) : (
+                <p className="mt-2 flex items-start gap-2 text-xs leading-relaxed text-muted">
+                  <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
+                  {ruang.terbuka_alamat
+                    ? "Ruang komersial — alamat lengkap dan patokannya dibuka begitu kamu mengajukan sewa."
+                    : "Ruang di rumah tinggal. Titik di peta digeser sekitar 200 m. Alamat lengkapnya bisa dibuka host lewat percakapan, atau terbuka sendiri setelah pembayaran."}
+                </p>
+              )}
               {/* TODO: peta. Butuh penyedia tile; yang diplot nanti
                   lat_publik/lng_publik, jangan pernah koordinat aslinya. */}
             </div>
@@ -398,7 +411,8 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
             >
               Ajukan sewa
             </Link>
-            <p className="mt-2 text-center text-xs text-muted">
+            <TanyaHost ruangId={ruang.id} />
+            <p className="mt-3 text-center text-xs text-muted">
               Belum ada pembayaran di langkah ini. Host menerima atau menolak dulu.
             </p>
 

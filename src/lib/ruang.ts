@@ -209,6 +209,13 @@ export type RuangPublik = {
 
 export type DetailRuang = {
   ruang: RuangPublik;
+  /**
+   * Alamat lengkap — hanya terisi kalau RLS mengizinkan pemanggil membacanya:
+   * host ruangnya, penyewa yang alamatnya dibuka lewat percakapan (tingkat 2),
+   * atau penyewa yang pemesanannya sudah dibayar (tingkat 3). Kalau tidak,
+   * hasilnya `null` tanpa galat — RLS menyaring baris, bukan menolak kuerinya.
+   */
+  alamatLengkap: { alamat: string; patokan: string | null } | null;
   host: HostRingkas;
   foto: FotoRuang[];
   ulasan: UlasanRuang[];
@@ -252,8 +259,15 @@ export async function getDetailRuang(
 
   const ruang = r.data as unknown as RuangPublik;
 
+  const { data: alamat } = await db
+    .from("ruang")
+    .select("alamat, patokan")
+    .eq("id", id)
+    .maybeSingle();
+
   return {
     ruang,
+    alamatLengkap: (alamat as { alamat: string; patokan: string | null } | null) ?? null,
     host: {
       nama: ruang.host_nama,
       foto_url: ruang.host_foto_url,

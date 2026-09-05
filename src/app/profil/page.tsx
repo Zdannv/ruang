@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell, ChevronRight, LogOut } from "lucide-react";
+import { Bell, ChevronRight, LogOut, MessageCircle } from "lucide-react";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import FormProfil from "./FormProfil";
@@ -7,6 +7,7 @@ import PasangAplikasi from "@/components/PasangAplikasi";
 import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { jumlahBelumDibaca } from "@/lib/notifikasi";
+import { pesanBelumDibaca } from "@/lib/percakapan";
 
 export const metadata: Metadata = { title: "Profil — Ruang" };
 
@@ -15,7 +16,10 @@ export default async function HalamanProfil() {
   if (!sesi) redirect("/masuk?lanjut=/profil");
 
   const db = await klienServer();
-  const belumDibaca = await jumlahBelumDibaca(db);
+  const [belumDibaca, pesanBaru] = await Promise.all([
+    jumlahBelumDibaca(db),
+    pesanBelumDibaca(db),
+  ]);
   const { data } = await db
     .from("profil")
     .select("id, nama, kota, telepon, terverifikasi, bergabung")
@@ -84,6 +88,29 @@ export default async function HalamanProfil() {
             {belumDibaca > 0
               ? `${belumDibaca} belum dibaca`
               : "Permintaan sewa, jawaban host, jadwal kunjungan"}
+          </span>
+        </span>
+        <ChevronRight className="h-4 w-4 shrink-0 text-muted" />
+      </Link>
+
+      <Link
+        href="/pesan"
+        className="naik naik-hover mt-2 flex items-center gap-3 rounded-2xl border border-line bg-card p-4"
+      >
+        <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-dark">
+          <MessageCircle className="h-5 w-5" />
+          {pesanBaru > 0 && (
+            <span className="angka absolute -right-1 -top-1 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold text-white">
+              {pesanBaru > 9 ? "9+" : pesanBaru}
+            </span>
+          )}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-semibold">Pesan</span>
+          <span className="block text-xs text-muted">
+            {pesanBaru > 0
+              ? `${pesanBaru} pesan belum dibaca`
+              : "Tanya-jawab dengan host atau penyewa"}
           </span>
         </span>
         <ChevronRight className="h-4 w-4 shrink-0 text-muted" />
