@@ -289,8 +289,12 @@ export default function PencarianRuang() {
             seperti itu paling terasa justru di koneksi lambat — persis keadaan
             saat orang paling tidak sabar. */}
         <section aria-label="Tipe ruang" className="pt-8 sm:pt-10">
+          {/* Judulnya dulu "Mau menyimpan apa?" — pertanyaan tentang barang yang
+              dijawab dengan bentuk ruang. Sejak penyaring kategori barang ada di
+              bawah, keduanya bertabrakan: dua judul menanyakan hal yang sama dan
+              cuma satu yang benar-benar menyaring barang. */}
           <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
-            Mau menyimpan apa?
+            Ruang seperti apa?
           </h2>
 
           {memuat ? (

@@ -3,14 +3,17 @@ import type { Metadata } from "next";
 import {
   ArrowRight,
   CalendarClock,
-  ChevronRight,
   ClipboardList,
+  GraduationCap,
   Handshake,
+  MessageCircle,
   Ruler,
   Search,
   ShieldAlert,
   Store,
+  Truck,
   Wallet,
+  Wrench,
 } from "lucide-react";
 import CariCepat from "@/components/CariCepat";
 import KolaseSorotan from "@/components/KolaseSorotan";
@@ -24,7 +27,7 @@ import type { TipeRuang } from "@/lib/ruang";
 export const metadata: Metadata = {
   title: "Ruang — sewa ruang kosong di dekatmu",
   description:
-    "Marketplace ruang antarwarga. Sewa garasi, kamar, atau gudang kosong di sekitarmu — dengan kondisi ruang yang dijelaskan apa adanya.",
+    "Marketplace ruang antarwarga. Sewa garasi, kamar, atau lantai ruko kosong di sekitarmu — untuk barang kosan, stok jualan, atau pindahan. Kondisi ruangnya dijelaskan apa adanya.",
 };
 
 const TIPE_UNGGULAN: TipeRuang[] = [
@@ -34,6 +37,49 @@ const TIPE_UNGGULAN: TipeRuang[] = [
   "lantai_ruko",
   "kontainer",
   "loteng",
+];
+
+/**
+ * Siapa yang menyewa, bukan ruang seperti apa yang disewakan.
+ *
+ * Sebelum ini halaman depan cuma bercerita tentang ruangnya — garasi, kamar,
+ * loteng — dan tidak sekali pun menyebut orangnya. Akibatnya pengunjung harus
+ * menerjemahkan sendiri "gudang 6 m³" menjadi "oh, barang kosan saya muat".
+ * Sebagian besar orang tidak melakukan itu; mereka menutup halamannya.
+ *
+ * Tautannya membawa penyaring kategori, jadi hasil pertama yang dilihat orang
+ * sudah ruang yang memang menerima barangnya. Kategori itu datang dari
+ * `13_umkm.sql` — tanpa migrasi itu penyaringnya tidak ada isinya.
+ */
+const SEGMEN = [
+  {
+    ikon: GraduationCap,
+    judul: "Kos kesempitan",
+    isi: "Pulang kampung sebulan, atau kamar tidak cukup untuk kardus dan sepeda. Sewa per bulan, ambil kapan pun dalam jendela akses.",
+    tautan: "/cari?kategori=kardus&radius=5",
+    ajakan: "Ruang untuk kardus",
+  },
+  {
+    ikon: Store,
+    judul: "Jualan online",
+    isi: "Stok menumpuk di ruang tamu dan perlu diambil beberapa kali seminggu. Cari yang memang menerima stok dagangan, bukan yang akan menolaknya.",
+    tautan: "/cari?kategori=stok_dagangan&radius=15",
+    ajakan: "Ruang untuk stok",
+  },
+  {
+    ikon: Truck,
+    judul: "Pindahan & renovasi",
+    isi: "Perabot butuh tempat satu sampai tiga bulan. Lebar pintu dan kendaraan terbesar yang bisa masuk tertulis di tiap ruang, jadi tidak ada kejutan saat truknya datang.",
+    tautan: "/cari?kategori=perabot&radius=10",
+    ajakan: "Ruang untuk perabot",
+  },
+  {
+    ikon: Wrench,
+    judul: "Usaha kecil",
+    isi: "Ban, perkakas, alat pameran, arsip yang tidak boleh lembap. Kelembapan dan riwayat banjir tiap ruang ikut tertulis.",
+    tautan: "/cari?kategori=ban_perkakas&radius=15",
+    ajakan: "Ruang untuk alat",
+  },
 ];
 
 const ALASAN = [
@@ -58,7 +104,12 @@ const LANGKAH = [
   {
     ikon: Search,
     judul: "Cari dari titikmu",
-    isi: "Atur radius, ukuran, dan anggaran. Jaraknya dihitung dari lokasi asli ruangnya, jadi angkanya persis.",
+    isi: "Atur radius, ukuran, anggaran, dan barang yang mau disimpan. Jaraknya dihitung dari lokasi asli ruangnya, jadi angkanya persis.",
+  },
+  {
+    ikon: MessageCircle,
+    judul: "Tanya hostnya dulu",
+    isi: "\u201CMuat motor saya nggak?\u201D, \u201Cboleh lihat dulu?\u201D — percakapan bisa dibuka sebelum memesan, jadi kamu tidak perlu mengisi tanggal dan manifes hanya untuk bertanya.",
   },
   {
     ikon: ClipboardList,
@@ -114,9 +165,10 @@ export default async function Beranda() {
             </h1>
 
             <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-muted">
-              Garasi yang mobilnya sudah dijual, kamar belakang yang tidak terpakai,
-              lantai dua ruko yang kosong. Lebih dekat dan lebih murah daripada gudang
-              penitipan — dan kondisinya dijelaskan apa adanya.
+              Buat yang kosannya kesempitan, yang stok jualannya menumpuk di ruang
+              tamu, atau yang perabotnya perlu tempat selama pindahan. Lebih dekat dan
+              lebih murah daripada gudang penitipan — dan kondisi ruangnya dijelaskan
+              apa adanya, bukan cuma difoto.
             </p>
 
             <div className="mt-7">
@@ -153,6 +205,43 @@ export default async function Beranda() {
         </div>
       </section>
 
+      {/* ── Buat siapa ─────────────────────────────────────────────────────── */}
+      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
+        <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+          Kamu yang mana?
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
+          Tiap tautan langsung menyaring ruang yang memang menerima barangmu — host
+          berhak menolak kategori yang tidak ia terima, dan lebih baik itu terpisah
+          sebelum kamu mengajukan, bukan sesudah.
+        </p>
+        <div className="mt-7 grid gap-4 sm:grid-cols-2">
+          {SEGMEN.map((g) => (
+            <Link
+              key={g.judul}
+              href={g.tautan}
+              className="naik naik-hover group flex gap-4 rounded-2xl border border-line bg-card p-5"
+            >
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand-dark">
+                <g.ikon className="h-5 w-5" />
+              </span>
+              <span className="min-w-0">
+                <span className="block font-display text-lg font-bold tracking-tight">
+                  {g.judul}
+                </span>
+                <span className="mt-1.5 block text-sm leading-relaxed text-muted">
+                  {g.isi}
+                </span>
+                <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand">
+                  {g.ajakan}
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* ── Tipe ruang ─────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
         <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
@@ -176,27 +265,6 @@ export default async function Beranda() {
           </div>
         </div>
 
-        {/* Pintu masuk terpisah untuk penjual online: mereka tidak mencari
-            "gudang", mereka mencari tempat menaruh stok yang bisa diambil
-            berkali-kali — dan itu justru alur yang paling matang di sini. */}
-        <Link
-          href="/cari?kategori=stok_dagangan&radius=15"
-          className="naik naik-hover mt-6 flex items-center gap-4 rounded-2xl border border-line bg-card p-5"
-        >
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand-dark">
-            <Store className="h-5 w-5" />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block font-display text-lg font-bold tracking-tight">
-              Jualan online dan stoknya menumpuk di rumah?
-            </span>
-            <span className="mt-1 block text-sm leading-relaxed text-muted">
-              Cari ruang yang memang menerima stok dagangan, dekat rumah, dengan
-              jadwal ambil-barang yang disepakati lewat aplikasi.
-            </span>
-          </span>
-          <ChevronRight className="hidden h-5 w-5 shrink-0 text-muted sm:block" />
-        </Link>
       </section>
 
       {/* ── Kenapa ─────────────────────────────────────────────────────────── */}
@@ -226,7 +294,7 @@ export default async function Beranda() {
         <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
           Cara kerjanya
         </h2>
-        <ol className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
           {LANGKAH.map((l, i) => {
             const belumAktif = i === LANGKAH.length - 1;
             return (
@@ -269,6 +337,11 @@ export default async function Beranda() {
               Kamu yang menentukan harganya, jendela aksesnya, dan barang apa yang
               boleh masuk. Manifes penyewa dicocokkan dengan kebijakanmu sebelum
               permintaannya sampai ke kamu — dan kamu tetap berhak menolak.
+            </p>
+            <p className="mt-2.5 text-sm leading-relaxed text-white/80">
+              Yang mencari sebagian besar tetangga sekecamatan: mahasiswa yang kosannya
+              kesempitan, penjual online yang stoknya menumpuk, keluarga yang sedang
+              pindahan.
             </p>
 
             {ringkas.jumlahPencari > 0 && (
