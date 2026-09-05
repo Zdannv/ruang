@@ -33,7 +33,7 @@ export default function KartuRuang({ ruang }: { ruang: RuangDenganFoto }) {
   return (
     <Link
       href={`/ruang/${ruang.id}`}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl bg-card ring-1 ring-line transition-shadow hover:shadow-lg hover:shadow-ink/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+      className="naik naik-hover group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-card focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-line">
         {ruang.foto ? (

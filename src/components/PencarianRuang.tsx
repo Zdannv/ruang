@@ -21,8 +21,9 @@ import {
 const PIL =
   "cursor-pointer rounded-full px-3.5 py-2 text-sm font-medium transition-colors " +
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
-const PIL_AKTIF = "bg-brand text-white";
-const PIL_MATI = "bg-card text-ink ring-1 ring-line hover:bg-brand-soft";
+const PIL_AKTIF = "border border-brand bg-brand text-white";
+const PIL_MATI =
+  "border border-line bg-card text-ink hover:border-brand/40 hover:bg-brand-soft";
 
 const TIPE_URUT: TipeRuang[] = [
   "kamar",
@@ -156,116 +157,131 @@ export default function PencarianRuang() {
 
   const bersihkan = () => router.replace(pathname, { scroll: false });
 
+  // "Hapus filter" mengembalikan SEMUANYA ke bawaan, termasuk titik dan radius
+  // — jadi tombolnya baru berguna kalau ada satu saja yang bukan bawaan.
+  const adaFilter =
+    searchParams.toString() !== "" &&
+    (Boolean(tipe) ||
+      volumeMin > 0 ||
+      hargaMaks > 0 ||
+      radiusKm !== RADIUS_BAWAAN ||
+      preset?.id !== TITIK_BAWAAN.id);
+
   return (
     <>
-      {/* ── Hero ───────────────────────────────────────────────────────────
-          Latar dibuat gradien, bukan foto: belum ada aset foto sendiri, dan
-          foto acak dari picsum tidak bisa diandalkan untuk layar pertama yang
-          dilihat calon partner. Ganti `bg-*` di bawah dengan <Image> begitu
-          ada satu foto ruang sungguhan yang layak dipajang. */}
-      <section className="relative -mt-[68px] overflow-hidden bg-gradient-to-br from-[#0d2a6b] via-brand to-[#3f7bff] pb-10 pt-[104px] sm:pb-14 sm:pt-[132px]">
-        <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-white/10 blur-3xl" />
+      {/* ── Bilah pencarian ────────────────────────────────────────────────
+          Ringkas, bukan hero.
 
-        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <h1 className="max-w-2xl font-display text-3xl font-bold leading-[1.1] tracking-tight text-white sm:text-5xl">
-            Ruang kosong di dekatmu, disewakan tetangga sendiri
-          </h1>
-          <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/80 sm:text-base">
-            Pilih titikmu, atur radius, lalu bandingkan ruangnya. Jarak dihitung dari
-            lokasi asli ruangnya, jadi angkanya persis.
-          </p>
+          Versi sebelumnya memakai bidang gradien biru setinggi hampir separuh
+          layar di sini — sama seperti halaman depan. Setelah dilihat di layar
+          sungguhan, akibatnya jelas: hasil pencarian, satu-satunya alasan orang
+          membuka halaman ini, terdorong ke bawah lipatan oleh bidang yang tidak
+          membawa informasi apa pun. Sekarang kendalinya muat dalam satu baris
+          dan kartu pertama sudah terlihat tanpa menggulir. */}
+      <section className="sticky top-[var(--tinggi-header)] z-40 border-b border-line bg-card/95 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-3 sm:px-6 lg:px-8">
+          <h1 className="sr-only">Cari ruang</h1>
 
-          {/* Bilah pencarian: menumpuk di layar kecil, jadi satu pil panjang
-              dari sm ke atas. */}
-          <div className="mt-7 flex flex-col gap-2 rounded-3xl bg-card p-2 shadow-xl shadow-ink/10 sm:flex-row sm:items-center sm:rounded-full sm:gap-0 sm:p-1.5">
-            <label className="flex flex-1 cursor-pointer items-center gap-3 rounded-2xl px-4 py-2.5 hover:bg-paper sm:rounded-full">
-              <MapPin className="h-4.5 w-4.5 shrink-0 text-brand" />
-              <span className="min-w-0 flex-1">
-                <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">
-                  Cari dari
-                </span>
-                <span className="relative flex items-center">
-                  <select
-                    value={preset?.id ?? "custom"}
-                    onChange={(e) => {
-                      const t = TITIK_PRESET.find((x) => x.id === e.target.value);
-                      if (t) ubah({ lat: String(t.lat), lng: String(t.lng) });
-                    }}
-                    className="w-full cursor-pointer appearance-none bg-transparent pr-6 text-sm font-semibold text-ink focus:outline-none"
-                  >
-                    {!preset && <option value="custom">Lokasi saya</option>}
-                    {TITIK_PRESET.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.nama}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute right-0 h-4 w-4 text-muted" />
-                </span>
-              </span>
-            </label>
+          <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 rounded-full border border-line bg-card px-3.5 py-2 sm:flex-none sm:min-w-56">
+            <MapPin className="h-4 w-4 shrink-0 text-brand" />
+            <span className="sr-only">Titik pencarian</span>
+            <span className="relative flex min-w-0 flex-1 items-center">
+              <select
+                value={preset?.id ?? "custom"}
+                onChange={(e) => {
+                  const t = TITIK_PRESET.find((x) => x.id === e.target.value);
+                  if (t) ubah({ lat: String(t.lat), lng: String(t.lng) });
+                }}
+                className="w-full cursor-pointer appearance-none truncate bg-transparent pr-5 text-sm font-medium text-ink focus:outline-none"
+              >
+                {!preset && <option value="custom">Lokasi saya</option>}
+                {TITIK_PRESET.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.nama}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-0 h-4 w-4 text-muted" />
+            </span>
+          </label>
 
-            <span className="hidden h-9 w-px bg-line sm:block" />
+          <label className="flex cursor-pointer items-center gap-2 rounded-full border border-line bg-card px-3.5 py-2">
+            <span className="text-xs text-muted">Radius</span>
+            <span className="relative flex items-center">
+              <select
+                value={radiusKm}
+                onChange={(e) => ubah({ radius: e.target.value })}
+                className="angka cursor-pointer appearance-none bg-transparent pr-5 text-sm font-medium text-ink focus:outline-none"
+              >
+                {RADIUS_PILIHAN.map((km) => (
+                  <option key={km} value={km}>
+                    {km} km
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-0 h-4 w-4 text-muted" />
+            </span>
+          </label>
 
-            <label className="flex cursor-pointer items-center gap-3 rounded-2xl px-4 py-2.5 hover:bg-paper sm:rounded-full">
-              <span className="min-w-0">
-                <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">
-                  Radius
-                </span>
-                <span className="relative flex items-center">
-                  <select
-                    value={radiusKm}
-                    onChange={(e) => ubah({ radius: e.target.value })}
-                    className="angka w-full cursor-pointer appearance-none bg-transparent pr-6 text-sm font-semibold text-ink focus:outline-none"
-                  >
-                    {RADIUS_PILIHAN.map((km) => (
-                      <option key={km} value={km}>
-                        {km} km
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute right-0 h-4 w-4 text-muted" />
-                </span>
-              </span>
-            </label>
+          <button
+            type="button"
+            onClick={pakaiLokasiSaya}
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-brand transition-colors hover:bg-brand-soft"
+          >
+            <Crosshair className="h-4 w-4" />
+            <span className="hidden sm:inline">Gunakan lokasi saya</span>
+            <span className="sm:hidden">Lokasiku</span>
+          </button>
 
-            <a
-              href="#hasil"
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark sm:ml-2"
-            >
-              <Search className="h-4 w-4" />
-              Lihat hasil
-            </a>
-          </div>
-
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1">
+          {adaFilter && (
             <button
               type="button"
-              onClick={pakaiLokasiSaya}
-              className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-semibold text-white/90 hover:text-white"
+              onClick={bersihkan}
+              className="ml-auto cursor-pointer rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-paper hover:text-ink"
             >
-              <Crosshair className="h-4 w-4" />
-              Gunakan lokasi saya
+              Hapus filter
             </button>
-            {!preset && (
-              <span className="angka text-xs text-white/70">
-                Titikmu: {lat.toFixed(4)}, {lng.toFixed(4)}
-              </span>
-            )}
-            {galatLokasi && <span className="text-xs text-white/90">{galatLokasi}</span>}
-          </div>
+          )}
         </div>
+
+        {(!preset || galatLokasi) && (
+          <div className="mx-auto max-w-6xl px-4 pb-3 sm:px-6 lg:px-8">
+            {!preset && (
+              <p className="angka text-xs text-muted">
+                Memakai lokasimu: {lat.toFixed(4)}, {lng.toFixed(4)}
+              </p>
+            )}
+            {galatLokasi && <p className="text-xs text-warn">{galatLokasi}</p>}
+          </div>
+        )}
       </section>
 
-      <div id="hasil" className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 pb-16 sm:px-6 lg:px-8">
-        {/* ── Tipe ruang ─────────────────────────────────────────────────── */}
-        {tipeTersedia.length > 0 && (
-          <section aria-label="Tipe ruang" className="pt-8 sm:pt-10">
-            <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
-              Mau menyimpan apa?
-            </h2>
+      <div id="hasil" className="mx-auto w-full max-w-6xl scroll-mt-[calc(var(--tinggi-header)*2)] px-4 pb-16 sm:px-6 lg:px-8">
+        {/* ── Tipe ruang ───────────────────────────────────────────────────
+            Bagiannya dirender bahkan saat hasilnya belum datang, dengan kartu
+            kosong sebagai penahan tempat.
 
+            Sebelumnya ia disembunyikan selama memuat, lalu muncul dan mendorong
+            seluruh hasil ke bawah tepat saat orang mulai membacanya. Pergeseran
+            seperti itu paling terasa justru di koneksi lambat — persis keadaan
+            saat orang paling tidak sabar. */}
+        <section aria-label="Tipe ruang" className="pt-8 sm:pt-10">
+          <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
+            Mau menyimpan apa?
+          </h2>
+
+          {memuat ? (
+            <div className="geser-x -mx-4 mt-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+              <div className="flex w-max gap-3 pb-1">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-24 w-24 shrink-0 animate-pulse rounded-2xl border border-line bg-card"
+                  />
+                ))}
+              </div>
+            </div>
+          ) : (
             <div className="geser-x -mx-4 mt-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
               <div className="flex w-max gap-3 pb-1">
                 <button
@@ -274,8 +290,8 @@ export default function PencarianRuang() {
                   onClick={() => ubah({ tipe: null })}
                   className={`flex h-24 w-24 shrink-0 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl text-xs font-semibold transition-colors ${
                     tipe
-                      ? "bg-card text-ink ring-1 ring-line hover:bg-brand-soft"
-                      : "bg-brand text-white"
+                      ? "naik border border-line bg-card text-ink hover:border-brand/40 hover:bg-brand-soft"
+                      : "border border-brand bg-brand text-white"
                   }`}
                 >
                   <Search className="h-6 w-6" />
@@ -304,8 +320,8 @@ export default function PencarianRuang() {
                 })}
               </div>
             </div>
-          </section>
-        )}
+          )}
+        </section>
 
         {/* ── Filter lain ────────────────────────────────────────────────── */}
         <section aria-label="Filter ukuran dan harga" className="mt-8 space-y-4">

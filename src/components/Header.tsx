@@ -19,7 +19,7 @@ export default async function Header() {
 
   return (
     <header className="sticky top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 rounded-2xl bg-card/95 px-4 py-3 shadow-sm ring-1 ring-line backdrop-blur">
+      <div className="naik mx-auto flex max-w-6xl items-center justify-between gap-4 rounded-2xl border border-line bg-card/90 px-4 py-3 backdrop-blur">
         <div className="flex items-center gap-1 sm:gap-6">
           <Link href="/" className="flex items-center gap-2">
             <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-white">

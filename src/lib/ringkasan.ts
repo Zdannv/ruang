@@ -53,3 +53,52 @@ export async function getRingkasanPasar(db: SupabaseClient): Promise<RingkasanPa
     return kosong;
   }
 }
+
+export type RuangSorotan = {
+  id: string;
+  judul: string;
+  kecamatan: string;
+  harga_bulanan: number;
+  foto: string | null;
+};
+
+/**
+ * Beberapa ruang untuk dipajang di halaman depan.
+ *
+ * Ruang sungguhan dari database, bukan gambar hiasan. Halaman depan yang
+ * memajang foto stok tidak memberi tahu apa pun tentang isi platformnya;
+ * memajang tiga ruang yang benar-benar tayang langsung menjawab pertanyaan
+ * pertama setiap pengunjung — "ada apa saja di sini?".
+ */
+export async function ruangSorotan(
+  db: SupabaseClient,
+  jumlah = 3
+): Promise<RuangSorotan[]> {
+  try {
+    const { data, error } = await db
+      .from("ruang_publik")
+      .select("id, judul, kecamatan, harga_bulanan")
+      .order("dibuat_pada", { ascending: false })
+      .limit(jumlah);
+    if (error || !data || data.length === 0) return [];
+
+    const ids = (data as { id: string }[]).map((r) => r.id);
+    const { data: foto } = await db
+      .from("ruang_foto_publik")
+      .select("ruang_id, url, urutan")
+      .in("ruang_id", ids)
+      .order("urutan");
+
+    const peta = new Map<string, string>();
+    for (const f of (foto ?? []) as { ruang_id: string; url: string }[]) {
+      if (!peta.has(f.ruang_id)) peta.set(f.ruang_id, f.url);
+    }
+
+    return (data as Omit<RuangSorotan, "foto">[]).map((r) => ({
+      ...r,
+      foto: peta.get(r.id) ?? null,
+    }));
+  } catch {
+    return [];
+  }
+}

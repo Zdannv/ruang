@@ -11,9 +11,10 @@ import {
   Wallet,
 } from "lucide-react";
 import CariCepat from "@/components/CariCepat";
+import KolaseSorotan from "@/components/KolaseSorotan";
 import { IKON_TIPE } from "@/components/IkonTipe";
 import { LABEL_TIPE, rupiah } from "@/lib/label";
-import { getRingkasanPasar } from "@/lib/ringkasan";
+import { getRingkasanPasar, ruangSorotan } from "@/lib/ringkasan";
 import { klienServer } from "@/lib/supabase/server";
 import { supabaseSiap } from "@/lib/supabase/env";
 import type { TipeRuang } from "@/lib/ruang";
@@ -75,64 +76,78 @@ const LANGKAH = [
 ];
 
 export default async function Beranda() {
-  const ringkas = supabaseSiap
-    ? await getRingkasanPasar(await klienServer())
-    : {
-        jumlahRuang: 0,
-        jumlahKecamatan: 0,
-        hargaTermurah: null,
-        jumlahPencari: 0,
-        kecamatanTeratas: [],
-      };
+  const db = supabaseSiap ? await klienServer() : null;
+  const [ringkas, sorotan] = db
+    ? await Promise.all([getRingkasanPasar(db), ruangSorotan(db, 3)])
+    : [
+        {
+          jumlahRuang: 0,
+          jumlahKecamatan: 0,
+          hargaTermurah: null,
+          jumlahPencari: 0,
+          kecamatanTeratas: [],
+        },
+        [],
+      ];
 
   return (
     <>
-      {/* ── Hero ───────────────────────────────────────────────────────────── */}
-      <section className="relative -mt-[68px] overflow-hidden bg-gradient-to-br from-[#0b2560] via-brand to-[#4d86ff] pb-14 pt-[112px] sm:pb-20 sm:pt-[148px]">
-        <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-40 -left-24 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
+      {/* ── Hero ───────────────────────────────────────────────────────────
+          Latar terang, bukan bidang biru penuh seperti versi sebelumnya.
+          Bidang warna sebesar itu tidak membawa informasi apa pun, dan justru
+          membuat foto ruang serta harganya — hal yang benar-benar ingin dilihat
+          orang — kalah menonjol. Warnanya sekarang cuma tersisa sebagai kilau
+          tipis di sudut. */}
+      <section className="relative -mt-[var(--tinggi-header)] overflow-hidden border-b border-line bg-card pt-[var(--tinggi-header)]">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(110%_75%_at_88%_-10%,#e6eeff_0%,transparent_58%)]" />
 
-        <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <p className="text-sm font-semibold text-white/70">
-            Marketplace ruang antarwarga
-          </p>
-          <h1 className="mt-3 max-w-3xl font-display text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-6xl">
-            Ruang kosong di dekatmu, disewakan tetangga sendiri
-          </h1>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-white/80">
-            Garasi yang mobilnya sudah dijual, kamar belakang yang tidak terpakai,
-            lantai dua ruko yang kosong. Lebih dekat dan lebih murah daripada gudang
-            penitipan — dan kondisinya dijelaskan apa adanya.
-          </p>
+        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:px-8 lg:py-20">
+          <div>
+            <span className="inline-flex items-center rounded-full border border-line bg-paper px-3 py-1 text-xs font-semibold text-muted">
+              Marketplace ruang antarwarga
+            </span>
 
-          <div className="mt-8 max-w-3xl">
-            <CariCepat />
+            <h1 className="mt-5 font-display text-[2.1rem] font-bold leading-[1.08] text-ink sm:text-5xl">
+              Ruang kosong di dekatmu, disewakan tetangga sendiri
+            </h1>
+
+            <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-muted">
+              Garasi yang mobilnya sudah dijual, kamar belakang yang tidak terpakai,
+              lantai dua ruko yang kosong. Lebih dekat dan lebih murah daripada gudang
+              penitipan — dan kondisinya dijelaskan apa adanya.
+            </p>
+
+            <div className="mt-7">
+              <CariCepat />
+            </div>
+
+            {ringkas.jumlahRuang > 0 && (
+              <dl className="angka mt-7 flex flex-wrap items-end gap-x-8 gap-y-4">
+                <div>
+                  <dd className="font-display text-2xl font-bold">{ringkas.jumlahRuang}</dd>
+                  <dt className="text-xs text-muted">ruang tayang</dt>
+                </div>
+                <div>
+                  <dd className="font-display text-2xl font-bold">
+                    {ringkas.jumlahKecamatan}
+                  </dd>
+                  <dt className="text-xs text-muted">kecamatan</dt>
+                </div>
+                {ringkas.hargaTermurah != null && (
+                  <div>
+                    <dd className="font-display text-2xl font-bold">
+                      {rupiah(ringkas.hargaTermurah)}
+                    </dd>
+                    <dt className="text-xs text-muted">termurah per bulan</dt>
+                  </div>
+                )}
+              </dl>
+            )}
           </div>
 
-          {ringkas.jumlahRuang > 0 && (
-            <dl className="angka mt-8 flex flex-wrap gap-x-10 gap-y-4">
-              <div>
-                <dd className="font-display text-2xl font-bold text-white">
-                  {ringkas.jumlahRuang}
-                </dd>
-                <dt className="text-xs text-white/70">ruang tayang</dt>
-              </div>
-              <div>
-                <dd className="font-display text-2xl font-bold text-white">
-                  {ringkas.jumlahKecamatan}
-                </dd>
-                <dt className="text-xs text-white/70">kecamatan</dt>
-              </div>
-              {ringkas.hargaTermurah != null && (
-                <div>
-                  <dd className="font-display text-2xl font-bold text-white">
-                    {rupiah(ringkas.hargaTermurah)}
-                  </dd>
-                  <dt className="text-xs text-white/70">termurah per bulan</dt>
-                </div>
-              )}
-            </dl>
-          )}
+          <div className="lg:pl-2">
+            <KolaseSorotan ruang={sorotan} />
+          </div>
         </div>
       </section>
 

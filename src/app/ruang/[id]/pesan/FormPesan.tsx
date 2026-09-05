@@ -267,7 +267,7 @@ export default function FormPesan({ ruang }: { ruang: RuangUntukPesan }) {
         </section>
       </div>
 
-      <aside className="lg:sticky lg:top-24 lg:self-start">
+      <aside className="lg:sticky lg:top-[calc(var(--tinggi-header)+1rem)] lg:self-start">
         <div className="rounded-2xl bg-card p-5 ring-1 ring-line">
           <p className="text-sm font-semibold">{ruang.judul}</p>
           <p className="text-xs text-muted">

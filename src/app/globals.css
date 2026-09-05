@@ -3,39 +3,76 @@
 /**
  * Palet dan tipografi.
  *
- * Arahnya mengikuti acuan yang diberikan: latar biru-abu pucat, kartu putih
- * melayang, satu biru primer yang dipakai hemat (tombol dan tautan saja), dan
- * heading serif di atas teks antarmuka sans. Kombinasi itu yang membuat
- * marketplace terasa rapi tanpa perlu ilustrasi mahal.
+ * Arahnya: terang, tenang, dan warna dipakai hemat.
  *
- * Sengaja tanpa mode gelap otomatis: prototipe ini dipresentasikan lewat
- * laptop atau proyektor orang lain, jadi tampilannya harus sama di mana pun
- * dibuka, bukan mengikuti setelan sistem yang tidak kita kendalikan.
+ * Versi sebelumnya memakai biru pekat sebagai bidang besar — hero landing dan
+ * seluruh bagian atas halaman pencarian. Setelah dilihat di layar sungguhan,
+ * dua hal jadi jelas: hasil pencarian terdorong ke bawah lipatan oleh bidang
+ * yang tidak membawa informasi apa pun, dan warna sekuat itu di area seluas
+ * itu membuat isi halaman — foto ruang, harga, kondisi — justru kalah menonjol.
+ *
+ * Sekarang latarnya nyaris putih, dan biru hanya muncul di tempat yang memang
+ * perlu ditekan: tombol utama, tautan, dan keadaan terpilih.
+ *
+ * Sengaja tanpa mode gelap otomatis: aplikasinya dipakai bergantian di HP dan
+ * laptop, sering oleh dua orang yang sedang berdiri di satu ruangan yang sama.
+ * Tampilan yang berubah-ubah mengikuti setelan perangkat justru menyulitkan
+ * saat keduanya membandingkan layar.
  */
 @theme inline {
-  --color-paper: #eef2f9;
+  --color-paper: #f7f8fa;
   --color-card: #ffffff;
-  --color-line: #e2e8f2;
-  --color-ink: #0f1729;
-  --color-muted: #64748b;
+  --color-line: #e8eaf0;
+  --color-line-kuat: #d5d9e2;
+  --color-ink: #101828;
+  --color-muted: #667085;
 
-  --color-brand: #1f5fff;
-  --color-brand-dark: #1747cc;
-  --color-brand-soft: #e8f0ff;
+  --color-brand: #2563eb;
+  --color-brand-dark: #1d4ed8;
+  --color-brand-soft: #eef4ff;
 
-  --color-good: #0f7a52;
-  --color-good-soft: #e6f5ec;
-  --color-warn: #b45309;
-  --color-warn-soft: #fffbeb;
+  --color-good: #067647;
+  --color-good-soft: #ecfdf3;
+  --color-warn: #b54708;
+  --color-warn-soft: #fffaeb;
 
   --font-sans: var(--font-inter);
   --font-display: var(--font-serif);
   --font-mono: var(--font-geist-mono);
 }
 
+/**
+ * Tinggi bilah atas, diukur dari halaman yang sudah jadi — bukan ditaksir.
+ *
+ * Tiga tempat bergantung pada angka ini: hero halaman depan yang menyelinap di
+ * bawah header, bilah filter yang menempel tepat di bawahnya, dan jarak gulir
+ * ke jangkar. Sebelumnya ketiganya menulis `68px` sendiri-sendiri, dan
+ * ketiganya salah — tingginya 74px di layar kecil dan 78px dari `sm` ke atas,
+ * sehingga bilah filter menyelinap 10px ke balik header.
+ */
+:root {
+  --tinggi-header: 74px;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --tinggi-header: 78px;
+  }
+}
+
 body {
   background-color: var(--color-paper);
   color: var(--color-ink);
+}
+
+/* Judul serif dipakai besar; tanpa ini spasi antarhurufnya terasa longgar. */
+.font-display {
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background-color: var(--color-brand-soft);
+  color: var(--color-brand-dark);
 }
 
 /* Harga dan jarak dibandingkan antar kartu, jadi lebar angkanya dibuat tetap
@@ -51,4 +88,26 @@ body {
 }
 .geser-x::-webkit-scrollbar {
   display: none;
+}
+
+/**
+ * Bayangan kartu.
+ *
+ * Dua tingkat saja, dan keduanya sangat halus. Bayangan tebal membuat halaman
+ * terasa berat justru saat isinya banyak — dan halaman hasil pencarian di sini
+ * memang menampilkan belasan kartu sekaligus.
+ */
+.naik {
+  box-shadow:
+    0 1px 2px rgb(16 24 40 / 0.04),
+    0 1px 3px rgb(16 24 40 / 0.06);
+}
+.naik-hover {
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+.naik-hover:hover {
+  box-shadow:
+    0 4px 6px -2px rgb(16 24 40 / 0.05),
+    0 12px 16px -4px rgb(16 24 40 / 0.08);
+  transform: translateY(-2px);
 }

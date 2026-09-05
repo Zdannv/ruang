@@ -316,6 +316,36 @@ Supabase — jangan menambah platform ketiga sebelum jelas keduanya tidak cukup.
 Unggah foto lewat signed URL langsung ke Supabase Storage, jangan lewat
 API route — mahal di bandwidth dan kena batas waktu fungsi.
 
+## Arah tampilan — diputuskan 4 September 2026
+
+Terang, tenang, dan **warna dipakai hemat**. Latar nyaris putih (`--color-paper`
+#f7f8fa), kartu putih bergaris tipis, dan biru merek (#2563eb) hanya muncul di
+tombol utama, tautan, dan keadaan terpilih.
+
+Ini menggantikan versi sebelumnya yang memakai gradien biru pekat sebagai
+bidang besar — hero halaman depan dan seluruh bagian atas `/cari`. Alasannya
+ketahuan setelah halamannya dilihat di layar sungguhan, bukan dari membaca
+kode:
+
+1. Di `/cari`, bidang itu mendorong hasil pencarian ke bawah lipatan. Hasil
+   pencarian adalah satu-satunya alasan orang membuka halaman itu.
+2. Warna sekuat itu di area seluas itu membuat foto ruang, harga, dan kondisi —
+   hal yang benar-benar ingin dilihat orang — justru kalah menonjol.
+
+Aturan yang mengikutinya:
+
+- **Halaman alat kerja tidak punya hero.** `/cari`, `/pemesanan`, `/host`
+  langsung ke isinya; kendalinya muat dalam satu bilah.
+- **Yang berwarna besar hanya foto**, dan fotonya ruang sungguhan dari
+  database — bukan gambar hiasan.
+- **Bayangan sangat halus, dua tingkat saja** (`.naik`, `.naik-hover` di
+  globals.css). Halaman hasil menampilkan belasan kartu sekaligus; bayangan
+  tebal membuatnya terasa berat.
+- **Tinggi bilah atas ada di satu variabel** (`--tinggi-header`), diukur dari
+  halaman jadi: 74px di layar kecil, 78px dari `sm`. Tiga tempat bergantung
+  padanya. Sebelumnya ketiganya menulis `68px` sendiri-sendiri dan ketiganya
+  salah, sehingga bilah filter menyelinap 10px ke balik header.
+
 ## Bahasa
 
 Seluruh UI dan copy dalam Bahasa Indonesia. Nama kolom database juga

@@ -27,7 +27,9 @@ export default function CariCepat() {
   return (
     <form
       onSubmit={cari}
-      className="flex flex-col gap-2 rounded-3xl bg-card p-2 shadow-2xl shadow-ink/10 sm:flex-row sm:items-center sm:rounded-full sm:gap-0 sm:p-1.5"
+      /* Di latar terang, kartu putih butuh garis tepi — bayangan saja tidak
+         cukup memisahkannya dari halaman. */
+      className="naik flex flex-col gap-2 rounded-2xl border border-line bg-card p-2 sm:flex-row sm:items-center sm:rounded-full sm:gap-0 sm:p-1.5"
     >
       <label className="flex flex-1 cursor-pointer items-center gap-3 rounded-2xl px-4 py-2.5 hover:bg-paper sm:rounded-full">
         <MapPin className="h-4.5 w-4.5 shrink-0 text-brand" />

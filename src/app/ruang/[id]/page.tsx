@@ -354,7 +354,7 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
         </div>
 
         {/* ── Panel harga ──────────────────────────────────────────────────── */}
-        <aside className="lg:sticky lg:top-24 lg:self-start">
+        <aside className="lg:sticky lg:top-[calc(var(--tinggi-header)+1rem)] lg:self-start">
           <div className="rounded-2xl bg-card p-5 ring-1 ring-line">
             <p className="angka text-2xl font-bold">
               {rupiah(ruang.harga_bulanan)}

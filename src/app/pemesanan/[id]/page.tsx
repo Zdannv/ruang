@@ -257,7 +257,7 @@ export default async function HalamanDetailPemesanan({
           </section>
         </div>
 
-        <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+        <aside className="space-y-4 lg:sticky lg:top-[calc(var(--tinggi-header)+1rem)] lg:self-start">
           <div className="rounded-2xl bg-card p-5 ring-1 ring-line">
             <dl className="angka space-y-2 text-sm">
               <div className="flex justify-between gap-3">
