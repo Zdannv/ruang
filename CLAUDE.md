@@ -212,6 +212,19 @@ Kerjakan berurutan. Jangan lompat.
     jalan.**
 
     `pesan` tidak bisa diubah atau dihapus klien — ia bukti saat bersengketa.
+17. **Balasan cepat — selesai** (4 Sep 2026). Lihat `12_balasan_cepat.sql`.
+
+    **Balasan yang bisa disusun dari data ruang TIDAK disimpan.** Lebar pintu,
+    jendela akses, sewa minimum, harga — semuanya dihitung di layar dari kolom
+    yang sudah ada. Menyimpannya berbahaya: balasan tersimpan bisa menyebut
+    lebar pintu lama setelah pintunya diganti, dan host tidak akan pernah tahu
+    ia sedang mengirim keterangan yang salah.
+
+    Yang disimpan hanya yang ditulis host sendiri, untuk hal yang memang tidak
+    ada di rubrik ("sebaiknya datang sore, pagi ramai").
+
+    Aturan turunannya: **kalau sebuah balasan bisa diturunkan dari kolom yang
+    sudah ada, turunkan — jangan simpan salinannya.**
 
 ### Berikutnya, selama pembayaran belum ada
 

@@ -6,6 +6,12 @@ import Utas from "./Utas";
 import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { getPercakapan, tandaiUtasDibaca } from "@/lib/percakapan";
+import {
+  balasanDariRuang,
+  daftarBalasan,
+  type BalasanSiap,
+  type RuangUntukBalasan,
+} from "@/lib/balasan";
 
 export const metadata: Metadata = { title: "Percakapan — Ruang" };
 
@@ -27,6 +33,28 @@ export default async function HalamanUtas({ params }: PageProps<"/pesan/[id]">) 
   // Ditandai dibaca saat halamannya dibuka. Menandainya dari klien setelah
   // render akan membuat lencana berkedip sekali sebelum hilang.
   await tandaiUtasDibaca(db, id, sayaHost ? "host" : "penyewa");
+
+  // Balasan cepat hanya berguna untuk host, jadi datanya cuma diambil untuk
+  // host — penyewa tidak perlu membayar dua kueri untuk sesuatu yang tidak
+  // akan ditampilkan.
+  let balasanRuang: BalasanSiap[] = [];
+  let balasanTersimpan: { id: string; isi: string }[] = [];
+  if (sayaHost) {
+    const [r, tersimpan] = await Promise.all([
+      db
+        .from("ruang_publik")
+        .select(
+          "akses_masuk, lebar_pintu_cm, jarak_parkir, posisi_lantai, jendela_akses, " +
+            "kuota_akses_bulanan, durasi_min_hari, harga_bulanan, deposit, " +
+            "kategori_diterima, penguncian, berbagi, kelembapan, riwayat_banjir"
+        )
+        .eq("id", utas.ruang_id)
+        .maybeSingle(),
+      daftarBalasan(db),
+    ]);
+    if (r.data) balasanRuang = balasanDariRuang(r.data as unknown as RuangUntukBalasan);
+    balasanTersimpan = tersimpan;
+  }
 
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
@@ -65,10 +93,13 @@ export default async function HalamanUtas({ params }: PageProps<"/pesan/[id]">) 
 
       <Utas
         percakapanId={utas.id}
+        profilId={sayaId}
         pesanAwal={pesan}
         sayaId={sayaId}
         sayaHost={sayaHost}
         alamatSudahDibuka={utas.alamat_dibuka_pada !== null}
+        balasanRuang={balasanRuang}
+        balasanTersimpan={balasanTersimpan}
       />
     </div>
   );
