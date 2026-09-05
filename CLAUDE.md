@@ -342,6 +342,22 @@ Supabase — jangan menambah platform ketiga sebelum jelas keduanya tidak cukup.
 Unggah foto lewat signed URL langsung ke Supabase Storage, jangan lewat
 API route — mahal di bandwidth dan kena batas waktu fungsi.
 
+**Region fungsi Vercel dikunci ke `sin1` di `vercel.json`, dan itu bukan
+kerapian.** Databasenya di Singapura, dan tiap perpindahan halaman memanggil
+Supabase 5-8 kali berurutan: `getUser()`, kueri profil, dua lencana header,
+lalu kueri halamannya. Kalau fungsinya jalan di Amerika, tiap panggilan bayar
+sekitar 230 ms — dan jeda yang terasa itu penjumlahan semuanya, bukan satu
+kueri yang lambat. Kalau region-nya berubah, yang rusak bukan fiturnya
+melainkan rasanya, dan itu jenis kerusakan yang paling lama tidak disadari.
+
+Dua aturan turunannya:
+
+- **Setiap rute punya `loading.tsx`.** Tanpa itu, menekan tautan tidak
+  menghasilkan apa-apa di layar sampai seluruh kueri servernya selesai.
+- **Apa pun yang tidak mendesak dikeluarkan dari jalur kritis** dengan
+  Suspense — angka di lencana header contohnya. Halaman tidak boleh menunggu
+  hitungan notifikasi hanya untuk menampilkan judulnya.
+
 ## Arah tampilan — diputuskan 4 September 2026
 
 Terang, tenang, dan **warna dipakai hemat**. Latar nyaris putih (`--color-paper`

@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { Bell, House, MessageCircle } from "lucide-react";
+import { Suspense } from "react";
+import { House } from "lucide-react";
 import { sesiSaya } from "@/lib/auth";
-import { klienServer } from "@/lib/supabase/server";
-import { jumlahBelumDibaca } from "@/lib/notifikasi";
-import { pesanBelumDibaca } from "@/lib/percakapan";
+import LencanaHeader, { LencanaKosong } from "@/components/LencanaHeader";
 
 /**
  * Bilah atas yang melayang di atas isi halaman — kartu putih membulat dengan
@@ -16,10 +15,7 @@ import { pesanBelumDibaca } from "@/lib/percakapan";
 export default async function Header() {
   const sesi = await sesiSaya();
   const nama = sesi?.profil?.nama ?? sesi?.email ?? null;
-  const db = sesi ? await klienServer() : null;
-  const [belumDibaca, pesanBaru] = db
-    ? await Promise.all([jumlahBelumDibaca(db), pesanBelumDibaca(db)])
-    : [0, 0];
+
 
   return (
     <header className="sticky top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
@@ -61,37 +57,12 @@ export default async function Header() {
               Pemesanan
             </Link>
 
-            <Link
-              href="/pesan"
-              aria-label={
-                pesanBaru > 0 ? `Pesan, ${pesanBaru} belum dibaca` : "Pesan"
-              }
-              className="relative rounded-full p-2 text-muted transition-colors hover:bg-paper hover:text-ink"
-            >
-              <MessageCircle className="h-5 w-5" />
-              {pesanBaru > 0 && (
-                <span className="angka absolute -right-0.5 -top-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold text-white">
-                  {pesanBaru > 9 ? "9+" : pesanBaru}
-                </span>
-              )}
-            </Link>
+            {/* Angka lencana butuh dua kueri; keduanya dikeluarkan dari jalur
+                kritis supaya header tampil lebih dulu dan angkanya menyusul. */}
+            <Suspense fallback={<LencanaKosong />}>
+              <LencanaHeader />
+            </Suspense>
 
-            <Link
-              href="/notifikasi"
-              aria-label={
-                belumDibaca > 0
-                  ? `Notifikasi, ${belumDibaca} belum dibaca`
-                  : "Notifikasi"
-              }
-              className="relative rounded-full p-2 text-muted transition-colors hover:bg-paper hover:text-ink"
-            >
-              <Bell className="h-5 w-5" />
-              {belumDibaca > 0 && (
-                <span className="angka absolute -right-0.5 -top-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold text-white">
-                  {belumDibaca > 9 ? "9+" : belumDibaca}
-                </span>
-              )}
-            </Link>
             <Link
               href="/profil"
               className="hidden max-w-32 truncate rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-paper hover:text-ink sm:block"
