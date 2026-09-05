@@ -3,11 +3,13 @@ import type { Metadata } from "next";
 import {
   ArrowRight,
   CalendarClock,
+  ChevronRight,
   ClipboardList,
   Handshake,
   Ruler,
   Search,
   ShieldAlert,
+  Store,
   Wallet,
 } from "lucide-react";
 import CariCepat from "@/components/CariCepat";
@@ -173,6 +175,28 @@ export default async function Beranda() {
             })}
           </div>
         </div>
+
+        {/* Pintu masuk terpisah untuk penjual online: mereka tidak mencari
+            "gudang", mereka mencari tempat menaruh stok yang bisa diambil
+            berkali-kali — dan itu justru alur yang paling matang di sini. */}
+        <Link
+          href="/cari?kategori=stok_dagangan&radius=15"
+          className="naik naik-hover mt-6 flex items-center gap-4 rounded-2xl border border-line bg-card p-5"
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand-dark">
+            <Store className="h-5 w-5" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-display text-lg font-bold tracking-tight">
+              Jualan online dan stoknya menumpuk di rumah?
+            </span>
+            <span className="mt-1 block text-sm leading-relaxed text-muted">
+              Cari ruang yang memang menerima stok dagangan, dekat rumah, dengan
+              jadwal ambil-barang yang disepakati lewat aplikasi.
+            </span>
+          </span>
+          <ChevronRight className="hidden h-5 w-5 shrink-0 text-muted sm:block" />
+        </Link>
       </section>
 
       {/* ── Kenapa ─────────────────────────────────────────────────────────── */}

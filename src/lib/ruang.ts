@@ -61,6 +61,8 @@ export type HasilRuang = {
   akses_masuk: AksesMasuk;
   riwayat_banjir: RiwayatBanjir;
   penguncian: Penguncian;
+  /** Dipakai menyaring hasil: penjual online mencari yang menerima stok. */
+  kategori_diterima: string[];
   jarak_km: number;
 };
 
@@ -103,7 +105,14 @@ export async function cariRuang(
   if (hasil.length === 0) return [];
 
   const foto = await fotoPertama(db, hasil.map((r) => r.id));
-  return hasil.map((r) => ({ ...r, foto: foto.get(r.id) ?? null }));
+  return hasil.map((r) => ({
+    ...r,
+    // Kolom ini baru ada sejak 13_umkm.sql. Di database yang belum
+    // dijalankan migrasinya ia tidak terkirim sama sekali, dan hasil
+    // pencarian tidak boleh ikut mati karenanya.
+    kategori_diterima: r.kategori_diterima ?? [],
+    foto: foto.get(r.id) ?? null,
+  }));
 }
 
 /**

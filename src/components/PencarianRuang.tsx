@@ -7,7 +7,7 @@ import KartuRuang from "@/components/KartuRuang";
 import { IKON_TIPE } from "@/components/IkonTipe";
 import { cariRuang, type RuangDenganFoto, type TipeRuang } from "@/lib/ruang";
 import { klienBrowser } from "@/lib/supabase/browser";
-import { LABEL_TIPE } from "@/lib/label";
+import { LABEL_KATEGORI, LABEL_TIPE } from "@/lib/label";
 import {
   HARGA_PILIHAN,
   RADIUS_BAWAAN,
@@ -60,6 +60,7 @@ export default function PencarianRuang() {
   const volumeMin = angkaDari(searchParams.get("volume"), 0);
   const hargaMaks = angkaDari(searchParams.get("harga"), 0);
   const tipe = (searchParams.get("tipe") ?? "") as TipeRuang | "";
+  const kategori = searchParams.get("kategori") ?? "";
 
   const preset = presetDari(lat, lng);
   const namaTitik = preset?.nama ?? "lokasimu";
@@ -139,10 +140,20 @@ export default function PencarianRuang() {
     [memuat, hasil]
   );
 
-  // Tipe disaring di sisi klien, bukan lewat parameter fungsi database.
-  // `ruang_terdekat()` sudah mengembalikan kolom `tipe`, dan menambah parameter
-  // baru berarti mengubah 01_schema.sql yang sudah diuji dan dijalankan.
-  const daftar = tipe ? semua.filter((r) => r.tipe === tipe) : semua;
+  // Tipe dan kategori disaring di sisi klien, bukan lewat parameter fungsi
+  // database. `ruang_terdekat()` sudah mengembalikan kedua kolomnya dan
+  // mengembalikan seluruh hasil dalam radius tanpa halaman, jadi hitungannya
+  // tetap benar. Dibungkus useMemo dengan alasan yang sama seperti `semua` —
+  // dan tanpanya React Compiler menolak mengoptimalkan seluruh komponen.
+  const daftar = useMemo(
+    () =>
+      semua.filter(
+        (r) =>
+          (!tipe || r.tipe === tipe) &&
+          (!kategori || r.kategori_diterima.includes(kategori))
+      ),
+    [semua, tipe, kategori]
+  );
 
   // Tipe yang memang ada isinya dalam radius sekarang. Menawarkan "Kontainer"
   // padahal tidak ada satu pun di sekitar situ cuma memancing hasil kosong.
@@ -155,6 +166,17 @@ export default function PencarianRuang() {
     return TIPE_URUT.filter((t) => ada.has(t));
   }, [semua, tipe]);
 
+  // Kategori yang benar-benar diterima seseorang dalam radius sekarang, dengan
+  // alasan yang sama seperti `tipeTersedia`. Ia sekaligus menahan keadaan
+  // "13_umkm.sql belum dijalankan": di database itu `kategori_diterima`
+  // kosong untuk semua baris, jadi barisan pilihannya tidak muncul sama sekali
+  // alih-alih memberi filter yang selalu menghasilkan nol.
+  const kategoriTersedia = useMemo(() => {
+    const ada = new Set(semua.flatMap((r) => r.kategori_diterima));
+    if (kategori) ada.add(kategori);
+    return Object.keys(LABEL_KATEGORI).filter((k) => ada.has(k));
+  }, [semua, kategori]);
+
   const bersihkan = () => router.replace(pathname, { scroll: false });
 
   // "Hapus filter" mengembalikan SEMUANYA ke bawaan, termasuk titik dan radius
@@ -162,6 +184,7 @@ export default function PencarianRuang() {
   const adaFilter =
     searchParams.toString() !== "" &&
     (Boolean(tipe) ||
+      Boolean(kategori) ||
       volumeMin > 0 ||
       hargaMaks > 0 ||
       radiusKm !== RADIUS_BAWAAN ||
@@ -377,6 +400,43 @@ export default function PencarianRuang() {
               </div>
             </div>
           </div>
+          {kategoriTersedia.length > 0 && (
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
+                Barang yang mau disimpan
+              </h3>
+              <p className="mt-1 text-xs text-muted">
+                Host berhak menolak kategori yang tidak ia terima, jadi menyaringnya
+                di sini menghemat permintaan yang sudah pasti ditolak.
+              </p>
+              <div className="geser-x -mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+                <div className="flex w-max gap-2 pb-1 sm:w-auto sm:flex-wrap">
+                  <button
+                    type="button"
+                    aria-pressed={!kategori}
+                    onClick={() => ubah({ kategori: null })}
+                    className={`${PIL} ${kategori ? PIL_MATI : PIL_AKTIF} whitespace-nowrap`}
+                  >
+                    Semua barang
+                  </button>
+                  {kategoriTersedia.map((kode) => {
+                    const aktif = kategori === kode;
+                    return (
+                      <button
+                        key={kode}
+                        type="button"
+                        aria-pressed={aktif}
+                        onClick={() => ubah({ kategori: aktif ? null : kode })}
+                        className={`${PIL} ${aktif ? PIL_AKTIF : PIL_MATI} whitespace-nowrap`}
+                      >
+                        {LABEL_KATEGORI[kode]}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* ── Hasil ──────────────────────────────────────────────────────── */}

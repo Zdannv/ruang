@@ -11,6 +11,8 @@ import { pesanBelumDibaca } from "@/lib/percakapan";
 
 export const metadata: Metadata = { title: "Profil — Ruang" };
 
+type UsahaProfil = { nama_usaha: string | null; npwp: string | null };
+
 export default async function HalamanProfil() {
   const sesi = await sesiSaya();
   if (!sesi) redirect("/masuk?lanjut=/profil");
@@ -23,6 +25,16 @@ export default async function HalamanProfil() {
   const { data } = await db
     .from("profil")
     .select("id, nama, kota, telepon, terverifikasi, bergabung")
+    .eq("id", sesi.profil?.id ?? "")
+    .maybeSingle();
+
+  // Diambil terpisah dari select di atas, dan galatnya ditelan: kedua kolom ini
+  // baru ada sejak 13_umkm.sql. Kalau digabung, database yang belum dijalankan
+  // migrasinya membuat SELURUH halaman akun gagal — termasuk tombol keluar,
+  // yang di HP cuma ada di sini.
+  const { data: usaha } = await db
+    .from("profil")
+    .select("nama_usaha, npwp")
     .eq("id", sesi.profil?.id ?? "")
     .maybeSingle();
 
@@ -127,6 +139,14 @@ export default async function HalamanProfil() {
             kota: profil.kota,
             telepon: profil.telepon ?? "",
           }}
+          usaha={
+            usaha
+              ? {
+                  namaUsaha: (usaha as UsahaProfil).nama_usaha ?? "",
+                  npwp: (usaha as UsahaProfil).npwp ?? "",
+                }
+              : null
+          }
         />
       </div>
 

@@ -7,21 +7,35 @@ import { Bagian, Kolom } from "@/components/host/Kolom";
 import { klienBrowser } from "@/lib/supabase/browser";
 import { bulanTahun } from "@/lib/label";
 
+/** Kolom nullable: string kosong disimpan sebagai NULL, bukan sebagai "". */
+const kosongJadiNull = (v: string) => (v.trim() === "" ? null : v.trim());
+
 export default function FormProfil({
   profilId,
   email,
   bergabung,
   terverifikasi,
   awal,
+  usaha,
 }: {
   profilId: string;
   email: string | null;
   bergabung: string | null;
   terverifikasi: boolean;
   awal: { nama: string; kota: string; telepon: string };
+  /**
+   * `null` kalau kolomnya belum ada di database — bagiannya disembunyikan
+   * seluruhnya, karena formulir yang setiap simpanannya gagal lebih buruk
+   * daripada formulir yang tidak ada.
+   */
+  usaha: { namaUsaha: string; npwp: string } | null;
 }) {
   const router = useRouter();
-  const [isi, setIsi] = useState(awal);
+  const [isi, setIsi] = useState({
+    ...awal,
+    namaUsaha: usaha?.namaUsaha ?? "",
+    npwp: usaha?.npwp ?? "",
+  });
   const [kirim, setKirim] = useState(false);
   const [galat, setGalat] = useState<string | null>(null);
   const [tersimpan, setTersimpan] = useState(false);
@@ -41,6 +55,12 @@ export default function FormProfil({
         // cuma memindahkan pemeriksaan "ada isinya atau tidak" ke setiap
         // tempat yang membacanya.
         telepon: isi.telepon.trim() === "" ? null : isi.telepon.trim(),
+        ...(usaha
+          ? {
+              nama_usaha: kosongJadiNull(isi.namaUsaha),
+              npwp: kosongJadiNull(isi.npwp),
+            }
+          : {}),
       })
       .eq("id", profilId);
 
@@ -83,6 +103,29 @@ export default function FormProfil({
           bantuan="Belum diverifikasi, dan hanya dibuka ke pihak lain setelah pembayaran."
         />
       </Bagian>
+
+      {usaha && (
+        <Bagian
+          judul="Usaha (opsional)"
+          keterangan="Isi kalau kamu menyewa untuk berdagang. Nama usaha ikut tertulis di berita acara serah terima, dan NPWP dipakai kalau kamu perlu bukti sewanya untuk pembukuan. Keduanya tidak pernah ditampilkan ke publik."
+        >
+          <Kolom
+            id="nama_usaha"
+            label="Nama usaha"
+            value={isi.namaUsaha}
+            onChange={(e) => setIsi((v) => ({ ...v, namaUsaha: e.target.value }))}
+            placeholder="Toko Melati"
+          />
+          <Kolom
+            id="npwp"
+            label="NPWP"
+            value={isi.npwp}
+            onChange={(e) => setIsi((v) => ({ ...v, npwp: e.target.value }))}
+            placeholder="00.000.000.0-000.000"
+            bantuan="Hanya terlihat olehmu."
+          />
+        </Bagian>
+      )}
 
       <section className="rounded-2xl bg-card p-5 ring-1 ring-line">
         <h2 className="font-display text-lg font-bold tracking-tight">Akun</h2>

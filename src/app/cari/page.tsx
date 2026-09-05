@@ -47,18 +47,28 @@ function PetunjukPemasangan() {
   );
 }
 
+/**
+ * Kerangka yang tampil sampai `PencarianRuang` terhidrasi — ia memakai
+ * `useSearchParams()`, jadi di server ia selalu tertahan Suspense.
+ *
+ * Bentuknya harus menyerupai halaman jadinya: bilah kendali dulu, lalu kisi
+ * kartu. Versi sebelumnya menaruh bidang gradien biru setinggi 420px di sini,
+ * sisa dari tampilan yang sudah diganti 4 September 2026 — jadi setiap kali
+ * `/cari` dibuka, hero yang sudah dihapus itu berkelip sekejap lebih dulu.
+ * Ia juga menulis sendiri `-mt-[68px]`, angka yang sudah salah sejak tinggi
+ * header diukur ulang dan dipindah ke `--tinggi-header`.
+ */
 function Kerangka() {
   return (
-    <>
-      <div className="-mt-[68px] h-[420px] bg-gradient-to-br from-[#0d2a6b] via-brand to-[#3f7bff]" />
-      <div className="mx-auto w-full max-w-6xl px-4 pt-8 sm:px-6 lg:px-8">
-        <div className="h-7 w-56 max-w-full animate-pulse rounded-lg bg-line" />
-        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-80 animate-pulse rounded-2xl bg-card ring-1 ring-line" />
-          ))}
-        </div>
+    <div className="mx-auto w-full max-w-6xl px-4 pt-8 sm:px-6 lg:px-8">
+      <div className="h-7 w-56 max-w-full animate-pulse rounded-lg bg-line" />
+      <div className="mt-6 h-40 animate-pulse rounded-2xl bg-card ring-1 ring-line" />
+      <div className="mt-8 h-7 w-40 max-w-full animate-pulse rounded-lg bg-line" />
+      <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="h-80 animate-pulse rounded-2xl bg-card ring-1 ring-line" />
+        ))}
       </div>
-    </>
+    </div>
   );
 }

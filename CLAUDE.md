@@ -226,6 +226,29 @@ Kerjakan berurutan. Jangan lompat.
     Aturan turunannya: **kalau sebuah balasan bisa diturunkan dari kolom yang
     sudah ada, turunkan — jangan simpan salinannya.**
 
+18. **Penjual online ikut terlayani — selesai** (5 Sep 2026). Lihat
+    `13_umkm.sql`. Kategori barang sudah ada di `ruang.kategori_diterima`
+    sejak `01_schema.sql`, termasuk `stok_dagangan`, tapi tidak ada satu pun
+    cara **menemukannya**: `ruang_terdekat()` tidak mengembalikan kolomnya dan
+    `/cari` tidak punya penyaringnya. Jadi ruang yang menerima stok dagangan
+    ada, dan penjual yang mencarinya tidak bisa memisahkannya dari yang akan
+    menolaknya. Sekarang bisa.
+
+    Ditambah juga `profil.nama_usaha` dan `profil.npwp`, keduanya opsional.
+    `npwp` masuk daftar kolom terlarang di `periksa_permukaan_publik()`.
+
+    **Tidak ditambahkan: invoice.** Menerbitkan "Invoice Rp1.200.000" untuk
+    uang yang belum pernah berpindah adalah dokumen palsu — dan bedanya dengan
+    layar yang mengaku "sudah dibayar" cuma satu: invoice dibawa orang ke
+    pembukuannya. Ia menunggu pembayaran, seperti serah terima.
+
+    **Tidak ditambahkan: pencatatan stok masuk-keluar.** Bentuknya belum
+    diketahui — satuan, SKU, per boks, per lembar — dan menebaknya berarti
+    membangun tabel yang harus dibongkar setelah penjual pertama memakainya.
+    Yang sudah ada sekarang sudah menutup sebagian besar gunanya: manifes
+    berversi mencatat nama, kategori, jumlah, dan nilai taksiran per barang,
+    dan `akses_log` mencatat setiap kedatangan.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris
