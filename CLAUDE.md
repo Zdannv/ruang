@@ -161,17 +161,30 @@ Kerjakan berurutan. Jangan lompat.
     `08_jendela.sql`. Menutup utang no. 1: aturan produk nomor satu akhirnya
     ditegakkan database, bukan cuma ditampilkan.
 
+12. **Notifikasi in-app — selesai** (4 Sep 2026). Lihat `09_notifikasi.sql`.
+    Sebelum ini host baru tahu ada permintaan kalau ia membuka `/pemesanan`
+    sendiri — untuk marketplace dua sisi itu cacat mendasar. Triggernya dipasang
+    di `pemesanan_transisi` dan `akses_log`, BUKAN di dalam masing-masing fungsi
+    transisi, supaya transisi yang ditambahkan nanti (pembayaran, serah terima)
+    otomatis ikut terkirim tanpa ada yang perlu ingat menambahkannya.
+13. **Lupa sandi & halaman profil — selesai** (4 Sep 2026). `/lupa-sandi`,
+    `/sandi-baru`, `/profil`.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris
 sendiri), dan itu pun lebih baik dikerjakan bersamaan dengan serah terimanya.
-Fitur sungguhan berikutnya — serah terima, pengakhiran lebih awal, kontrak
-PDF — semuanya menunggu `menunggu_pembayaran` bisa dilewati.
 
-Yang bisa dikerjakan tanpa menunggu apa pun dan belum dikerjakan: layar lupa
-sandi (utang no. 6), halaman profil untuk mengubah nama/kota/nomor, dan
-notifikasi in-app supaya host tahu ada permintaan masuk tanpa harus membuka
-`/pemesanan` sendiri.
+Artinya: **tidak ada lagi fitur berarti yang bisa dibangun tanpa jalur
+pembayaran.** Serah terima, pengakhiran lebih awal, dan kontrak PDF semuanya
+menunggu `menunggu_pembayaran` bisa dilewati. Yang tersisa cuma pekerjaan yang
+tidak menambah alur: verifikasi nomor HP (menunggu WhatsApp/SMS), memisahkan
+properti dari ruang (utang no. 4), dan mengganti foto seed.
+
+Kalau ada waktu dan pembayaran masih jauh, yang paling berguna dikerjakan
+adalah **menyiapkan integrasi pembayarannya sendiri**: pilih penyedia, daftar
+akun bisnis, lalu bangun `bayar_pemesanan()` beserta webhook-nya. Itu satu-
+satunya hal yang membuka enam langkah berikutnya sekaligus.
 
 ## Yang masih menunggu pihak luar
 
@@ -183,7 +196,7 @@ mengaku "sudah dibayar" tanpa uang sungguhan adalah kebohongan, bukan demo.
 |---|---|---|
 | Pembayaran | payment gateway berlisensi + akun bisnis | model pemesanan & transisi status |
 | Verifikasi identitas | vendor e-KYC | kolom rujukan id vendor; jangan simpan foto KTP sendiri |
-| Notifikasi WhatsApp | WhatsApp Business API provider | notifikasi in-app, email lewat Supabase |
+| Notifikasi WhatsApp | WhatsApp Business API provider | notifikasi in-app **sudah ada**; email lewat Supabase belum |
 | Kontrak PDF | menunggu alur pesan | dibuat dari data pemesanan, bukan berkas contoh |
 
 **Login tidak lagi masuk daftar ini.** Switcher peran dibuang; yang dipakai
@@ -223,6 +236,11 @@ memasang `alter default privileges ... grant all on tables to anon`. Jadi tiap
 tabel baru butuh `revoke all ... from anon` eksplisit — jangan pernah
 mengandalkan "kan saya tidak memberi grant".
 
+**Notifikasi ditulis trigger, tidak pernah klien.** Klien tidak punya INSERT ke
+`notifikasi` sama sekali — kalau punya, siapa pun bisa mengirim "Host menerima
+permintaanmu" palsu ke orang lain. Triggernya menempel di `pemesanan_transisi`
+dan `akses_log`; penerimanya selalu pihak yang TIDAK melakukan tindakan itu.
+
 **Jendela akses adalah data, bukan teks.** Tabel `jendela_akses` yang jadi
 sumber kebenaran; `ruang.jendela_akses` cuma label tampilan yang dihasilkan
 trigger dari baris-baris itu. Jangan pernah menulis label itu dari aplikasi.
@@ -253,8 +271,7 @@ satu pun kueri yang jalan.
    penting, karena EXIF foto HP hampir selalu memuat GPS. Yang belum: kamera
    in-app untuk foto serah terima, dan bucket terpisah untuk foto bukti, yang
    tidak boleh publik.
-6. **Belum ada lupa sandi.** Supabase menyediakannya; layarnya belum dibuat.
-7. **Nomor HP belum diverifikasi.** Diisi saat daftar dan disimpan apa adanya;
+6. **Nomor HP belum diverifikasi.** Diisi saat daftar dan disimpan apa adanya;
    verifikasinya menunggu jalur WhatsApp/SMS.
 
 ## Stack

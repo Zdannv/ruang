@@ -1,0 +1,140 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { BadgeCheck, Loader2 } from "lucide-react";
+import { Bagian, Kolom } from "@/components/host/Kolom";
+import { klienBrowser } from "@/lib/supabase/browser";
+import { bulanTahun } from "@/lib/label";
+
+export default function FormProfil({
+  profilId,
+  email,
+  bergabung,
+  terverifikasi,
+  awal,
+}: {
+  profilId: string;
+  email: string | null;
+  bergabung: string | null;
+  terverifikasi: boolean;
+  awal: { nama: string; kota: string; telepon: string };
+}) {
+  const router = useRouter();
+  const [isi, setIsi] = useState(awal);
+  const [kirim, setKirim] = useState(false);
+  const [galat, setGalat] = useState<string | null>(null);
+  const [tersimpan, setTersimpan] = useState(false);
+
+  const simpan = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setKirim(true);
+    setGalat(null);
+    setTersimpan(false);
+
+    const { error } = await klienBrowser()
+      .from("profil")
+      .update({
+        nama: isi.nama.trim(),
+        kota: isi.kota.trim(),
+        // Kolom ini nullable sejak 03: string kosong yang disimpan apa adanya
+        // cuma memindahkan pemeriksaan "ada isinya atau tidak" ke setiap
+        // tempat yang membacanya.
+        telepon: isi.telepon.trim() === "" ? null : isi.telepon.trim(),
+      })
+      .eq("id", profilId);
+
+    setKirim(false);
+    if (error) {
+      setGalat(error.message);
+      return;
+    }
+    setTersimpan(true);
+    router.refresh();
+  };
+
+  return (
+    <form onSubmit={simpan} className="space-y-5">
+      <Bagian judul="Identitas">
+        <div className="sm:col-span-2">
+          <Kolom
+            id="nama"
+            label="Nama"
+            required
+            value={isi.nama}
+            onChange={(e) => setIsi((v) => ({ ...v, nama: e.target.value }))}
+            bantuan="Yang dilihat host atau penyewa di pemesanan dan ulasan."
+          />
+        </div>
+        <Kolom
+          id="kota"
+          label="Kota"
+          required
+          value={isi.kota}
+          onChange={(e) => setIsi((v) => ({ ...v, kota: e.target.value }))}
+        />
+        <Kolom
+          id="telepon"
+          label="Nomor HP"
+          type="tel"
+          value={isi.telepon}
+          onChange={(e) => setIsi((v) => ({ ...v, telepon: e.target.value }))}
+          placeholder="08xxxxxxxxxx"
+          bantuan="Belum diverifikasi, dan hanya dibuka ke pihak lain setelah pembayaran."
+        />
+      </Bagian>
+
+      <section className="rounded-2xl bg-card p-5 ring-1 ring-line">
+        <h2 className="font-display text-lg font-bold tracking-tight">Akun</h2>
+        <dl className="mt-3 space-y-2 text-sm">
+          <div className="flex flex-wrap justify-between gap-3">
+            <dt className="text-muted">Email</dt>
+            <dd className="font-medium">{email ?? "—"}</dd>
+          </div>
+          <div className="flex flex-wrap justify-between gap-3">
+            <dt className="text-muted">Bergabung</dt>
+            <dd className="angka font-medium">
+              {bergabung ? bulanTahun(bergabung) : "—"}
+            </dd>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <dt className="text-muted">Verifikasi identitas</dt>
+            <dd className="font-medium">
+              {terverifikasi ? (
+                <span className="inline-flex items-center gap-1.5 text-brand">
+                  <BadgeCheck className="h-4 w-4" />
+                  Terverifikasi
+                </span>
+              ) : (
+                <span className="text-muted">Belum</span>
+              )}
+            </dd>
+          </div>
+        </dl>
+        <p className="mt-3 border-t border-line pt-3 text-xs leading-relaxed text-muted">
+          Email tidak bisa diganti dari sini — menggantinya berarti memverifikasi ulang
+          alamat yang baru, dan alurnya belum dibangun. Verifikasi identitas menunggu
+          vendor e-KYC; kami tidak menyimpan foto KTP di database sendiri.
+        </p>
+      </section>
+
+      {galat && (
+        <p className="rounded-xl bg-warn-soft px-3.5 py-2.5 text-sm text-warn">{galat}</p>
+      )}
+      {tersimpan && (
+        <p className="rounded-xl bg-good-soft px-3.5 py-2.5 text-sm text-good">
+          Perubahan tersimpan.
+        </p>
+      )}
+
+      <button
+        type="submit"
+        disabled={kirim}
+        className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {kirim && <Loader2 className="h-4 w-4 animate-spin" />}
+        Simpan perubahan
+      </button>
+    </form>
+  );
+}

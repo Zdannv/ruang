@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Inbox, Search, UserRound } from "lucide-react";
+import { Bell, House, Inbox, Search, UserRound } from "lucide-react";
 
 /**
  * Navigasi bawah untuk layar kecil.
@@ -17,18 +17,21 @@ import { House, Inbox, Search, UserRound } from "lucide-react";
 export default function NavBawah({ masuk }: { masuk: boolean }) {
   const path = usePathname();
 
-  const item = [
-    { href: "/cari", label: "Cari", ikon: Search },
-    { href: "/pemesanan", label: "Pemesanan", ikon: Inbox },
-    { href: "/host", label: "Sewakan", ikon: House },
-    masuk
-      ? { href: "/pemesanan", label: "Akun", ikon: UserRound }
-      : { href: "/masuk", label: "Masuk", ikon: UserRound },
-  ];
-
-  // Item terakhir menunjuk tujuan yang sama dengan "Pemesanan" saat sudah
-  // masuk, jadi jangan tampilkan dua-duanya.
-  const tampil = masuk ? item.slice(0, 3) : item;
+  // Saat sudah masuk, item keempat jadi notifikasi — bukan "Akun" yang dulu
+  // menunjuk tujuan yang sama dengan Pemesanan.
+  const tampil = masuk
+    ? [
+        { href: "/cari", label: "Cari", ikon: Search },
+        { href: "/pemesanan", label: "Pemesanan", ikon: Inbox },
+        { href: "/host", label: "Sewakan", ikon: House },
+        { href: "/notifikasi", label: "Notifikasi", ikon: Bell },
+      ]
+    : [
+        { href: "/cari", label: "Cari", ikon: Search },
+        { href: "/pemesanan", label: "Pemesanan", ikon: Inbox },
+        { href: "/host", label: "Sewakan", ikon: House },
+        { href: "/masuk", label: "Masuk", ikon: UserRound },
+      ];
 
   return (
     <nav

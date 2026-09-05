@@ -74,15 +74,25 @@ export default function FormMasuk() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="nama@contoh.com"
         />
-        <KolomIsian
-          id="sandi"
-          label="Sandi"
-          type="password"
-          autoComplete="current-password"
-          required
-          value={sandi}
-          onChange={(e) => setSandi(e.target.value)}
-        />
+        <div>
+          <KolomIsian
+            id="sandi"
+            label="Sandi"
+            type="password"
+            autoComplete="current-password"
+            required
+            value={sandi}
+            onChange={(e) => setSandi(e.target.value)}
+          />
+          <p className="mt-1.5 text-right">
+            <Link
+              href="/lupa-sandi"
+              className="text-xs font-semibold text-brand hover:text-brand-dark"
+            >
+              Lupa sandi?
+            </Link>
+          </p>
+        </div>
 
         {galat && (
           <p className="rounded-xl bg-warn-soft px-3.5 py-2.5 text-sm text-warn">{galat}</p>

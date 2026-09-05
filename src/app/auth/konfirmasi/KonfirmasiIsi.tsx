@@ -3,116 +3,42 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { EmailOtpType } from "@supabase/supabase-js";
 import { CircleCheck, CircleX, Loader2 } from "lucide-react";
 import KartuAuth from "@/components/auth/KartuAuth";
 import { klienBrowser } from "@/lib/supabase/browser";
+import { selesaikanTautan } from "@/lib/tautanAuth";
 
 type Keadaan =
   | { tahap: "memeriksa" }
   | { tahap: "berhasil" }
   | { tahap: "gagal"; pesan: string };
 
-/** Berapa lama menunggu klien Supabase menyelesaikan tautannya sendiri. */
-const BATAS_MS = 6000;
-
 /**
  * Menyelesaikan tautan konfirmasi email.
  *
- * Dikerjakan di klien, bukan di route handler server, dan itu bukan pilihan
- * gaya. Supabase bisa mengembalikan hasil verifikasi dalam tiga bentuk berbeda
- * tergantung templat email dan alur yang aktif:
- *
- *   1. `?token_hash=...&type=signup` — perlu `verifyOtp` eksplisit.
- *   2. `?code=...` — alur PKCE; ditangani sendiri oleh klien browser.
- *   3. `#access_token=...&refresh_token=...` — alur implisit.
- *
- * Bentuk ketiga TIDAK PERNAH sampai ke server: fragment URL tidak dikirim
- * peramban dalam permintaan HTTP. Versi pertama halaman ini berupa route
- * handler, jadi untuk bentuk itu ia selalu menjawab "tautannya tidak lengkap"
- * padahal tokennya ada di alamat yang sedang dibuka.
- *
- * `createBrowserClient` sudah menyalakan `detectSessionInUrl`, jadi bentuk 2
- * dan 3 selesai sendiri begitu klien dibuat — yang perlu dilakukan di sini
- * cuma menunggu sesinya muncul, dan menangani bentuk 1 secara eksplisit.
+ * Seluruh penanganan tiga bentuk balasan Supabase ada di `selesaikanTautan` —
+ * lihat komentar di sana untuk alasan kenapa ini harus dikerjakan di klien.
  */
 export default function KonfirmasiIsi() {
   const router = useRouter();
   const [keadaan, setKeadaan] = useState<Keadaan>({ tahap: "memeriksa" });
 
   useEffect(() => {
-    const db = klienBrowser();
     let hidup = true;
-    let pewaktu: ReturnType<typeof setTimeout> | undefined;
 
-    const selesai = (k: Keadaan) => {
+    selesaikanTautan(klienBrowser()).then((hasil) => {
       if (!hidup) return;
-      hidup = false;
-      clearTimeout(pewaktu);
-      setKeadaan(k);
-      if (k.tahap === "berhasil") {
+      if (hasil.ok) {
+        setKeadaan({ tahap: "berhasil" });
         // Header dirender di server dan masih memegang keadaan "belum masuk".
         router.refresh();
+      } else {
+        setKeadaan({ tahap: "gagal", pesan: hasil.pesan });
       }
-    };
-
-    const jalan = async () => {
-      const url = new URL(window.location.href);
-      const fragmen = new URLSearchParams(url.hash.replace(/^#/, ""));
-
-      // Supabase menaruh alasan kegagalannya di query ATAU di fragment,
-      // tergantung alur — dua-duanya diperiksa.
-      const galatUrl =
-        url.searchParams.get("error_description") ??
-        fragmen.get("error_description") ??
-        url.searchParams.get("error") ??
-        fragmen.get("error");
-      if (galatUrl) {
-        selesai({ tahap: "gagal", pesan: galatUrl.replace(/\+/g, " ") });
-        return;
-      }
-
-      // Sesi bisa sudah terbentuk sebelum efek ini jalan.
-      const { data: awal } = await db.auth.getUser();
-      if (awal.user) {
-        selesai({ tahap: "berhasil" });
-        return;
-      }
-
-      const { data: langganan } = db.auth.onAuthStateChange((_peristiwa, sesi) => {
-        if (sesi) {
-          langganan.subscription.unsubscribe();
-          selesai({ tahap: "berhasil" });
-        }
-      });
-
-      const tokenHash = url.searchParams.get("token_hash");
-      const type = url.searchParams.get("type") as EmailOtpType | null;
-      if (tokenHash && type) {
-        const { error } = await db.auth.verifyOtp({ type, token_hash: tokenHash });
-        if (error) {
-          langganan.subscription.unsubscribe();
-          selesai({ tahap: "gagal", pesan: error.message });
-        }
-        return;
-      }
-
-      pewaktu = setTimeout(() => {
-        langganan.subscription.unsubscribe();
-        selesai({
-          tahap: "gagal",
-          pesan:
-            "Tautannya tidak memuat token yang bisa dipakai. Biasanya karena " +
-            "tautannya sudah pernah dibuka, atau sudah lewat batas waktunya.",
-        });
-      }, BATAS_MS);
-    };
-
-    jalan();
+    });
 
     return () => {
       hidup = false;
-      clearTimeout(pewaktu);
     };
   }, [router]);
 

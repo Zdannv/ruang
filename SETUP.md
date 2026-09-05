@@ -12,7 +12,8 @@ pihak luar, bukan karena sengaja dipalsukan.
 1. Buat project Supabase baru (region **Southeast Asia / Singapore**).
 2. SQL Editor → jalankan berurutan: `01_schema.sql`, `02_seed.sql`,
    `03_auth_rls.sql`, `04_pesan.sql`, `05_host.sql`, `06_akses.sql`,
-   `07_advisor.sql`, `08_jendela.sql`. **Kedelapannya wajib.**
+   `07_advisor.sql`, `08_jendela.sql`, `09_notifikasi.sql`.
+   **Kesembilannya wajib.**
    Aplikasi membaca lewat view yang dibuat di `03`–`05` dan menulis lewat
    fungsi di `04`; tanpa itu layarnya menjawab "relation does not exist".
    `05` juga membuat bucket Storage `ruang-foto` beserta policy-nya.
@@ -157,6 +158,9 @@ Daftar lengkap utang teknis ada di CLAUDE.md bagian "Utang yang diketahui".
   kalau anon bisa membaca kolom rahasia atau punya hak ke tabel dasar. Perlu,
   karena Supabase memberi `all on tables to anon` ke setiap tabel baru lewat
   default privileges.
+- **Notifikasi ditulis trigger, bukan klien.** Klien tidak punya INSERT ke
+  `notifikasi`; diuji dengan mencoba menyisipkan notifikasi palsu ke akun orang
+  lain dan ditolak `permission denied`.
 - **Klien tidak punya hak tulis apa pun ke tabel bukti.** `manifes_item`,
   `pemesanan_transisi`, `akses_log`, `serah_terima`, dan `pemesanan` cuma
   SELECT untuk `authenticated`; semua penulisan lewat fungsi SECURITY DEFINER.

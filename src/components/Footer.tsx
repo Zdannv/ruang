@@ -40,6 +40,9 @@ export default function Footer() {
               <Link href="/pemesanan" className="block text-ink hover:text-brand">
                 Pemesanan saya
               </Link>
+              <Link href="/profil" className="block text-ink hover:text-brand">
+                Profil
+              </Link>
             </div>
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">

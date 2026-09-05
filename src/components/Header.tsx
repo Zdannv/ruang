@@ -1,6 +1,8 @@
 import Link from "next/link";
-import { House } from "lucide-react";
+import { Bell, House } from "lucide-react";
 import { sesiSaya } from "@/lib/auth";
+import { klienServer } from "@/lib/supabase/server";
+import { jumlahBelumDibaca } from "@/lib/notifikasi";
 
 /**
  * Bilah atas yang melayang di atas isi halaman — kartu putih membulat dengan
@@ -13,6 +15,7 @@ import { sesiSaya } from "@/lib/auth";
 export default async function Header() {
   const sesi = await sesiSaya();
   const nama = sesi?.profil?.nama ?? sesi?.email ?? null;
+  const belumDibaca = sesi ? await jumlahBelumDibaca(await klienServer()) : 0;
 
   return (
     <header className="sticky top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
@@ -51,9 +54,29 @@ export default async function Header() {
             >
               Pemesanan
             </Link>
-            <span className="hidden max-w-32 truncate text-sm font-medium text-muted sm:block">
+
+            <Link
+              href="/notifikasi"
+              aria-label={
+                belumDibaca > 0
+                  ? `Notifikasi, ${belumDibaca} belum dibaca`
+                  : "Notifikasi"
+              }
+              className="relative rounded-full p-2 text-muted transition-colors hover:bg-paper hover:text-ink"
+            >
+              <Bell className="h-5 w-5" />
+              {belumDibaca > 0 && (
+                <span className="angka absolute -right-0.5 -top-0.5 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold text-white">
+                  {belumDibaca > 9 ? "9+" : belumDibaca}
+                </span>
+              )}
+            </Link>
+            <Link
+              href="/profil"
+              className="hidden max-w-32 truncate rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-paper hover:text-ink sm:block"
+            >
               {nama}
-            </span>
+            </Link>
             {/* Form POST, bukan tautan: lihat alasannya di app/keluar/route.ts */}
             <form action="/keluar" method="post">
               <button
