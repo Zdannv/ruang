@@ -48,9 +48,11 @@ export default async function Header() {
 
         {sesi ? (
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Di HP tautan ini sudah ada di bilah bawah; menampilkannya dua
+                kali cuma menyempitkan header yang sama. */}
             <Link
               href="/pemesanan"
-              className="rounded-full px-3.5 py-2 text-sm font-semibold text-ink transition-colors hover:bg-paper"
+              className="hidden rounded-full px-3.5 py-2 text-sm font-semibold text-ink transition-colors hover:bg-paper sm:block"
             >
               Pemesanan
             </Link>

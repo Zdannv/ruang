@@ -38,9 +38,32 @@ export function pastikanSiap(): void {
  * mengabaikannya dan diam-diam memakai Site URL.
  */
 export function siteUrl(path = "/"): string {
-  const dikonfigurasi = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  const base = (
-    dikonfigurasi || (typeof window !== "undefined" ? window.location.origin : "")
-  ).replace(/\/+$/, "");
+  const base = (alamatDasar() || "").replace(/\/+$/, "");
   return `${base}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+/**
+ * Urutan sumber alamat dasar, dari yang paling bisa dipercaya.
+ *
+ * Yang penting bukan cuma "ada nilainya", tapi bahwa nilainya STABIL. Tiap
+ * deployment Vercel punya URL sendiri yang mengandung hash acak
+ * (`ruang-96ozoct4d-....vercel.app`), dan URL itu berganti tiap kali deploy.
+ * Tautan konfirmasi yang menunjuk ke sana akan mati begitu ada deployment
+ * berikutnya — padahal email biasanya dibuka beberapa menit kemudian.
+ *
+ * Karena itu `VERCEL_URL` (URL deployment) sengaja TIDAK dipakai, sedangkan
+ * `VERCEL_PROJECT_PRODUCTION_URL` (domain produksi yang tetap) dipakai.
+ */
+function alamatDasar(): string {
+  const disetel = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (disetel) return disetel;
+
+  // Disediakan Vercel otomatis untuk project Next.js, dan nilainya tetap
+  // lintas deployment. Cadangan kalau NEXT_PUBLIC_SITE_URL lupa diisi.
+  const produksi = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL?.trim();
+  if (produksi) return `https://${produksi.replace(/^https?:\/\//, "")}`;
+
+  // Terakhir: alamat yang sedang dibuka. Cukup untuk pengembangan lokal, tapi
+  // inilah sumber masalah "tautan konfirmasi menunjuk ke localhost".
+  return typeof window !== "undefined" ? window.location.origin : "";
 }

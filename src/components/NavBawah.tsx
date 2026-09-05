@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, House, Inbox, Search, UserRound } from "lucide-react";
+import { House, Inbox, Search, UserRound } from "lucide-react";
 
 /**
  * Navigasi bawah untuk layar kecil.
@@ -17,14 +17,21 @@ import { Bell, House, Inbox, Search, UserRound } from "lucide-react";
 export default function NavBawah({ masuk }: { masuk: boolean }) {
   const path = usePathname();
 
-  // Saat sudah masuk, item keempat jadi notifikasi — bukan "Akun" yang dulu
-  // menunjuk tujuan yang sama dengan Pemesanan.
+  /*
+    Item keempat menunjuk /profil, dan itu perbaikan atas kesalahan sendiri.
+
+    Sempat diganti jadi "Notifikasi" waktu lonceng ditambahkan — akibatnya di
+    HP tidak ada satu pun jalan menuju halaman profil, karena satu-satunya
+    tautan tersisa (nama pengguna di header) disembunyikan di bawah `sm`.
+    Notifikasi tetap terjangkau: dari lonceng di header, dan dari kartu di
+    halaman akun yang sekaligus menunjukkan berapa yang belum dibaca.
+  */
   const tampil = masuk
     ? [
         { href: "/cari", label: "Cari", ikon: Search },
         { href: "/pemesanan", label: "Pemesanan", ikon: Inbox },
         { href: "/host", label: "Sewakan", ikon: House },
-        { href: "/notifikasi", label: "Notifikasi", ikon: Bell },
+        { href: "/profil", label: "Akun", ikon: UserRound },
       ]
     : [
         { href: "/cari", label: "Cari", ikon: Search },
