@@ -182,6 +182,17 @@ Kerjakan berurutan. Jangan lompat.
     setelah ia keluar. Yang disimpan hanya aset statis ber-hash; navigasi selalu
     dari jaringan, dan saat gagal jatuh ke `public/offline.html` — berkas statis
     biasa, bukan rute Next, supaya tidak ikut merender layout yang membaca sesi.
+15. **Web push — selesai** (4 Sep 2026). Lihat `10_push.sql`. Dipicu Database
+    Webhook Supabase saat baris `notifikasi` dibuat, dikirim `/api/push`.
+
+    **`/api/push` tidak memercayai badan permintaan webhook** dan membaca
+    sendiri dari database. Kalau ia memakai isi yang dikirim webhook, siapa pun
+    yang menebak rahasianya bisa mengirim pemberitahuan berisi apa saja ke
+    perangkat orang lain.
+
+    Ini satu-satunya tempat `SUPABASE_SERVICE_ROLE_KEY` dipakai, karena
+    pengirim push harus membaca langganan milik orang lain. Jangan
+    memperluasnya ke tempat lain.
 
 ### Berikutnya, selama pembayaran belum ada
 
@@ -193,10 +204,6 @@ pembayaran.** Serah terima, pengakhiran lebih awal, dan kontrak PDF semuanya
 menunggu `menunggu_pembayaran` bisa dilewati. Yang tersisa cuma pekerjaan yang
 tidak menambah alur: verifikasi nomor HP (menunggu WhatsApp/SMS), memisahkan
 properti dari ruang (utang no. 4), dan mengganti foto seed.
-
-Selain itu tinggal **web push** (lihat catatan di bawah tabel "menunggu pihak
-luar") — tidak butuh vendor, dan sekarang sudah punya service worker untuk
-menampungnya.
 
 Kalau ada waktu dan pembayaran masih jauh, yang paling berguna dikerjakan
 adalah **menyiapkan integrasi pembayarannya sendiri**: pilih penyedia, daftar
@@ -215,11 +222,10 @@ mengaku "sudah dibayar" tanpa uang sungguhan adalah kebohongan, bukan demo.
 | Verifikasi identitas | vendor e-KYC | kolom rujukan id vendor; jangan simpan foto KTP sendiri |
 | Notifikasi WhatsApp | WhatsApp Business API provider | notifikasi in-app **sudah ada**; email lewat Supabase belum |
 
-**Web push TIDAK masuk daftar ini** dan sering dikira begitu. Ia tidak butuh
-vendor mana pun: kunci VAPID dibuat sendiri, dan service worker-nya sudah ada.
-Yang perlu ditambahkan cuma tabel langganan push, penangan `push` di `sw.js`,
-dan pengirim di server. Sejak PWA jadi, ini jalur notifikasi luar aplikasi yang
-paling murah — jauh sebelum WhatsApp Business API.
+**Web push sudah ada** sejak `10_push.sql`, dan ia tidak butuh vendor mana pun:
+kunci VAPID dibuat sendiri. Pemberitahuan sampai ke perangkat meski aplikasinya
+tertutup — untuk host, itu justru keadaan yang paling sering terjadi. Cara
+menyalakannya ada di SETUP.md; opsional, aplikasinya jalan penuh tanpanya.
 | Kontrak PDF | menunggu alur pesan | dibuat dari data pemesanan, bukan berkas contoh |
 
 **Login tidak lagi masuk daftar ini.** Switcher peran dibuang; yang dipakai

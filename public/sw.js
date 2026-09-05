@@ -94,3 +94,62 @@ self.addEventListener("fetch", (event) => {
 
   // Sisanya (mis. data rute Next) lewat begitu saja tanpa disimpan.
 });
+
+/**
+ * Web push.
+ *
+ * Isi pemberitahuan dikirim server dalam bentuk JSON sederhana. Kalau isinya
+ * tidak bisa dibaca — versi lama, atau push kosong yang dikirim layanan untuk
+ * menguji langganan — tetap ditampilkan sesuatu, karena `userVisibleOnly`
+ * mewajibkan setiap push berakhir dengan pemberitahuan yang terlihat. Diam
+ * saja akan membuat peramban mencabut izin push situs ini.
+ */
+self.addEventListener("push", (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = {};
+  }
+
+  const judul = data.judul || "Ruang";
+  const opsi = {
+    body: data.isi || "Ada pembaruan di Ruang.",
+    icon: "/icon-192.png",
+    badge: "/icon-192.png",
+    lang: "id",
+    // Notifikasi untuk satu pemesanan saling menimpa alih-alih menumpuk:
+    // host yang meninggalkan HP semalam tidak perlu menemukan dua puluh
+    // baris tentang satu pemesanan yang sama.
+    tag: data.tautan || "ruang",
+    renotify: false,
+    data: { tautan: data.tautan || "/notifikasi" },
+  };
+
+  event.waitUntil(self.registration.showNotification(judul, opsi));
+});
+
+/**
+ * Mengetuk pemberitahuan membuka halaman yang dituju.
+ *
+ * Kalau aplikasinya sudah terbuka di suatu tab, tab itu yang dipakai dan
+ * diarahkan — bukan membuka tab baru. Orang yang mengetuk tiga pemberitahuan
+ * tidak seharusnya berakhir dengan tiga salinan aplikasi yang sama.
+ */
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const tujuan = event.notification.data?.tautan || "/notifikasi";
+
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((daftar) => {
+        for (const klien of daftar) {
+          if (new URL(klien.url).origin === self.location.origin && "focus" in klien) {
+            return klien.navigate(tujuan).then((k) => k && k.focus());
+          }
+        }
+        return self.clients.openWindow(tujuan);
+      })
+  );
+});

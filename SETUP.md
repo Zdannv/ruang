@@ -12,8 +12,8 @@ pihak luar, bukan karena sengaja dipalsukan.
 1. Buat project Supabase baru (region **Southeast Asia / Singapore**).
 2. SQL Editor → jalankan berurutan: `01_schema.sql`, `02_seed.sql`,
    `03_auth_rls.sql`, `04_pesan.sql`, `05_host.sql`, `06_akses.sql`,
-   `07_advisor.sql`, `08_jendela.sql`, `09_notifikasi.sql`.
-   **Kesembilannya wajib.**
+   `07_advisor.sql`, `08_jendela.sql`, `09_notifikasi.sql`, `10_push.sql`.
+   **Kesepuluhnya wajib.**
    Aplikasi membaca lewat view yang dibuat di `03`–`05` dan menulis lewat
    fungsi di `04`; tanpa itu layarnya menjawab "relation does not exist".
    `05` juga membuat bucket Storage `ruang-foto` beserta policy-nya.
@@ -28,6 +28,53 @@ pihak luar, bukan karena sengaja dipalsukan.
    Kalau tidak terdaftar, Supabase mengabaikan `emailRedirectTo` dan diam-diam
    memakai Site URL — tautan konfirmasinya jadi mendarat di tempat yang salah.
 7. `npm install && npm run dev`.
+
+## Menyalakan web push
+
+Opsional — aplikasinya jalan penuh tanpa ini, cuma notifikasinya hanya terlihat
+saat aplikasi dibuka. Web push **tidak butuh vendor mana pun**; kunci VAPID
+dibuat sendiri.
+
+1. Buat kunci dan rahasia:
+
+   ```bash
+   npx web-push generate-vapid-keys
+   node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
+   ```
+
+2. Isi di `.env.local` (dan di Environment Variables Vercel):
+   `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`,
+   `PUSH_RAHASIA`, dan `SUPABASE_SERVICE_ROLE_KEY`.
+
+   `SUPABASE_SERVICE_ROLE_KEY` melewati SELURUH RLS. Ia dipakai di satu tempat
+   saja — `/api/push`, yang perlu membaca langganan milik orang lain untuk bisa
+   mengirim ke perangkat mereka. Jangan pernah memberinya awalan
+   `NEXT_PUBLIC_`, dan jangan memakainya untuk apa pun yang bisa dikerjakan
+   klien biasa.
+
+3. Supabase Dashboard → Database → **Webhooks** → Create:
+
+   | Isian | Nilai |
+   |---|---|
+   | Table | `notifikasi` |
+   | Events | `Insert` |
+   | Type | HTTP Request |
+   | Method | `POST` |
+   | URL | `https://<domain-kamu>/api/push` |
+   | HTTP Header | `x-ruang-rahasia: <isi PUSH_RAHASIA>` |
+
+   Webhook-nya **tidak perlu** mengirim isi notifikasinya. `/api/push` sengaja
+   mengabaikan badan permintaan dan membaca sendiri dari database: kalau ia
+   memercayai badan permintaan, siapa pun yang menebak rahasianya bisa
+   mengirim pemberitahuan berisi apa saja ke perangkat orang lain.
+
+4. Buka `/notifikasi` di aplikasi, tekan **Nyalakan**. Izin diminta setelah
+   ditekan, bukan saat halaman dimuat — permintaan izin yang muncul tiba-tiba
+   hampir selalu ditolak, dan penolakan di Chrome bersifat permanen.
+
+**Perlu domain HTTPS.** Service worker hanya didaftarkan di production, jadi
+push tidak bisa diuji lewat `next dev`. Webhook Supabase juga tidak bisa
+menghubungi `localhost`.
 
 ## Menguji PWA-nya
 

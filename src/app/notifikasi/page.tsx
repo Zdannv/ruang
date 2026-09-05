@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import DaftarNotifikasi from "./DaftarNotifikasi";
+import TombolPush from "./TombolPush";
 import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { daftarNotifikasi } from "@/lib/notifikasi";
@@ -22,6 +23,8 @@ export default async function HalamanNotifikasi() {
       <p className="mt-1.5 text-sm text-muted">
         Email dan WhatsApp menyusul — keduanya menunggu penyedia di luar.
       </p>
+
+      {sesi.profil && <TombolPush profilId={sesi.profil.id} />}
 
       <DaftarNotifikasi awal={daftar} />
     </div>
