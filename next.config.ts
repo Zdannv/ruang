@@ -18,6 +18,27 @@ const hostSupabase = (() => {
 })();
 
 const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
+      },
+      {
+        // Service worker tidak boleh di-cache: kalau versi lamanya menempel,
+        // perbaikan di dalamnya tidak pernah sampai ke perangkat orang.
+        source: "/sw.js",
+        headers: [
+          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+        ],
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       // Foto isi seed (lihat 02_seed.sql). Bisa dicabut begitu seluruh isinya

@@ -36,7 +36,10 @@ export default function NavBawah({ masuk }: { masuk: boolean }) {
   return (
     <nav
       aria-label="Navigasi utama"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-card/95 backdrop-blur sm:hidden"
+      /* pb-[env(safe-area-inset-bottom)]: saat dipasang sebagai PWA di iPhone,
+         bilah ini berada tepat di area gestur home indicator. Tanpa padding
+         itu, ikonnya tertimpa garis home. */
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur sm:hidden"
     >
       <ul className="mx-auto flex max-w-md">
         {tampil.map((x) => {

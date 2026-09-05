@@ -29,6 +29,26 @@ pihak luar, bukan karena sengaja dipalsukan.
    memakai Site URL — tautan konfirmasinya jadi mendarat di tempat yang salah.
 7. `npm install && npm run dev`.
 
+## Menguji PWA-nya
+
+Manifest jalan di `next dev`, tapi **service worker sengaja hanya didaftarkan di
+production**. Di pengembangan, service worker yang menyimpan aset membuat
+perubahan kode tampak tidak berlaku — orang mengubah satu baris, memuat ulang,
+melihat versi lama, lalu mencari bug yang tidak ada.
+
+Untuk menguji PWA-nya utuh (install ke layar utama, halaman offline):
+
+```bash
+npm run build && npm start
+```
+
+Lalu buka `http://localhost:3000` di Chrome → DevTools → Application. Manifest
+dan service worker harus terdaftar, dan mematikan jaringan di tab Network
+harus memunculkan halaman offline, bukan layar dinosaurus.
+
+Ikonnya dihasilkan, bukan diunduh: `node skrip/buat-ikon.mjs` menulis ulang
+keempat berkas PNG di `public/`. Jalankan lagi kalau warna mereknya berubah.
+
 ## Kalau tautan konfirmasi email berakhir ERR_CONNECTION_REFUSED
 
 Ini kegagalan yang paling sering terjadi saat pengembangan, dan urutan

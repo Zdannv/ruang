@@ -169,6 +169,19 @@ Kerjakan berurutan. Jangan lompat.
     otomatis ikut terkirim tanpa ada yang perlu ingat menambahkannya.
 13. **Lupa sandi & halaman profil — selesai** (4 Sep 2026). `/lupa-sandi`,
     `/sandi-baru`, `/profil`.
+14. **PWA — selesai** (4 Sep 2026). Menutup keputusan produk nomor 4, yang
+    selama ini baru terpenuhi separuh: aplikasinya memang mobile-first, tapi
+    belum bisa dipasang di layar utama. Sekarang ada `app/manifest.ts`, ikon
+    192/512/maskable/apple-touch yang dihasilkan `skrip/buat-ikon.mjs`, service
+    worker, dan halaman offline.
+
+    **Service worker tidak boleh menyimpan HTML halaman.** Hampir semua halaman
+    dirender di server dan isinya bergantung pada siapa yang sedang masuk —
+    nama di header, daftar pemesanan, alamat ruang yang sudah dibayar.
+    Menyimpannya berarti halaman berisi data satu orang bisa tersaji lagi
+    setelah ia keluar. Yang disimpan hanya aset statis ber-hash; navigasi selalu
+    dari jaringan, dan saat gagal jatuh ke `public/offline.html` — berkas statis
+    biasa, bukan rute Next, supaya tidak ikut merender layout yang membaca sesi.
 
 ### Berikutnya, selama pembayaran belum ada
 
@@ -180,6 +193,10 @@ pembayaran.** Serah terima, pengakhiran lebih awal, dan kontrak PDF semuanya
 menunggu `menunggu_pembayaran` bisa dilewati. Yang tersisa cuma pekerjaan yang
 tidak menambah alur: verifikasi nomor HP (menunggu WhatsApp/SMS), memisahkan
 properti dari ruang (utang no. 4), dan mengganti foto seed.
+
+Selain itu tinggal **web push** (lihat catatan di bawah tabel "menunggu pihak
+luar") — tidak butuh vendor, dan sekarang sudah punya service worker untuk
+menampungnya.
 
 Kalau ada waktu dan pembayaran masih jauh, yang paling berguna dikerjakan
 adalah **menyiapkan integrasi pembayarannya sendiri**: pilih penyedia, daftar
@@ -197,6 +214,12 @@ mengaku "sudah dibayar" tanpa uang sungguhan adalah kebohongan, bukan demo.
 | Pembayaran | payment gateway berlisensi + akun bisnis | model pemesanan & transisi status |
 | Verifikasi identitas | vendor e-KYC | kolom rujukan id vendor; jangan simpan foto KTP sendiri |
 | Notifikasi WhatsApp | WhatsApp Business API provider | notifikasi in-app **sudah ada**; email lewat Supabase belum |
+
+**Web push TIDAK masuk daftar ini** dan sering dikira begitu. Ia tidak butuh
+vendor mana pun: kunci VAPID dibuat sendiri, dan service worker-nya sudah ada.
+Yang perlu ditambahkan cuma tabel langganan push, penangan `push` di `sw.js`,
+dan pengirim di server. Sejak PWA jadi, ini jalur notifikasi luar aplikasi yang
+paling murah — jauh sebelum WhatsApp Business API.
 | Kontrak PDF | menunggu alur pesan | dibuat dari data pemesanan, bukan berkas contoh |
 
 **Login tidak lagi masuk daftar ini.** Switcher peran dibuang; yang dipakai
