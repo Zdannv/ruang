@@ -87,6 +87,7 @@ export default function FormRuang({
   const [galat, setGalat] = useState<string | null>(null);
   const [pesanLokasi, setPesanLokasi] = useState<string | null>(null);
   const [konfirmasiHapus, setKonfirmasiHapus] = useState(false);
+  const [tersimpan, setTersimpan] = useState(false);
 
   const ubah = <K extends keyof IsiRuang>(kunci: K, nilai: IsiRuang[K]) =>
     setIsi((v) => ({ ...v, [kunci]: nilai }));
@@ -120,16 +121,27 @@ export default function FormRuang({
     }
     setKirim(true);
     setGalat(null);
+    setTersimpan(false);
     try {
       const db = klienBrowser();
       if (ruangId) {
         await ubahRuang(db, ruangId, isi);
-        router.replace(`/host/ruang/${ruangId}`);
+        // Versi sebelumnya memanggil `router.replace` ke alamat yang SEDANG
+        // dibuka. Itu bukan perpindahan halaman, jadi komponennya tidak pernah
+        // dilepas — dan karena `setKirim(false)` cuma ada di cabang galat,
+        // tombolnya berputar selamanya setiap kali penyimpanannya berhasil.
+        // Yang dibutuhkan halaman ini cuma memuat ulang datanya.
+        setKirim(false);
+        setTersimpan(true);
+        router.refresh();
       } else {
         const id = await buatRuang(db, hostId, isi);
+        // Di sini `kirim` sengaja dibiarkan menyala: halamannya benar-benar
+        // berpindah, dan pemintalnya adalah satu-satunya tanda bahwa
+        // perpindahan itu sedang berjalan.
         router.replace(`/host/ruang/${id}`);
+        router.refresh();
       }
-      router.refresh();
     } catch (e: unknown) {
       setKirim(false);
       setGalat(e instanceof Error ? e.message : "Gagal menyimpan.");
@@ -499,6 +511,11 @@ export default function FormRuang({
 
       {galat && (
         <p className="rounded-xl bg-warn-soft px-3.5 py-2.5 text-sm text-warn">{galat}</p>
+      )}
+      {tersimpan && (
+        <p className="rounded-xl bg-good-soft px-3.5 py-2.5 text-sm text-good">
+          Perubahan tersimpan.
+        </p>
       )}
 
       <div className="flex flex-wrap items-center gap-3">

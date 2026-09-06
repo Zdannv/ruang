@@ -69,7 +69,14 @@ export default function KelolaFoto({
   return (
     <section className="rounded-2xl bg-card p-5 ring-1 ring-line">
       <h2 className="font-display text-lg font-bold tracking-tight">Foto</h2>
-      <p className="mt-1 text-xs leading-relaxed text-muted">
+      {/* Bagian ini menyimpan sendiri, tapi di bawahnya ada tombol "Simpan
+          perubahan" milik formulir ruang — dan host pertama yang memakainya
+          memang mengira foto baru masuk setelah tombol itu ditekan. */}
+      <p className="mt-1 text-xs font-medium text-good">
+        Foto tersimpan begitu dipilih. Tidak perlu menekan &ldquo;Simpan
+        perubahan&rdquo; di bawah.
+      </p>
+      <p className="mt-1.5 text-xs leading-relaxed text-muted">
         Foto diperkecil dan disimpan ulang di peramban sebelum diunggah, sehingga
         metadata aslinya ikut terbuang — termasuk koordinat GPS yang biasanya
         menempel di foto HP. Tanpa itu, alamat persis ruangmu terbaca dari berkas
