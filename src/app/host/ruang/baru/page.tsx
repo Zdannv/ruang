@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
-import FormRuang from "@/components/host/FormRuang";
+import DaftarRuangBaru from "@/components/host/DaftarRuangBaru";
 import { sesiSaya } from "@/lib/auth";
 
 export const metadata: Metadata = { title: "Daftarkan ruang — Ruang" };
@@ -26,14 +26,11 @@ export default async function RuangBaru() {
         Daftarkan ruang
       </h1>
       <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
-        Simpan sebagai draf dulu kalau belum yakin — draf tidak terlihat siapa pun.
-        Foto dan jendela aksesnya diatur setelah ruangnya tersimpan, karena keduanya
-        menempel ke ruang yang sudah punya id.
+        Dua langkah: keterangan ruangnya dulu, lalu fotonya. Simpan sebagai draf
+        kalau belum yakin — draf tidak terlihat siapa pun sampai kamu menayangkannya.
       </p>
 
-      <div className="mt-6">
-        <FormRuang hostId={sesi.profil.id} />
-      </div>
+      <DaftarRuangBaru hostId={sesi.profil.id} />
     </div>
   );
 }

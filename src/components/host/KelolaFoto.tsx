@@ -7,6 +7,7 @@ import { ImagePlus, Loader2, Trash2 } from "lucide-react";
 import { klienBrowser } from "@/lib/supabase/browser";
 import {
   KETERANGAN_FOTO,
+  daftarFoto,
   hapusFoto,
   unggahFoto,
   type FotoMilikSaya,
@@ -23,13 +24,22 @@ import {
 export default function KelolaFoto({
   hostId,
   ruangId,
-  foto,
+  awal,
 }: {
   hostId: string;
   ruangId: string;
-  foto: FotoMilikSaya[];
+  /**
+   * Isi awal saja — sesudahnya daftar ini dikelola komponen sendiri.
+   *
+   * Dulu ia bergantung penuh pada `router.refresh()` untuk memperbarui
+   * grid-nya, dan itu cuma bekerja di halaman yang memang mengambil fotonya
+   * dari server. Di alur daftar ruang, halamannya tidak mengambil apa pun —
+   * host akan mengunggah foto lalu melihat kotak kosong.
+   */
+  awal: FotoMilikSaya[];
 }) {
   const router = useRouter();
+  const [foto, setFoto] = useState(awal);
   const [keterangan, setKeterangan] = useState(KETERANGAN_FOTO[0]);
   const [proses, setProses] = useState(false);
   const [galat, setGalat] = useState<string | null>(null);
@@ -45,6 +55,9 @@ export default function KelolaFoto({
         await unggahFoto(db, { hostId, ruangId, file, keterangan, urutan });
         urutan += 1;
       }
+      setFoto(await daftarFoto(db, ruangId));
+      // Halaman induknya ikut disegarkan supaya hitungan fotonya tidak basi;
+      // grid di atas tidak menunggunya.
       router.refresh();
     } catch (e: unknown) {
       setGalat(e instanceof Error ? e.message : "Foto gagal diunggah.");
@@ -57,7 +70,9 @@ export default function KelolaFoto({
     setProses(true);
     setGalat(null);
     try {
-      await hapusFoto(klienBrowser(), f);
+      const db = klienBrowser();
+      await hapusFoto(db, f);
+      setFoto(await daftarFoto(db, ruangId));
       router.refresh();
     } catch (e: unknown) {
       setGalat(e instanceof Error ? e.message : "Foto gagal dihapus.");
@@ -69,12 +84,13 @@ export default function KelolaFoto({
   return (
     <section className="rounded-2xl bg-card p-5 ring-1 ring-line">
       <h2 className="font-display text-lg font-bold tracking-tight">Foto</h2>
-      {/* Bagian ini menyimpan sendiri, tapi di bawahnya ada tombol "Simpan
-          perubahan" milik formulir ruang — dan host pertama yang memakainya
-          memang mengira foto baru masuk setelah tombol itu ditekan. */}
+      {/* Bagian ini menyimpan sendiri, dan host pertama yang memakainya memang
+          mengira foto baru masuk setelah tombol "Simpan perubahan" di bawahnya
+          ditekan. Kalimatnya sengaja tidak menyebut tombol itu: komponen yang
+          sama juga dipakai di langkah dua alur daftar ruang, dan di sana tombol
+          itu tidak ada. */}
       <p className="mt-1 text-xs font-medium text-good">
-        Foto tersimpan begitu dipilih. Tidak perlu menekan &ldquo;Simpan
-        perubahan&rdquo; di bawah.
+        Foto tersimpan begitu dipilih. Tidak perlu menekan tombol simpan mana pun.
       </p>
       <p className="mt-1.5 text-xs leading-relaxed text-muted">
         Foto diperkecil dan disimpan ulang di peramban sebelum diunggah, sehingga

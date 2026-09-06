@@ -100,7 +100,7 @@ export default async function KelolaRuang({ params }: PageProps<"/host/ruang/[id
       </div>
 
       <div className="mt-6 space-y-5">
-        <KelolaFoto hostId={sesi.profil.id} ruangId={ruang.id} foto={foto} />
+        <KelolaFoto hostId={sesi.profil.id} ruangId={ruang.id} awal={foto} />
         <KelolaJendela ruangId={ruang.id} jendela={jendela} />
         <FormRuang hostId={sesi.profil.id} ruangId={ruang.id} awal={isi} />
       </div>

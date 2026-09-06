@@ -76,10 +76,20 @@ export default function FormRuang({
   hostId,
   awal,
   ruangId,
+  onDibuat,
 }: {
   hostId: string;
   awal?: IsiRuang;
   ruangId?: string;
+  /**
+   * Dipanggil dengan id ruang yang baru dibuat, alih-alih berpindah halaman.
+   *
+   * Dipakai alur daftar ruang, yang setelah ini menampilkan langkah foto di
+   * halaman yang sama. Foto butuh id ruangnya — itu sebabnya urutannya tidak
+   * bisa dibalik — tapi itu alasan teknis dan tidak ada gunanya diketahui
+   * host, jadi ia tidak perlu ikut berpindah halaman untuk melewatinya.
+   */
+  onDibuat?: (id: string) => void;
 }) {
   const router = useRouter();
   const [isi, setIsi] = useState<IsiRuang>(awal ?? AWAL);
@@ -136,11 +146,19 @@ export default function FormRuang({
         router.refresh();
       } else {
         const id = await buatRuang(db, hostId, isi);
-        // Di sini `kirim` sengaja dibiarkan menyala: halamannya benar-benar
-        // berpindah, dan pemintalnya adalah satu-satunya tanda bahwa
-        // perpindahan itu sedang berjalan.
-        router.replace(`/host/ruang/${id}`);
-        router.refresh();
+        if (onDibuat) {
+          // Tidak ada perpindahan halaman di jalur ini, jadi pemintalnya harus
+          // dimatikan sendiri — persis jenis kelalaian yang dulu membuat
+          // tombol simpan berputar selamanya.
+          setKirim(false);
+          onDibuat(id);
+        } else {
+          // Di sini `kirim` sengaja dibiarkan menyala: halamannya benar-benar
+          // berpindah, dan pemintalnya adalah satu-satunya tanda bahwa
+          // perpindahan itu sedang berjalan.
+          router.replace(`/host/ruang/${id}`);
+          router.refresh();
+        }
       }
     } catch (e: unknown) {
       setKirim(false);
@@ -525,7 +543,7 @@ export default function FormRuang({
           className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
         >
           {kirim && <Loader2 className="h-4 w-4 animate-spin" />}
-          {ruangId ? "Simpan perubahan" : "Simpan ruang"}
+          {ruangId ? "Simpan perubahan" : onDibuat ? "Lanjut ke foto" : "Simpan ruang"}
         </button>
 
         {ruangId && (

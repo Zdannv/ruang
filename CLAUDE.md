@@ -279,6 +279,27 @@ Kerjakan berurutan. Jangan lompat.
     kehilangan penghematan. Kemunduran itu diuji terhadap database sungguhan
     yang kolomnya memang belum ada.
 
+20. **Alur daftar ruang jadi dua langkah — selesai** (6 Sep 2026).
+    `/host/ruang/baru`: keterangan ruangnya dulu, lalu fotonya, di halaman
+    yang sama.
+
+    Sebelumnya halaman itu cuma berisi formulirnya, dan fotonya baru bisa
+    diunggah kalau host menemukan sendiri jalan kembali ke ruang yang barusan
+    ia buat. Halamannya bahkan menjelaskan alasannya — "karena keduanya
+    menempel ke ruang yang sudah punya id". Itu kendala teknis yang bocor jadi
+    masalah produk, dan dasbornya sendiri sudah tahu akibatnya: ia memasang
+    peringatan "ruang tanpa foto hampir tidak pernah diklik".
+
+    Urutannya memang tidak bisa dibalik — foto butuh id ruangnya, untuk jalur
+    berkas di Storage maupun untuk baris `ruang_foto`. Yang diubah adalah siapa
+    yang menanggung kendala itu.
+
+    `KelolaFoto` sekarang mengelola daftarnya sendiri, tidak lagi bergantung
+    penuh pada `router.refresh()`. Ketergantungan itu cuma bekerja di halaman
+    yang memang mengambil fotonya dari server; di langkah dua alur ini halaman
+    tidak mengambil apa pun, jadi host akan mengunggah foto lalu menatap kotak
+    kosong.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris
