@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, PencilLine } from "lucide-react";
-import { ambilWilayah, type Wilayah } from "@/lib/wilayah";
+import { Loader2, RotateCw } from "lucide-react";
+import { ambilWilayah, type Tingkat, type Wilayah } from "@/lib/wilayah";
 
 /**
  * Pemilih berjenjang: provinsi → kabupaten/kota → kecamatan → kelurahan.
@@ -13,9 +13,17 @@ import { ambilWilayah, type Wilayah } from "@/lib/wilayah";
  * "Kec. Lowokwaru" adalah tiga wilayah berbeda menurut database — dan tidak
  * ada satu pun layar yang bisa menyadari bahwa hitungannya sudah pecah.
  *
- * Daftarnya boleh gagal diambil. Kalau itu terjadi, komponennya berpindah ke
- * pengisian manual alih-alih menyandera formulirnya: host yang sedang
- * mendaftarkan ruang tidak boleh terhenti gara-gara layanan pihak ketiga.
+ * TIDAK ADA jalur mengetik sendiri, dan itu keputusan yang diambil sadar.
+ * Versi sebelumnya punya tombol "wilayahku tidak ada di daftar — ketik
+ * sendiri", dan tombol itu melubangi satu-satunya hal yang komponen ini ada
+ * untuk menjaganya: begitu satu orang mengetik "kota malang", hitungan
+ * wilayahnya pecah dan tidak ada layar yang bisa menyadarinya.
+ *
+ * Konsekuensinya ditanggung: kalau daftarnya tidak bisa diambil, formulirnya
+ * memang tertahan. Yang meredam itu, provinsi dan kabupaten/kota disalin ke
+ * dalam repo dan disajikan `/api/wilayah` saat upstream-nya mati — jadi nama
+ * KOTA selalu bisa dipilih dari daftar yang sah. Kecamatan dan kelurahan
+ * bergantung pada layanannya, dan di situ yang ditawarkan adalah coba lagi.
  */
 export default function PilihWilayah({
   nilai,
@@ -29,12 +37,13 @@ export default function PilihWilayah({
    * Sedalam apa wilayahnya ditanyakan.
    *
    * Ruang butuh sampai kelurahan: itu satuan yang ditampilkan ke publik dan
-   * yang dipakai mengelompokkan hasil. Pendaftaran akun cukup sampai
-   * kabupaten/kota — di sana wilayahnya hanya jadi titik awal pencarian, dan
-   * dua dropdown tambahan di formulir daftar adalah gesekan yang harganya
-   * lebih mahal daripada ketelitian yang didapat.
+   * yang dipakai mengelompokkan hasil. Permintaan ruang berhenti di kecamatan,
+   * karena itu satuan yang dipakai `permintaan_kecamatan`. Pendaftaran akun
+   * cukup sampai kabupaten/kota — di sana wilayahnya hanya jadi titik awal
+   * pencarian, dan dua dropdown tambahan di formulir daftar adalah gesekan
+   * yang harganya lebih mahal daripada ketelitian yang didapat.
    */
-  sampai?: "kabupaten" | "kelurahan";
+  sampai?: "kabupaten" | "kecamatan" | "kelurahan";
   /** 1 untuk kartu sempit seperti formulir masuk/daftar. */
   kolom?: 1 | 2;
 }) {
@@ -48,10 +57,16 @@ export default function PilihWilayah({
   const [kodeKecamatan, setKodeKecamatan] = useState("");
 
   const [memuat, setMemuat] = useState(true);
-  const [manual, setManual] = useState(false);
+  const [gagal, setGagal] = useState(false);
+  // Dinaikkan tiap kali "coba lagi" ditekan, supaya efek pengambilan
+  // provinsinya berjalan ulang.
+  const [percobaan, setPercobaan] = useState(0);
 
   useEffect(() => {
     let hidup = true;
+    // Penyetelan ulang `memuat`/`gagal` ada di `cobaLagi()`, bukan di sini:
+    // setState sinkron di dalam efek memicu render berantai, dan React
+    // Compiler menolaknya.
     ambilWilayah("provinsi")
       .then((d) => {
         if (!hidup) return;
@@ -60,13 +75,19 @@ export default function PilihWilayah({
       })
       .catch(() => {
         if (!hidup) return;
-        setManual(true);
+        setGagal(true);
         setMemuat(false);
       });
     return () => {
       hidup = false;
     };
-  }, []);
+  }, [percobaan]);
+
+  const cobaLagi = () => {
+    setMemuat(true);
+    setGagal(false);
+    setPercobaan((n) => n + 1);
+  };
 
   const pilihProvinsi = async (kode: string) => {
     setKodeProvinsi(kode);
@@ -76,7 +97,7 @@ export default function PilihWilayah({
     setKecamatan([]);
     setKelurahan([]);
     onGanti({ kelurahan: "", kecamatan: "", kota: "" });
-    if (kode) setKabupaten(await ambilWilayah("kabupaten", kode).catch(() => []));
+    if (kode) setKabupaten(await ambilAtauTandai("kabupaten", kode, setGagal));
   };
 
   const pilihKabupaten = async (kode: string) => {
@@ -89,7 +110,7 @@ export default function PilihWilayah({
       kecamatan: "",
       kota: kabupaten.find((k) => k.kode === kode)?.nama ?? "",
     });
-    if (kode) setKecamatan(await ambilWilayah("kecamatan", kode).catch(() => []));
+    if (kode) setKecamatan(await ambilAtauTandai("kecamatan", kode, setGagal));
   };
 
   const pilihKecamatan = async (kode: string) => {
@@ -100,41 +121,39 @@ export default function PilihWilayah({
       kelurahan: "",
       kecamatan: kecamatan.find((k) => k.kode === kode)?.nama ?? "",
     });
-    if (kode) setKelurahan(await ambilWilayah("kelurahan", kode).catch(() => []));
+    if (kode) setKelurahan(await ambilAtauTandai("kelurahan", kode, setGagal));
   };
 
   const kisi = kolom === 1 ? "grid gap-4" : "grid gap-4 sm:grid-cols-2";
   const bungkus = kolom === 1 ? "" : "sm:col-span-2";
   const sampaiKelurahan = sampai === "kelurahan";
+  const sampaiKecamatan = sampai !== "kabupaten";
 
-  if (manual) {
+  if (gagal && provinsi.length === 0) {
     return (
       <div className={bungkus}>
         <p className="rounded-xl bg-warn-soft px-3.5 py-2.5 text-xs leading-relaxed text-warn">
-          Daftar wilayah sedang tidak bisa diambil, jadi ketik sendiri. Tulis apa
-          adanya tanpa awalan — <strong>Lowokwaru</strong>, bukan
-          &ldquo;Kec. Lowokwaru&rdquo; — supaya ruangmu terhitung di wilayah yang
-          sama dengan yang lain.
+          Daftar wilayah sedang tidak bisa diambil, jadi pilihannya belum muncul.
+          Wilayah hanya boleh dipilih dari daftar resmi — mengetiknya sendiri
+          membuat ruangmu terhitung di wilayah yang berbeda dari tetanggamu.
         </p>
-        <div className={`mt-3 ${kolom === 1 ? "grid gap-4" : "grid gap-4 sm:grid-cols-3"}`}>
-          {sampaiKelurahan && (
-            <>
-              <Teks id="kelurahan" label="Kelurahan" nilai={nilai.kelurahan}
-                onGanti={(v) => onGanti({ ...nilai, kelurahan: v })} />
-              <Teks id="kecamatan" label="Kecamatan" nilai={nilai.kecamatan}
-                onGanti={(v) => onGanti({ ...nilai, kecamatan: v })} />
-            </>
-          )}
-          <Teks id="kota" label="Kabupaten/Kota" nilai={nilai.kota}
-            onGanti={(v) => onGanti({ ...nilai, kota: v })} />
-        </div>
+        <button
+          type="button"
+          onClick={cobaLagi}
+          className="mt-2.5 inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-card px-4 py-2 text-xs font-semibold text-ink ring-1 ring-line transition-colors hover:bg-paper"
+        >
+          <RotateCw className="h-3.5 w-3.5" />
+          Coba lagi
+        </button>
       </div>
     );
   }
 
   const terisi = sampaiKelurahan
-    ? nilai.kelurahan && nilai.kecamatan && nilai.kota
-    : Boolean(nilai.kota);
+    ? Boolean(nilai.kelurahan && nilai.kecamatan && nilai.kota)
+    : sampaiKecamatan
+      ? Boolean(nilai.kecamatan && nilai.kota)
+      : Boolean(nilai.kota);
 
   return (
     <div className={bungkus}>
@@ -155,7 +174,7 @@ export default function PilihWilayah({
           nonaktif={!kodeProvinsi}
           onGanti={pilihKabupaten}
         />
-        {sampaiKelurahan && (
+        {sampaiKecamatan && (
           <>
             <Pilih
               id="kecamatan"
@@ -165,19 +184,21 @@ export default function PilihWilayah({
               nonaktif={!kodeKabupaten}
               onGanti={pilihKecamatan}
             />
-            <Pilih
-              id="kelurahan"
-              label="Kelurahan"
-              nilai={kelurahan.find((k) => k.nama === nilai.kelurahan)?.kode ?? ""}
-              daftar={kelurahan}
-              nonaktif={!kodeKecamatan}
-              onGanti={(kode) =>
-                onGanti({
-                  ...nilai,
-                  kelurahan: kelurahan.find((k) => k.kode === kode)?.nama ?? "",
-                })
-              }
-            />
+            {sampaiKelurahan && (
+              <Pilih
+                id="kelurahan"
+                label="Kelurahan"
+                nilai={kelurahan.find((k) => k.nama === nilai.kelurahan)?.kode ?? ""}
+                daftar={kelurahan}
+                nonaktif={!kodeKecamatan}
+                onGanti={(kode) =>
+                  onGanti({
+                    ...nilai,
+                    kelurahan: kelurahan.find((k) => k.kode === kode)?.nama ?? "",
+                  })
+                }
+              />
+            )}
           </>
         )}
       </div>
@@ -197,19 +218,28 @@ export default function PilihWilayah({
           </>
         ) : sampaiKelurahan ? (
           "Pilih sampai kelurahan. Yang terlihat publik cuma kelurahan dan kecamatan — alamat lengkapnya tidak."
+        ) : sampaiKecamatan ? (
+          "Pilih sampai kecamatan — itu satuan yang dilihat host saat menghitung permintaan."
         ) : (
           "Dipakai sebagai titik awal pencarian, dan bisa diubah kapan pun dari halaman akun."
         )}
       </p>
 
-      <button
-        type="button"
-        onClick={() => setManual(true)}
-        className="mt-2 inline-flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-muted transition-colors hover:text-ink"
-      >
-        <PencilLine className="h-3.5 w-3.5" />
-        Wilayahku tidak ada di daftar — ketik sendiri
-      </button>
+      {/* Kegagalan di tingkat dalam: daftarnya kosong padahal induknya sudah
+          dipilih. Yang ditawarkan coba lagi, bukan kolom teks. */}
+      {gagal && provinsi.length > 0 && (
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          <p className="text-xs text-warn">Sebagian daftar gagal diambil.</p>
+          <button
+            type="button"
+            onClick={cobaLagi}
+            className="inline-flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-brand hover:text-brand-dark"
+          >
+            <RotateCw className="h-3.5 w-3.5" />
+            Coba lagi
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -259,29 +289,24 @@ function Pilih({
   );
 }
 
-function Teks({
-  id,
-  label,
-  nilai,
-  onGanti,
-}: {
-  id: string;
-  label: string;
-  nilai: string;
-  onGanti: (v: string) => void;
-}) {
-  return (
-    <div>
-      <label htmlFor={id} className="block text-sm font-medium">
-        {label}
-      </label>
-      <input
-        id={id}
-        required
-        value={nilai}
-        onChange={(e) => onGanti(e.target.value)}
-        className="mt-1.5 w-full rounded-xl bg-card px-3.5 py-2.5 text-sm ring-1 ring-line focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-      />
-    </div>
-  );
+/**
+ * Ambil satu tingkat, dan tandai kegagalannya alih-alih menelannya.
+ *
+ * Versi sebelumnya menulis `.catch(() => [])`, yang membuat kegagalan jaringan
+ * terlihat sama persis dengan "wilayah ini memang tidak punya kecamatan" —
+ * dan orangnya menatap dropdown kosong tanpa tahu harus menunggu atau
+ * menyerah.
+ */
+async function ambilAtauTandai(
+  tingkat: Tingkat,
+  kode: string,
+  tandai: (v: boolean) => void
+): Promise<Wilayah[]> {
+  try {
+    const hasil = await ambilWilayah(tingkat, kode);
+    return hasil;
+  } catch {
+    tandai(true);
+    return [];
+  }
 }

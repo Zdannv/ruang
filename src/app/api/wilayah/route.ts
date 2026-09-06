@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import dasar from "@/data/wilayah-dasar.json";
 
 /**
  * Perantara ke wilayah.id — daftar wilayah administratif Indonesia.
@@ -13,6 +14,18 @@ import { NextResponse } from "next/server";
  * Datanya bersumber dari Kemendagri (Permendagri 72/2019) dan praktis tidak
  * pernah berubah, jadi ia disimpan 30 hari di sisi kita. Upstream-nya gratis
  * dan tanpa kunci; menahannya di cache adalah bentuk sopan memakainya.
+ *
+ * Provinsi dan kabupaten/kota juga disalin ke dalam repo
+ * (`src/data/wilayah-dasar.json`, 25 KB) dan dipakai kalau upstream-nya tidak
+ * bisa dihubungi. Alasannya: nama kota WAJIB berasal dari daftar yang sah —
+ * kalau daftarnya bisa hilang, orangnya akhirnya harus mengetik sendiri, dan
+ * dari situ "Malang", "malang", dan "kota malang" masuk ke database sebagai
+ * tiga wilayah berbeda.
+ *
+ * Kecamatan dan kelurahan TIDAK disalin: jumlahnya 7.200 dan 83.000, dan
+ * mengunduhnya berarti ribuan permintaan ke layanan gratis. Di dua tingkat itu
+ * kegagalan dijawab 502 dan formulirnya menawarkan coba lagi — bukan kolom
+ * teks bebas.
  */
 
 const TINGKAT = {
@@ -75,11 +88,33 @@ export async function GET(permintaan: Request) {
       }
     );
   } catch {
+    const cadangan = dariSalinan(tingkat as Tingkat, kode);
+    if (cadangan) {
+      return NextResponse.json(
+        { daftar: cadangan, sumber: "salinan" },
+        // Sengaja tidak disimpan lama: ini jawaban darurat, dan begitu
+        // upstream-nya hidup lagi yang benar adalah kembali ke sana.
+        { headers: { "cache-control": "public, max-age=60" } }
+      );
+    }
     // Tidak dipura-purakan berhasil dengan daftar kosong: formulirnya harus
-    // tahu bedanya, supaya ia bisa berpindah ke pengisian manual.
+    // tahu bedanya, supaya ia bisa menawarkan coba lagi.
     return NextResponse.json(
       { galat: "daftar wilayah sedang tidak bisa diambil" },
       { status: 502 }
     );
   }
+}
+
+/** Salinan dalam repo — hanya dua tingkat teratas. Lihat komentar di atas. */
+function dariSalinan(
+  tingkat: Tingkat,
+  kode: string
+): { kode: string; nama: string }[] | null {
+  if (tingkat === "provinsi") return dasar.provinsi;
+  if (tingkat === "kabupaten") {
+    const isi = (dasar.kabupaten as Record<string, { kode: string; nama: string }[]>)[kode];
+    return isi ?? null;
+  }
+  return null;
 }

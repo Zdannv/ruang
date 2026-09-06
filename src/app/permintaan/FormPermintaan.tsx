@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2 } from "lucide-react";
 import { Kolom, Pilihan } from "@/components/host/Kolom";
+import PilihWilayah from "@/components/host/PilihWilayah";
 import { klienBrowser } from "@/lib/supabase/browser";
 import {
   buatPermintaan,
@@ -27,7 +28,7 @@ export default function FormPermintaan({
   const router = useRouter();
   const [isi, setIsi] = useState<IsiPermintaan>({
     kecamatan: "",
-    kota: "Malang",
+    kota: "",
     volume_m3: 10,
     harga_maks: 500000,
     mulai: hariIni(),
@@ -38,11 +39,16 @@ export default function FormPermintaan({
 
   const simpan = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Select tidak bisa `required`: <option> pertamanya bernilai string kosong.
+    if (!isi.kecamatan || !isi.kota) {
+      setGalat("Pilih kecamatan yang kamu cari.");
+      return;
+    }
     setKirim(true);
     setGalat(null);
     try {
       await buatPermintaan(klienBrowser(), penyewaId, isi);
-      setIsi((v) => ({ ...v, kecamatan: "" }));
+      setIsi((v) => ({ ...v, kecamatan: "", kota: "" }));
       router.refresh();
     } catch (e: unknown) {
       setGalat(e instanceof Error ? e.message : "Gagal menyimpan permintaan.");
@@ -109,20 +115,16 @@ export default function FormPermintaan({
         </p>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <Kolom
-            id="kecamatan"
-            label="Kecamatan yang dicari"
-            required
-            value={isi.kecamatan}
-            onChange={(e) => setIsi((v) => ({ ...v, kecamatan: e.target.value }))}
-            placeholder="Lowokwaru"
-          />
-          <Kolom
-            id="kota"
-            label="Kota"
-            required
-            value={isi.kota}
-            onChange={(e) => setIsi((v) => ({ ...v, kota: e.target.value }))}
+          {/* Dipilih dari daftar, bukan diketik: hitungan di atas
+              dikelompokkan `permintaan_kecamatan` BERDASARKAN TEKS kecamatan,
+              jadi satu orang yang menulis "lowokwaru" membuat permintaannya
+              tidak pernah terlihat oleh host Lowokwaru. */}
+          <PilihWilayah
+            nilai={{ kelurahan: "", kecamatan: isi.kecamatan, kota: isi.kota }}
+            onGanti={(w) =>
+              setIsi((v) => ({ ...v, kecamatan: w.kecamatan, kota: w.kota }))
+            }
+            sampai="kecamatan"
           />
           <Kolom
             id="volume"

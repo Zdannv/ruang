@@ -440,6 +440,45 @@ Kerjakan berurutan. Jangan lompat.
     (kalau izinnya sudah ada) → titik terakhir di perangkat itu → wilayah
     pendaftaran → titik bawaan.
 
+26. **Wilayah hanya boleh dipilih dari daftar — selesai** (6 Sep 2026).
+    Tidak ada lagi satu pun kolom teks bebas untuk kelurahan, kecamatan,
+    atau kota di seluruh aplikasi.
+
+    Yang dibuang: tombol "wilayahku tidak ada di daftar — ketik sendiri" dan
+    seluruh mode manualnya di `PilihWilayah`. Tombol itu ditulis sebagai
+    jaring saat layanannya mati, tapi ia melubangi satu-satunya hal yang
+    komponen itu ada untuk menjaganya — begitu satu orang mengetik "kota
+    malang", hitungan wilayahnya pecah dan tidak ada layar yang bisa
+    menyadarinya.
+
+    Dua formulir yang ternyata masih memakai teks bebas dan ikut diganti:
+
+    - **`/permintaan`** — dan ini yang paling merugikan. Formulir itu justru
+      yang mengisi `permintaan_kecamatan`, view yang mengelompokkan
+      BERDASARKAN TEKS kecamatan. Satu orang yang menulis "lowokwaru" membuat
+      permintaannya tidak pernah terlihat oleh host Lowokwaru, dan keduanya
+      tidak akan pernah tahu kenapa.
+    - **`/profil`** pada jalur sebelum migrasi 16 — `kelurahan` dan
+      `kecamatan` belum ada kolomnya di sana, tapi `kota` ada, dan ia tetap
+      harus berasal dari daftar.
+
+    Ganti jaringnya: `src/data/wilayah-dasar.json` (25 KB) memuat 38 provinsi
+    dan 514 kabupaten/kota, dan `/api/wilayah` menyajikannya saat upstream
+    tidak bisa dihubungi. Jadi nama **kota** selalu bisa dipilih dari daftar
+    yang sah, apa pun yang terjadi pada wilayah.id.
+
+    Kecamatan dan kelurahan sengaja TIDAK disalin: jumlahnya 7.200 dan 83.000,
+    dan mengunduhnya berarti ribuan permintaan ke layanan gratis. Di dua
+    tingkat itu kegagalan dijawab 502 dan formulirnya menawarkan **coba
+    lagi**. Konsekuensinya ditanggung sadar: kalau wilayah.id mati, ruang baru
+    memang tidak bisa didaftarkan sampai ia hidup lagi. Ruang dengan kecamatan
+    "test" lebih merugikan daripada ruang yang didaftarkan sepuluh menit
+    kemudian.
+
+    `PilihWilayah` sekarang punya prop `sampai`: `"kabupaten"` untuk
+    pendaftaran akun, `"kecamatan"` untuk permintaan ruang, `"kelurahan"`
+    untuk ruang.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris

@@ -118,13 +118,17 @@ export default function FormProfil({
             </p>
           </div>
         ) : (
-          <Kolom
-            id="kota"
-            label="Kota"
-            required
-            value={isi.kota}
-            onChange={(e) => setIsi((v) => ({ ...v, kota: e.target.value }))}
-          />
+          // Sebelum 16_wilayah_profil.sql, `kelurahan` dan `kecamatan` belum
+          // ada kolomnya — tapi `kota` ada, dan ia tetap harus berasal dari
+          // daftar yang sah.
+          <div className="sm:col-span-2">
+            <p className="mb-2 text-sm font-medium">Kota</p>
+            <PilihWilayah
+              nilai={{ kelurahan: "", kecamatan: "", kota: isi.kota }}
+              onGanti={(w) => setIsi((v) => ({ ...v, kota: w.kota }))}
+              sampai="kabupaten"
+            />
+          </div>
         )}
         <Kolom
           id="telepon"
