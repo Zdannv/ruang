@@ -13,7 +13,7 @@ pihak luar, bukan karena sengaja dipalsukan.
 2. SQL Editor → jalankan berurutan: `01_schema.sql`, `03_auth_rls.sql`,
    `04_pesan.sql`, `05_host.sql`, `06_akses.sql`, `07_advisor.sql`,
    `08_jendela.sql`, `09_notifikasi.sql`, `10_push.sql`, `11_pesan_chat.sql`,
-   `12_balasan_cepat.sql`, `13_umkm.sql`, `14_foto_kecil.sql`.
+   `12_balasan_cepat.sql`, `13_umkm.sql`, `14_foto_kecil.sql`, `16_wilayah_profil.sql`.
    **Semuanya wajib.** Aplikasi membaca lewat view yang dibuat di `03`–`05`
    dan menulis lewat fungsi di `04`; tanpa itu layarnya menjawab "relation
    does not exist". `05` juga membuat bucket Storage `ruang-foto` beserta

@@ -404,6 +404,42 @@ Kerjakan berurutan. Jangan lompat.
     false dan pencarian tidak pernah dijalankan sama sekali. Ketahuan saat
     halamannya dibuka, bukan dari membaca kodenya.
 
+25. **Titik awal ikut wilayah pendaftaran — selesai** (6 Sep 2026). Lihat
+    `16_wilayah_profil.sql` dan `src/app/api/titik-saya/route.ts`.
+
+    Untuk orang Malang, titik bawaan "Kampus UB" kebetulan masuk akal. Untuk
+    orang Surabaya ia salah, dan tidak ada apa pun di aplikasi yang
+    menyadarinya — padahal wilayahnya sudah ditanyakan saat mendaftar.
+
+    Yang menghalangi bukan datanya melainkan bentuknya: `profil.kota` adalah
+    NAMA, `ruang_terdekat()` butuh koordinat. Jembatannya `/api/titik-saya`,
+    yang menggeokode nama wilayahnya **sekali** lewat Nominatim, menyimpan
+    hasilnya ke `profil.lat`/`lng`, dan sesudahnya menjawab dari database.
+
+    **Rute itu tidak menerima parameter apa pun, dan itu keputusan
+    keamanan.** Wilayah yang digeokode selalu diambil dari profil
+    pemanggilnya sendiri. Kalau ia menerima `?q=`, ia menjadi geocoder terbuka
+    atas nama server kita — dan Nominatim membatasi pemakaian per IP, jadi
+    penyalahgunaannya memblokir seluruh pengguna aplikasi ini, bukan
+    penyalahgunanya.
+
+    **Yang dikirim ke Nominatim hanya nama wilayah administratif.** Koordinat
+    asli ruang TIDAK BOLEH pernah dikirim ke geocoder mana pun; seluruh aturan
+    penyamaran alamat sia-sia kalau titik aslinya bocor lewat permintaan pihak
+    ketiga.
+
+    Formulir daftar sekarang memakai `PilihWilayah` dan berhenti di
+    **kabupaten/kota** (`sampai="kabupaten"`), bukan kelurahan: di sana
+    wilayahnya cuma jadi titik awal pencarian, dan dua dropdown tambahan di
+    formulir daftar lebih mahal daripada ketelitian yang didapat. Halaman akun
+    menawarkan keempat tingkatnya bagi yang mau lebih tepat, dan mengubahnya
+    **mengosongkan `lat`/`lng`** supaya dihitung ulang — kalau tidak,
+    pencarian tetap mulai dari kota lama setelah orangnya pindah.
+
+    Urutan titik awal `/cari` selengkapnya: parameter URL → lokasi sungguhan
+    (kalau izinnya sudah ada) → titik terakhir di perangkat itu → wilayah
+    pendaftaran → titik bawaan.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris

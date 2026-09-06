@@ -20,9 +20,23 @@ import { ambilWilayah, type Wilayah } from "@/lib/wilayah";
 export default function PilihWilayah({
   nilai,
   onGanti,
+  sampai = "kelurahan",
+  kolom = 2,
 }: {
   nilai: { kelurahan: string; kecamatan: string; kota: string };
   onGanti: (w: { kelurahan: string; kecamatan: string; kota: string }) => void;
+  /**
+   * Sedalam apa wilayahnya ditanyakan.
+   *
+   * Ruang butuh sampai kelurahan: itu satuan yang ditampilkan ke publik dan
+   * yang dipakai mengelompokkan hasil. Pendaftaran akun cukup sampai
+   * kabupaten/kota — di sana wilayahnya hanya jadi titik awal pencarian, dan
+   * dua dropdown tambahan di formulir daftar adalah gesekan yang harganya
+   * lebih mahal daripada ketelitian yang didapat.
+   */
+  sampai?: "kabupaten" | "kelurahan";
+  /** 1 untuk kartu sempit seperti formulir masuk/daftar. */
+  kolom?: 1 | 2;
 }) {
   const [provinsi, setProvinsi] = useState<Wilayah[]>([]);
   const [kabupaten, setKabupaten] = useState<Wilayah[]>([]);
@@ -89,20 +103,28 @@ export default function PilihWilayah({
     if (kode) setKelurahan(await ambilWilayah("kelurahan", kode).catch(() => []));
   };
 
+  const kisi = kolom === 1 ? "grid gap-4" : "grid gap-4 sm:grid-cols-2";
+  const bungkus = kolom === 1 ? "" : "sm:col-span-2";
+  const sampaiKelurahan = sampai === "kelurahan";
+
   if (manual) {
     return (
-      <div className="sm:col-span-2">
+      <div className={bungkus}>
         <p className="rounded-xl bg-warn-soft px-3.5 py-2.5 text-xs leading-relaxed text-warn">
           Daftar wilayah sedang tidak bisa diambil, jadi ketik sendiri. Tulis apa
           adanya tanpa awalan — <strong>Lowokwaru</strong>, bukan
           &ldquo;Kec. Lowokwaru&rdquo; — supaya ruangmu terhitung di wilayah yang
           sama dengan yang lain.
         </p>
-        <div className="mt-3 grid gap-4 sm:grid-cols-3">
-          <Teks id="kelurahan" label="Kelurahan" nilai={nilai.kelurahan}
-            onGanti={(v) => onGanti({ ...nilai, kelurahan: v })} />
-          <Teks id="kecamatan" label="Kecamatan" nilai={nilai.kecamatan}
-            onGanti={(v) => onGanti({ ...nilai, kecamatan: v })} />
+        <div className={`mt-3 ${kolom === 1 ? "grid gap-4" : "grid gap-4 sm:grid-cols-3"}`}>
+          {sampaiKelurahan && (
+            <>
+              <Teks id="kelurahan" label="Kelurahan" nilai={nilai.kelurahan}
+                onGanti={(v) => onGanti({ ...nilai, kelurahan: v })} />
+              <Teks id="kecamatan" label="Kecamatan" nilai={nilai.kecamatan}
+                onGanti={(v) => onGanti({ ...nilai, kecamatan: v })} />
+            </>
+          )}
           <Teks id="kota" label="Kabupaten/Kota" nilai={nilai.kota}
             onGanti={(v) => onGanti({ ...nilai, kota: v })} />
         </div>
@@ -110,11 +132,13 @@ export default function PilihWilayah({
     );
   }
 
-  const terisi = nilai.kelurahan && nilai.kecamatan && nilai.kota;
+  const terisi = sampaiKelurahan
+    ? nilai.kelurahan && nilai.kecamatan && nilai.kota
+    : Boolean(nilai.kota);
 
   return (
-    <div className="sm:col-span-2">
-      <div className="grid gap-4 sm:grid-cols-2">
+    <div className={bungkus}>
+      <div className={kisi}>
         <Pilih
           id="provinsi"
           label="Provinsi"
@@ -131,27 +155,31 @@ export default function PilihWilayah({
           nonaktif={!kodeProvinsi}
           onGanti={pilihKabupaten}
         />
-        <Pilih
-          id="kecamatan"
-          label="Kecamatan"
-          nilai={kodeKecamatan}
-          daftar={kecamatan}
-          nonaktif={!kodeKabupaten}
-          onGanti={pilihKecamatan}
-        />
-        <Pilih
-          id="kelurahan"
-          label="Kelurahan"
-          nilai={kelurahan.find((k) => k.nama === nilai.kelurahan)?.kode ?? ""}
-          daftar={kelurahan}
-          nonaktif={!kodeKecamatan}
-          onGanti={(kode) =>
-            onGanti({
-              ...nilai,
-              kelurahan: kelurahan.find((k) => k.kode === kode)?.nama ?? "",
-            })
-          }
-        />
+        {sampaiKelurahan && (
+          <>
+            <Pilih
+              id="kecamatan"
+              label="Kecamatan"
+              nilai={kodeKecamatan}
+              daftar={kecamatan}
+              nonaktif={!kodeKabupaten}
+              onGanti={pilihKecamatan}
+            />
+            <Pilih
+              id="kelurahan"
+              label="Kelurahan"
+              nilai={kelurahan.find((k) => k.nama === nilai.kelurahan)?.kode ?? ""}
+              daftar={kelurahan}
+              nonaktif={!kodeKecamatan}
+              onGanti={(kode) =>
+                onGanti({
+                  ...nilai,
+                  kelurahan: kelurahan.find((k) => k.kode === kode)?.nama ?? "",
+                })
+              }
+            />
+          </>
+        )}
       </div>
 
       {/* Ringkasan ini penting saat MENGUBAH ruang: yang tersimpan di database
@@ -163,12 +191,14 @@ export default function PilihWilayah({
           <>
             Tersimpan:{" "}
             <strong className="text-ink">
-              {nilai.kelurahan}, {nilai.kecamatan}, {nilai.kota}
+              {[nilai.kelurahan, nilai.kecamatan, nilai.kota].filter(Boolean).join(", ")}
             </strong>
             . Memilih ulang di atas akan menggantinya.
           </>
-        ) : (
+        ) : sampaiKelurahan ? (
           "Pilih sampai kelurahan. Yang terlihat publik cuma kelurahan dan kecamatan — alamat lengkapnya tidak."
+        ) : (
+          "Dipakai sebagai titik awal pencarian, dan bisa diubah kapan pun dari halaman akun."
         )}
       </p>
 

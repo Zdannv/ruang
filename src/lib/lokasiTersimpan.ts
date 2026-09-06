@@ -77,3 +77,28 @@ export async function izinLokasiSudahAda(): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Titik dari wilayah yang orangnya sebut saat mendaftar.
+ *
+ * Dipakai sebagai cadangan sebelum titik bawaan: untuk orang Malang, "Kampus
+ * UB" kebetulan masuk akal, tapi untuk orang Surabaya ia salah — padahal
+ * wilayahnya sudah ditanyakan waktu mendaftar.
+ *
+ * Mengembalikan null untuk siapa pun yang belum masuk, dan untuk profil yang
+ * wilayahnya tidak bisa dikenali. Pemanggilnya jatuh ke titik bawaan.
+ */
+export async function titikProfil(): Promise<
+  { lat: number; lng: number; nama: string } | null
+> {
+  try {
+    const jawab = await fetch("/api/titik-saya");
+    if (!jawab.ok) return null;
+    const isi = (await jawab.json()) as {
+      titik?: { lat: number; lng: number; nama: string } | null;
+    };
+    return isi.titik ?? null;
+  } catch {
+    return null;
+  }
+}

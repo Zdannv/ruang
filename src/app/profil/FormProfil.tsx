@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { BadgeCheck, Loader2 } from "lucide-react";
 import { Bagian, Kolom } from "@/components/host/Kolom";
+import PilihWilayah from "@/components/host/PilihWilayah";
 import { klienBrowser } from "@/lib/supabase/browser";
 import { bulanTahun } from "@/lib/label";
 
@@ -16,6 +17,7 @@ export default function FormProfil({
   bergabung,
   terverifikasi,
   awal,
+  wilayah,
   usaha,
 }: {
   profilId: string;
@@ -23,6 +25,11 @@ export default function FormProfil({
   bergabung: string | null;
   terverifikasi: boolean;
   awal: { nama: string; kota: string; telepon: string };
+  /**
+   * `null` kalau kolomnya belum ada di database — bagiannya disembunyikan,
+   * dan kolom `Kota` teks yang lama dipakai sebagai gantinya.
+   */
+  wilayah: { kelurahan: string; kecamatan: string; kota: string } | null;
   /**
    * `null` kalau kolomnya belum ada di database — bagiannya disembunyikan
    * seluruhnya, karena formulir yang setiap simpanannya gagal lebih buruk
@@ -36,6 +43,9 @@ export default function FormProfil({
     namaUsaha: usaha?.namaUsaha ?? "",
     npwp: usaha?.npwp ?? "",
   });
+  const [wil, setWil] = useState(
+    wilayah ?? { kelurahan: "", kecamatan: "", kota: awal.kota }
+  );
   const [kirim, setKirim] = useState(false);
   const [galat, setGalat] = useState<string | null>(null);
   const [tersimpan, setTersimpan] = useState(false);
@@ -50,7 +60,19 @@ export default function FormProfil({
       .from("profil")
       .update({
         nama: isi.nama.trim(),
-        kota: isi.kota.trim(),
+        kota: wilayah ? wil.kota : isi.kota.trim(),
+        ...(wilayah
+          ? {
+              kelurahan: kosongJadiNull(wil.kelurahan),
+              kecamatan: kosongJadiNull(wil.kecamatan),
+              // Koordinatnya dikosongkan supaya `/api/titik-saya` menghitung
+              // ulang dari wilayah yang baru. Membiarkannya berarti pencarian
+              // tetap mulai dari kota lama setelah orangnya pindah — kesalahan
+              // yang tidak akan pernah ia hubungkan dengan formulir ini.
+              lat: null,
+              lng: null,
+            }
+          : {}),
         // Kolom ini nullable sejak 03: string kosong yang disimpan apa adanya
         // cuma memindahkan pemeriksaan "ada isinya atau tidak" ke setiap
         // tempat yang membacanya.
@@ -86,13 +108,24 @@ export default function FormProfil({
             bantuan="Yang dilihat host atau penyewa di pemesanan dan ulasan."
           />
         </div>
-        <Kolom
-          id="kota"
-          label="Kota"
-          required
-          value={isi.kota}
-          onChange={(e) => setIsi((v) => ({ ...v, kota: e.target.value }))}
-        />
+        {wilayah ? (
+          <div className="sm:col-span-2">
+            <p className="mb-2 text-sm font-medium">Wilayah tempatmu tinggal</p>
+            <PilihWilayah nilai={wil} onGanti={setWil} />
+            <p className="mt-2 text-xs leading-relaxed text-muted">
+              Dipakai sebagai titik awal pencarian ketika izin lokasi belum
+              diberikan. Tidak pernah ditampilkan ke pihak lain.
+            </p>
+          </div>
+        ) : (
+          <Kolom
+            id="kota"
+            label="Kota"
+            required
+            value={isi.kota}
+            onChange={(e) => setIsi((v) => ({ ...v, kota: e.target.value }))}
+          />
+        )}
         <Kolom
           id="telepon"
           label="Nomor HP"

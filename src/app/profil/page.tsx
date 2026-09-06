@@ -12,6 +12,7 @@ import { pesanBelumDibaca } from "@/lib/percakapan";
 export const metadata: Metadata = { title: "Profil — Ruang" };
 
 type UsahaProfil = { nama_usaha: string | null; npwp: string | null };
+type WilayahProfil = { kelurahan: string | null; kecamatan: string | null };
 
 export default async function HalamanProfil() {
   const sesi = await sesiSaya();
@@ -35,6 +36,17 @@ export default async function HalamanProfil() {
   const { data: usaha } = await db
     .from("profil")
     .select("nama_usaha, npwp")
+    .eq("id", sesi.profil?.id ?? "")
+    .maybeSingle();
+
+  // Select ketiga, dengan alasan yang sama seperti kolom usaha di atas:
+  // `kelurahan` dan `kecamatan` baru ada sejak 16_wilayah_profil.sql, dan
+  // menggabungkannya membuat database yang belum dijalankan migrasinya
+  // menjatuhkan seluruh halaman akun. Dipisah dari kueri usaha karena
+  // migrasinya berbeda — yang satu belum ada tidak berarti yang lain juga.
+  const { data: wilayah } = await db
+    .from("profil")
+    .select("kelurahan, kecamatan")
     .eq("id", sesi.profil?.id ?? "")
     .maybeSingle();
 
@@ -139,6 +151,15 @@ export default async function HalamanProfil() {
             kota: profil.kota,
             telepon: profil.telepon ?? "",
           }}
+          wilayah={
+            wilayah
+              ? {
+                  kelurahan: (wilayah as WilayahProfil).kelurahan ?? "",
+                  kecamatan: (wilayah as WilayahProfil).kecamatan ?? "",
+                  kota: profil.kota,
+                }
+              : null
+          }
           usaha={
             usaha
               ? {

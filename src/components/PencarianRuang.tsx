@@ -17,7 +17,12 @@ import {
   VOLUME_PILIHAN,
   presetDari,
 } from "@/lib/titik";
-import { bacaTitik, izinLokasiSudahAda, simpanTitik } from "@/lib/lokasiTersimpan";
+import {
+  bacaTitik,
+  izinLokasiSudahAda,
+  simpanTitik,
+  titikProfil,
+} from "@/lib/lokasiTersimpan";
 
 const PIL =
   "cursor-pointer rounded-full px-3.5 py-2 text-sm font-medium transition-colors " +
@@ -63,8 +68,12 @@ export default function PencarianRuang() {
   const tipe = (searchParams.get("tipe") ?? "") as TipeRuang | "";
   const kategori = searchParams.get("kategori") ?? "";
 
+  // Dipakai label titik supaya tertulis "Ketawanggede", bukan "lokasimu",
+  // untuk titik yang datang dari wilayah pendaftaran.
+  const [namaWilayahProfil, setNamaWilayahProfil] = useState<string | null>(null);
+
   const preset = presetDari(lat, lng);
-  const namaTitik = preset?.nama ?? "lokasimu";
+  const namaTitik = preset?.nama ?? namaWilayahProfil ?? "lokasimu";
   const kunci = `${lat}|${lng}|${radiusKm}|${volumeMin}|${hargaMaks}`;
 
   const ubah = useCallback(
@@ -116,7 +125,8 @@ export default function PencarianRuang() {
          Lihat `izinLokasiSudahAda()` untuk alasan kenapa tidak boleh
          bertanya sendiri di sini.
       3. Titik terakhir yang ia pakai di perangkat ini.
-      4. Titik bawaan.
+      4. Wilayah yang ia sebut saat mendaftar — lihat `/api/titik-saya`.
+      5. Titik bawaan.
 
     `siapCari` menahan kueri pertama sampai keputusannya jatuh. Tanpa itu,
     halaman menjalankan satu pencarian dari Kampus UB, menampilkan hasilnya,
@@ -126,8 +136,9 @@ export default function PencarianRuang() {
   const [siapCari, setSiapCari] = useState(
     () => searchParams.has("lat") || searchParams.has("lng")
   );
-  // true hanya di keadaan "benar-benar kunjungan pertama": izinnya belum
-  // pernah diberikan DAN tidak ada titik yang diingat.
+  // true hanya di keadaan "benar-benar tidak ada petunjuk": izinnya belum
+  // pernah diberikan, tidak ada titik yang diingat, DAN wilayah pendaftarannya
+  // tidak diketahui.
   const [tawarkanLokasi, setTawarkanLokasi] = useState(false);
 
   useEffect(() => {
@@ -161,26 +172,36 @@ export default function PencarianRuang() {
 
     izinLokasiSudahAda().then((ada) => {
       if (!hidup) return;
-      if (!ada) {
+      const tanpaLokasi = async (tawarkan: boolean) => {
         const ingat = bacaTitik();
         if (ingat) {
           pakai(ingat);
-        } else {
-          setTawarkanLokasi(true);
-          setSiapCari(true);
+          return;
         }
+        const profil = await titikProfil();
+        if (!hidup) return;
+        if (profil) {
+          setNamaWilayahProfil(profil.nama);
+          pakai(profil);
+          return;
+        }
+        if (tawarkan) setTawarkanLokasi(true);
+        setSiapCari(true);
+      };
+
+      if (!ada) {
+        void tanpaLokasi(true);
         return;
       }
       navigator.geolocation.getCurrentPosition(
         (pos) => pakai({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
         () => {
           // Izinnya ada tapi perangkatnya gagal membaca posisi — GPS mati,
-          // atau di dalam gedung. Jatuh ke titik terakhir, bukan ke layar
-          // kosong.
+          // atau di dalam gedung. Turun ke cadangan, bukan ke layar kosong.
+          // Tawarannya TIDAK dimunculkan di sini: izinnya sudah ada, jadi
+          // menawarkan "pakai lokasiku" cuma mengulang yang baru saja gagal.
           if (!hidup) return;
-          const ingat = bacaTitik();
-          if (ingat) pakai(ingat);
-          else setSiapCari(true);
+          void tanpaLokasi(false);
         },
         { timeout: 8000, maximumAge: 5 * 60 * 1000 }
       );

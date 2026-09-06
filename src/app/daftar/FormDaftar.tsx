@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, MailCheck, UserCheck } from "lucide-react";
 import KolomIsian from "@/components/auth/KolomIsian";
 import KartuAuth from "@/components/auth/KartuAuth";
+import PilihWilayah from "@/components/host/PilihWilayah";
 import { klienBrowser } from "@/lib/supabase/browser";
 import { siteUrl } from "@/lib/supabase/env";
 
@@ -19,7 +20,10 @@ export default function FormDaftar() {
   );
   const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
-  const [kota, setKota] = useState("Malang");
+  // Wilayahnya dipilih dari daftar, bukan diketik: nilainya jadi titik awal
+  // pencarian lewat `/api/titik-saya`, dan nama yang salah tulis tidak bisa
+  // digeokode. Cukup sampai kabupaten/kota di sini — lihat prop `sampai`.
+  const [wilayah, setWilayah] = useState({ kelurahan: "", kecamatan: "", kota: "" });
   const [telepon, setTelepon] = useState("");
   const [sandi, setSandi] = useState("");
   const [kirim, setKirim] = useState(false);
@@ -34,6 +38,11 @@ export default function FormDaftar() {
       setGalat(`Sandi minimal ${SANDI_MIN} karakter.`);
       return;
     }
+    // Select tidak bisa `required`: <option> pertamanya bernilai string kosong.
+    if (!wilayah.kota) {
+      setGalat("Pilih kabupaten/kota tempatmu tinggal.");
+      return;
+    }
     setKirim(true);
     setGalat(null);
     setSudahTerdaftar(false);
@@ -43,7 +52,13 @@ export default function FormDaftar() {
       password: sandi,
       options: {
         // Dibaca trigger `handle_new_user` untuk mengisi baris profil.
-        data: { nama: nama.trim(), kota: kota.trim(), telepon: telepon.trim() },
+        data: {
+          nama: nama.trim(),
+          kota: wilayah.kota,
+          kecamatan: wilayah.kecamatan,
+          kelurahan: wilayah.kelurahan,
+          telepon: telepon.trim(),
+        },
         emailRedirectTo: siteUrl("/auth/konfirmasi"),
       },
     });
@@ -225,14 +240,15 @@ export default function FormDaftar() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="nama@contoh.com"
         />
-        <KolomIsian
-          id="kota"
-          label="Kota"
-          required
-          autoComplete="address-level2"
-          value={kota}
-          onChange={(e) => setKota(e.target.value)}
-        />
+        <div>
+          <p className="mb-2 text-sm font-medium">Kamu tinggal di mana?</p>
+          <PilihWilayah
+            nilai={wilayah}
+            onGanti={setWilayah}
+            sampai="kabupaten"
+            kolom={1}
+          />
+        </div>
         <KolomIsian
           id="telepon"
           label="Nomor HP"
