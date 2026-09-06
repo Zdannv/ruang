@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Konfirmasi alamat email baru</title>
+</head>
+<!--
+  Templat email Ruang. Ditempel ke Supabase Dashboard -> Authentication ->
+  Emails. Aturannya berbeda dari halaman web:
+
+  - Tata letak pakai <table>, bukan flex atau grid. Outlook merender lewat
+    Word dan mengabaikan keduanya.
+  - Seluruh CSS inline. Sebagian klien email membuang <style> di <head>.
+  - Tidak ada gambar dari luar. Gambar eksternal dinilai spam oleh sebagian
+    penyaring, dan sebagian besar klien memblokirnya secara bawaan — logo
+    yang tidak tampil justru membuat emailnya terlihat palsu.
+  - Warnanya ditulis eksplisit, tidak mengandalkan tema.
+-->
+<body style="margin:0;padding:0;background:#eef2f9;">
+  <!-- Cuplikan yang tampil di daftar inbox sebelum email dibuka. -->
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Konfirmasi perpindahan alamat email akun Ruang kamu.</div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+         style="background:#eef2f9;padding:32px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+               style="max-width:520px;background:#ffffff;border-radius:16px;
+                      border:1px solid #e2e8f0;overflow:hidden;">
+          <tr>
+            <td style="padding:28px 32px 0 32px;">
+              <span style="font:700 20px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                           color:#0f172a;letter-spacing:-0.02em;">Ruang</span>
+              <span style="font:400 12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                           color:#64748b;padding-left:8px;">marketplace ruang antarwarga</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 32px 0 32px;">
+              <h1 style="margin:0;font:700 22px/1.3 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                         color:#0f172a;letter-spacing:-0.02em;">Konfirmasi alamat email baru</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:12px 32px 0 32px;font:400 15px/1.65 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#334155;">
+              Akun Ruang yang sekarang memakai
+              <strong style="color:#0f172a;">{{ .Email }}</strong> diminta berpindah ke
+              <strong style="color:#0f172a;">{{ .NewEmail }}</strong>. Konfirmasi dari
+              alamat yang baru untuk menyelesaikannya.
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 32px 0 32px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="border-radius:999px;background:#2563eb;">
+                    <a href="{{ .SiteURL }}/auth/konfirmasi?token_hash={{ .TokenHash }}&type=email_change"
+                       style="display:inline-block;padding:13px 28px;border-radius:999px;
+                              font:600 15px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+                              color:#ffffff;text-decoration:none;">Konfirmasi alamat baru</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 32px 0 32px;font:400 13px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#64748b;">
+              Tombolnya tidak bisa diklik? Salin alamat ini ke peramban:<br>
+              <a href="{{ .SiteURL }}/auth/konfirmasi?token_hash={{ .TokenHash }}&type=email_change" style="color:#2563eb;word-break:break-all;">{{ .SiteURL }}/auth/konfirmasi?token_hash={{ .TokenHash }}&type=email_change</a>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 32px 0 32px;">
+              <div style="border-top:1px solid #e2e8f0;padding-top:16px;
+                          font:400 13px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#64748b;">
+                Sampai tautan ini dibuka, akunmu tetap memakai alamat yang lama.<br><br>
+                <strong style="color:#334155;">Bukan kamu yang meminta?</strong>
+                Abaikan email ini, lalu ganti sandi akunmu — permintaan perpindahan
+                email hanya bisa dibuat dari sesi yang sudah masuk.
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 32px 28px 32px;
+                       font:400 12px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#94a3b8;">
+              Email ini dikirim otomatis, jadi jangan dibalas.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

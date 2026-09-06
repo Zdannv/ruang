@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Loader2, MailCheck } from "lucide-react";
+import { Loader2, MailCheck, UserCheck } from "lucide-react";
 import KolomIsian from "@/components/auth/KolomIsian";
 import KartuAuth from "@/components/auth/KartuAuth";
 import { klienBrowser } from "@/lib/supabase/browser";
@@ -25,6 +25,7 @@ export default function FormDaftar() {
   const [kirim, setKirim] = useState(false);
   const [galat, setGalat] = useState<string | null>(null);
   const [terkirim, setTerkirim] = useState(false);
+  const [sudahTerdaftar, setSudahTerdaftar] = useState(false);
   const [kirimUlang, setKirimUlang] = useState<"siap" | "proses" | "selesai">("siap");
 
   const daftar = async (e: React.FormEvent) => {
@@ -35,6 +36,7 @@ export default function FormDaftar() {
     }
     setKirim(true);
     setGalat(null);
+    setSudahTerdaftar(false);
 
     const { data, error } = await klienBrowser().auth.signUp({
       email: email.trim(),
@@ -49,11 +51,35 @@ export default function FormDaftar() {
     setKirim(false);
 
     if (error) {
-      setGalat(
-        error.message === "User already registered"
-          ? "Email itu sudah terdaftar. Coba masuk saja."
-          : error.message
-      );
+      if (/already registered|already been registered/i.test(error.message)) {
+        setSudahTerdaftar(true);
+        return;
+      }
+      setGalat(error.message);
+      return;
+    }
+
+    /*
+      Email yang sudah terdaftar TIDAK datang sebagai galat selama konfirmasi
+      email menyala. Supabase justru menjawab sukses dengan objek user
+      samaran — dan itu disengaja, supaya orang tidak bisa memakai formulir
+      daftar untuk menebak-nebak alamat email siapa saja yang punya akun.
+
+      Akibatnya di layar: menekan "Daftar" dengan email yang sudah dipakai
+      memberi jawaban yang sama dengan pendaftaran yang berhasil, padahal
+      tidak ada email apa pun yang dikirim. Orang akan menunggu email yang
+      tidak pernah datang.
+
+      Penandanya `identities` yang kosong; itu satu-satunya bedanya dari user
+      sungguhan. Konsekuensi yang perlu diketahui: memberi tahu bahwa emailnya
+      sudah terdaftar berarti melepas perlindungan tadi. Ditukar sadar —
+      penyewa yang tidak bisa masuk ke akunnya sendiri adalah kerugian yang
+      pasti, sedangkan penebakan alamat email di sini paling banter memberi
+      tahu bahwa seseorang punya akun. Halaman lupa sandi tetap menjawab sama
+      untuk email yang ada maupun tidak.
+    */
+    if (data.user && (data.user.identities?.length ?? 0) === 0) {
+      setSudahTerdaftar(true);
       return;
     }
 
@@ -77,6 +103,43 @@ export default function FormDaftar() {
     });
     setKirimUlang("selesai");
   };
+
+  if (sudahTerdaftar) {
+    return (
+      <KartuAuth
+        judul="Email ini sudah terdaftar"
+        keterangan={`${email.trim()} sudah punya akun di Ruang. Tidak ada email baru yang dikirim.`}
+        kaki={
+          <>
+            Salah alamat?{" "}
+            <button
+              type="button"
+              onClick={() => setSudahTerdaftar(false)}
+              className="cursor-pointer font-semibold text-brand hover:text-brand-dark"
+            >
+              Ubah dan daftar lagi
+            </button>
+          </>
+        }
+      >
+        <div className="flex flex-col items-center gap-4 text-center">
+          <UserCheck className="h-10 w-10 text-brand" />
+          <Link
+            href={`/masuk?email=${encodeURIComponent(email.trim())}`}
+            className="w-full rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+          >
+            Masuk ke akun itu
+          </Link>
+          <Link
+            href="/lupa-sandi"
+            className="w-full rounded-full bg-card px-6 py-3 text-sm font-semibold text-ink ring-1 ring-line transition-colors hover:bg-paper"
+          >
+            Lupa sandinya
+          </Link>
+        </div>
+      </KartuAuth>
+    );
+  }
 
   if (terkirim) {
     return (

@@ -32,11 +32,44 @@ pihak luar, bukan karena sengaja dipalsukan.
 4. `cp .env.example .env.local`, lalu isi URL + **anon key**.
 5. Authentication → Sign In / Providers → pastikan **Email** aktif dan
    *Confirm email* menyala.
-6. Authentication → URL Configuration → **Redirect URLs**: tambahkan
-   `http://localhost:3000/auth/konfirmasi` (dan alamat production-nya nanti).
-   Kalau tidak terdaftar, Supabase mengabaikan `emailRedirectTo` dan diam-diam
-   memakai Site URL — tautan konfirmasinya jadi mendarat di tempat yang salah.
-7. `npm install && npm run dev`.
+6. Authentication → URL Configuration. **Dua kolom, dan yang pertama paling
+   sering salah.**
+
+   - **Site URL** → domain produksinya, mis. `https://ruang-kamu.vercel.app`.
+     Bukan `http://localhost:3000`. Ke sinilah setiap tautan email mendarat
+     kalau tujuan lainnya tidak cocok, jadi selama isinya localhost, orang
+     yang membuka email konfirmasi di HP akan melihat *"This site can't be
+     reached"* — meskipun akunnya sudah benar-benar terkonfirmasi.
+   - **Redirect URLs** → tambahkan `http://localhost:3000/**` untuk
+     pengembangan. Yang tidak terdaftar di sini diabaikan Supabase, yang
+     diam-diam memakai Site URL sebagai gantinya.
+
+   Isi Site URL project bisa diperiksa tanpa membuka dashboard — kirim token
+   yang sengaja ngawur, lalu lihat ke mana ia dialihkan:
+
+   ```bash
+   curl -sD - -o /dev/null "$NEXT_PUBLIC_SUPABASE_URL/auth/v1/verify?token=bogus&type=signup" | grep -i ^location
+   ```
+
+   Alamat sebelum tanda `#` itulah Site URL yang sedang dipakai.
+
+7. Authentication → Emails → tempel isi `supabase/email/*.html` ke templat yang
+   sesuai:
+
+   | Berkas | Templat Supabase | Subject yang disarankan |
+   |---|---|---|
+   | `01_konfirmasi_pendaftaran.html` | Confirm signup | Konfirmasi email kamu — Ruang |
+   | `02_setel_ulang_sandi.html` | Reset password | Setel ulang sandi — Ruang |
+   | `03_ganti_alamat_email.html` | Change email address | Konfirmasi alamat email baru — Ruang |
+
+   Ketiganya memakai `{{ .TokenHash }}`, bukan `{{ .ConfirmationURL }}`, dan
+   itu bukan selera. `ConfirmationURL` menempuh dua lompatan — lewat
+   `/auth/v1/verify` milik Supabase, lalu dialihkan ke aplikasi — sehingga
+   **Site URL dan Redirect URLs dua-duanya** harus benar. Versi TokenHash
+   menuju langsung ke halaman kita, jadi cuma Site URL yang menentukan. Satu
+   pengaturan yang bisa salah, bukan dua.
+
+8. `npm install && npm run dev`.
 
 ## Menyalakan web push
 

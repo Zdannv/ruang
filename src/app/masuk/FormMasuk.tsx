@@ -12,7 +12,9 @@ export default function FormMasuk() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [email, setEmail] = useState("");
+  // Diisi lewat `?email=` dari layar "email ini sudah terdaftar", supaya orang
+  // tidak perlu mengetik ulang alamat yang barusan ia ketik.
+  const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [sandi, setSandi] = useState("");
   const [kirim, setKirim] = useState(false);
   // Galat dari tautan email (mis. tautannya kedaluwarsa) sampai ke sini lewat

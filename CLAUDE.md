@@ -343,6 +343,38 @@ Kerjakan berurutan. Jangan lompat.
     akun yang sedang dipakai, dan pemiliknya akan mendapati layar "Profilmu
     belum terbentuk" tanpa tahu sebabnya.
 
+23. **Alur daftar & email dirapikan — selesai** (6 Sep 2026).
+
+    **Email yang sudah terdaftar akhirnya ditolak.** Selama konfirmasi email
+    menyala, Supabase TIDAK mengembalikan galat untuk email yang sudah
+    dipakai — ia menjawab sukses dengan objek user samaran, supaya formulir
+    daftar tidak bisa dipakai menebak alamat email siapa saja yang punya akun.
+    Akibatnya di layar: menekan "Daftar" dengan email lama memberi jawaban
+    yang sama dengan pendaftaran berhasil, padahal tidak ada email yang
+    dikirim, dan orangnya menunggu sesuatu yang tidak pernah datang.
+
+    Penandanya `data.user.identities` yang kosong. Memakainya berarti melepas
+    perlindungan tadi, dan itu **ditukar sadar**: penyewa yang tidak bisa
+    masuk ke akunnya sendiri adalah kerugian yang pasti, sedangkan penebakan
+    alamat di sini paling banter memberi tahu bahwa seseorang punya akun.
+    `/lupa-sandi` tetap menjawab sama untuk email yang ada maupun tidak — kalau
+    nanti perlindungan itu mau dipulihkan, di situlah tempatnya diperketat,
+    bukan dengan membuat layar daftar berbohong lagi.
+
+    **Templat email ditulis sendiri**, di `supabase/email/`. Ketiganya memakai
+    `{{ .TokenHash }}`, bukan `{{ .ConfirmationURL }}`: yang terakhir menempuh
+    dua lompatan sehingga Site URL DAN Redirect URLs dua-duanya harus benar,
+    sedangkan TokenHash menuju langsung ke halaman kita. Satu pengaturan yang
+    bisa salah, bukan dua.
+
+    Aturan menulisnya berbeda dari halaman web dan ditulis di komentar tiap
+    berkas: tata letak `<table>`, CSS inline, tanpa gambar eksternal.
+
+    **Catatan konfigurasi, bukan kode:** *"This site can't be reached"* setelah
+    menekan tautan konfirmasi hampir selalu berarti Site URL project masih
+    `http://localhost:3000`. Cara memeriksanya tanpa dashboard ada di SETUP.md
+    langkah 6.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris
