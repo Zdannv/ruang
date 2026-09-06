@@ -21,6 +21,7 @@ import type {
   RiwayatBanjir,
   TipeRuang,
 } from "@/lib/ruang";
+import { AKHIRAN_KECIL } from "@/lib/ruang";
 
 export type StatusRuang = "draf" | "moderasi" | "tayang" | "ditangguhkan";
 
@@ -141,7 +142,56 @@ export const KETERANGAN_FOTO = [
   "lantai",
 ];
 
+/** Sisi terpanjang versi penuh — dipakai galeri di halaman detail. */
 const LEBAR_MAKS = 1600;
+
+/**
+ * Sisi terpanjang versi kecil — dipakai kartu hasil pencarian.
+ *
+ * 800px, bukan 400px seperti lebar kartunya di layar: layar HP hampir semuanya
+ * 2x atau 3x, dan gambar 400px di slot 360px akan terlihat lembek di sana.
+ * Pada 800px WebP ukurannya masih sekitar 60 KB — seperlima versi penuh.
+ */
+const LEBAR_KECIL = 800;
+
+type Gambar = { blob: Blob; mime: string; ekstensi: string };
+
+/**
+ * Encode canvas ke WebP, jatuh ke JPEG kalau peramban tidak bisa.
+ *
+ * `toBlob` dengan tipe yang tidak didukung TIDAK melempar galat — ia diam-diam
+ * mengembalikan PNG, yang untuk foto justru jauh lebih besar daripada JPEG.
+ * Jadi yang diperiksa adalah `blob.type`, bukan ada atau tidaknya hasil.
+ */
+async function encode(kanvas: HTMLCanvasElement, mutu: number): Promise<Gambar> {
+  const webp = await new Promise<Blob | null>((selesai) =>
+    kanvas.toBlob(selesai, "image/webp", mutu)
+  );
+  if (webp && webp.type === "image/webp") {
+    return { blob: webp, mime: "image/webp", ekstensi: "webp" };
+  }
+  const jpeg = await new Promise<Blob | null>((selesai) =>
+    kanvas.toBlob(selesai, "image/jpeg", mutu)
+  );
+  if (!jpeg) throw new Error("Gambarnya gagal diproses.");
+  return { blob: jpeg, mime: "image/jpeg", ekstensi: "jpg" };
+}
+
+function gambarKe(
+  bitmap: ImageBitmap,
+  lebarMaks: number,
+  mutu: number
+): Promise<Gambar> {
+  const skala = Math.min(1, lebarMaks / Math.max(bitmap.width, bitmap.height));
+  const kanvas = document.createElement("canvas");
+  kanvas.width = Math.round(bitmap.width * skala);
+  kanvas.height = Math.round(bitmap.height * skala);
+
+  const ctx = kanvas.getContext("2d");
+  if (!ctx) throw new Error("Peramban ini tidak bisa memproses gambar.");
+  ctx.drawImage(bitmap, 0, 0, kanvas.width, kanvas.height);
+  return encode(kanvas, mutu);
+}
 
 /**
  * Kompres ulang gambar lewat canvas sebelum diunggah.
@@ -154,23 +204,18 @@ const LEBAR_MAKS = 1600;
  * Menggambar ke canvas lalu meng-encode ulang menghasilkan berkas yang hanya
  * berisi piksel: tidak ada GPS, tidak ada merek kamera, tidak ada jam.
  */
-export async function tanpaExif(file: File): Promise<Blob> {
+export async function tanpaExif(
+  file: File
+): Promise<{ besar: Gambar; kecil: Gambar }> {
   const bitmap = await createImageBitmap(file);
-  const skala = Math.min(1, LEBAR_MAKS / Math.max(bitmap.width, bitmap.height));
-  const kanvas = document.createElement("canvas");
-  kanvas.width = Math.round(bitmap.width * skala);
-  kanvas.height = Math.round(bitmap.height * skala);
-
-  const ctx = kanvas.getContext("2d");
-  if (!ctx) throw new Error("Peramban ini tidak bisa memproses gambar.");
-  ctx.drawImage(bitmap, 0, 0, kanvas.width, kanvas.height);
-  bitmap.close();
-
-  const blob = await new Promise<Blob | null>((selesai) =>
-    kanvas.toBlob(selesai, "image/jpeg", 0.85)
-  );
-  if (!blob) throw new Error("Gambarnya gagal diproses.");
-  return blob;
+  try {
+    return {
+      besar: await gambarKe(bitmap, LEBAR_MAKS, 0.82),
+      kecil: await gambarKe(bitmap, LEBAR_KECIL, 0.75),
+    };
+  } finally {
+    bitmap.close();
+  }
 }
 
 /**
@@ -190,29 +235,47 @@ export async function unggahFoto(
     urutan: number;
   }
 ): Promise<void> {
-  const bersih = await tanpaExif(opsi.file);
+  const { besar, kecil } = await tanpaExif(opsi.file);
   // Folder pertama WAJIB id profil — policy storage mengikatnya ke situ.
-  const nama = `${opsi.hostId}/${opsi.ruangId}/${crypto.randomUUID()}.jpg`;
+  const dasar = `${opsi.hostId}/${opsi.ruangId}/${crypto.randomUUID()}`;
+  const namaBesar = `${dasar}.${besar.ekstensi}`;
+  const namaKecil = `${dasar}${AKHIRAN_KECIL}.${kecil.ekstensi}`;
 
-  const unggah = await db.storage
-    .from(BUCKET_FOTO)
-    .upload(nama, bersih, { contentType: "image/jpeg", upsert: false });
-  if (unggah.error) throw unggah.error;
+  const kirim = (nama: string, g: Gambar) =>
+    db.storage
+      .from(BUCKET_FOTO)
+      .upload(nama, g.blob, { contentType: g.mime, upsert: false });
 
-  const { data } = db.storage.from(BUCKET_FOTO).getPublicUrl(nama);
+  const u1 = await kirim(namaBesar, besar);
+  if (u1.error) throw u1.error;
+
+  // Mulai dari sini setiap kegagalan harus membersihkan berkas yang sudah
+  // telanjur naik. Berkas yatim tidak pernah tampil di mana pun, tapi tetap
+  // menghabiskan kuota penyimpanan dan tidak ada satu pun layar yang bisa
+  // menghapusnya — jejaknya cuma ada di Storage.
+  const u2 = await kirim(namaKecil, kecil);
+  if (u2.error) {
+    await db.storage.from(BUCKET_FOTO).remove([namaBesar]);
+    throw u2.error;
+  }
 
   const { error } = await db.from("ruang_foto").insert({
     ruang_id: opsi.ruangId,
-    url: data.publicUrl,
+    url: db.storage.from(BUCKET_FOTO).getPublicUrl(namaBesar).data.publicUrl,
+    url_kecil: db.storage.from(BUCKET_FOTO).getPublicUrl(namaKecil).data.publicUrl,
     urutan: opsi.urutan,
     keterangan: opsi.keterangan,
   });
-  if (error) throw error;
+  if (error) {
+    await db.storage.from(BUCKET_FOTO).remove([namaBesar, namaKecil]);
+    throw error;
+  }
 }
 
 export type FotoMilikSaya = {
   id: string;
   url: string;
+  url_kecil: string | null;
   urutan: number;
   keterangan: string;
 };
@@ -223,7 +286,7 @@ export async function daftarFoto(
 ): Promise<FotoMilikSaya[]> {
   const { data, error } = await db
     .from("ruang_foto")
-    .select("id, url, urutan, keterangan")
+    .select("id, url, url_kecil, urutan, keterangan")
     .eq("ruang_id", ruangId)
     .order("urutan");
   if (error) throw error;
@@ -239,14 +302,22 @@ export async function daftarFoto(
  */
 export async function hapusFoto(
   db: SupabaseClient,
-  foto: { id: string; url: string }
+  foto: { id: string; url: string; url_kecil?: string | null }
 ): Promise<void> {
   const { error } = await db.from("ruang_foto").delete().eq("id", foto.id);
   if (error) throw error;
 
+  // Kedua berkasnya sekaligus. Melewatkan yang kecil berarti setiap
+  // penghapusan meninggalkan separuh gambar di Storage selamanya.
+  const jalur = [foto.url, foto.url_kecil]
+    .map((u) => (u ? jalurBucket(u) : null))
+    .filter((j): j is string => j !== null);
+  if (jalur.length > 0) await db.storage.from(BUCKET_FOTO).remove(jalur);
+}
+
+/** Jalur di dalam bucket dari URL publiknya, atau null kalau bukan milik kita. */
+function jalurBucket(url: string): string | null {
   const tanda = `/${BUCKET_FOTO}/`;
-  const posisi = foto.url.indexOf(tanda);
-  if (posisi === -1) return;
-  const jalur = foto.url.slice(posisi + tanda.length);
-  await db.storage.from(BUCKET_FOTO).remove([jalur]);
+  const posisi = url.indexOf(tanda);
+  return posisi === -1 ? null : url.slice(posisi + tanda.length);
 }

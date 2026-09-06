@@ -8,6 +8,7 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { fotoPertama } from "@/lib/ruang";
 
 export type RingkasanPasar = {
   jumlahRuang: number;
@@ -83,16 +84,10 @@ export async function ruangSorotan(
     if (error || !data || data.length === 0) return [];
 
     const ids = (data as { id: string }[]).map((r) => r.id);
-    const { data: foto } = await db
-      .from("ruang_foto_publik")
-      .select("ruang_id, url, urutan")
-      .in("ruang_id", ids)
-      .order("urutan");
-
-    const peta = new Map<string, string>();
-    for (const f of (foto ?? []) as { ruang_id: string; url: string }[]) {
-      if (!peta.has(f.ruang_id)) peta.set(f.ruang_id, f.url);
-    }
+    // Sengaja memakai `fotoPertama` milik pencarian, bukan menyalin kuerinya:
+    // di sanalah kemunduran ke database tanpa kolom `url_kecil` ditangani,
+    // dan salinan kedua pasti akan lupa ikut diperbaiki.
+    const peta = await fotoPertama(db, ids);
 
     return (data as Omit<RuangSorotan, "foto">[]).map((r) => ({
       ...r,

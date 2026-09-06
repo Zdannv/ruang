@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { rupiah } from "@/lib/label";
+import { sudahDiperkecil } from "@/lib/ruang";
 import type { RuangSorotan } from "@/lib/ringkasan";
 
 /**
@@ -28,6 +29,7 @@ export default function KolaseSorotan({ ruang }: { ruang: RuangSorotan[] }) {
       >
         <Image
           src={utama.foto as string}
+          unoptimized={sudahDiperkecil(utama.foto as string)}
           alt={utama.judul}
           fill
           sizes="(min-width: 1024px) 460px, 100vw"
@@ -52,6 +54,7 @@ export default function KolaseSorotan({ ruang }: { ruang: RuangSorotan[] }) {
         >
           <Image
             src={r.foto as string}
+            unoptimized={sudahDiperkecil(r.foto as string)}
             alt={r.judul}
             fill
             sizes="(min-width: 1024px) 230px, 50vw"

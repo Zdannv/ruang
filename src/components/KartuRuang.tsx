@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { IKON_TIPE } from "@/components/IkonTipe";
-import type { RuangDenganFoto } from "@/lib/ruang";
+import { sudahDiperkecil, type RuangDenganFoto } from "@/lib/ruang";
 import {
   LABEL_AKSES,
   LABEL_BANJIR,
@@ -36,12 +36,18 @@ export default function KartuRuang({ ruang }: { ruang: RuangDenganFoto }) {
       className="naik naik-hover group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-card focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
     >
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-line">
+        {/* `unoptimized` saat fotonya sudah versi 800px dari unggahan: ia
+            sudah berukuran tepat untuk kartu ini, dan menyerahkannya ke
+            pengubah ukuran berarti membayar per gambar untuk memperkecil
+            sesuatu yang sudah kecil. Foto lama dan isi seed belum punya versi
+            kecil, jadi untuk mereka pengubah ukurannya tetap dipakai. */}
         {ruang.foto ? (
           <Image
             src={ruang.foto}
             alt={`Foto ${ruang.judul}`}
             fill
             sizes="(min-width: 1024px) 360px, (min-width: 640px) 45vw, 100vw"
+            unoptimized={sudahDiperkecil(ruang.foto)}
             className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
           />
         ) : (

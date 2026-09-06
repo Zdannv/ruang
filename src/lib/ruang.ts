@@ -15,6 +15,7 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { kolomBelumAda } from "@/lib/galat";
 
 export type TipeRuang =
   | "kamar"
@@ -79,6 +80,28 @@ export type FilterPencarian = {
 /** Sama dengan nilai bawaan `p_harga_maks` di `ruang_terdekat()`. */
 const HARGA_TANPA_BATAS = 999999999;
 
+/**
+ * Akhiran nama berkas versi kecil, dipakai dua arah.
+ *
+ * `unggahFoto()` menempelkannya saat menyimpan; `sudahDiperkecil()` di bawah
+ * membacanya kembali untuk memutuskan apakah gambarnya masih perlu diperkecil
+ * lagi oleh pengubah ukuran. Keduanya WAJIB memakai tetapan ini, jangan
+ * menulis ulang teksnya.
+ */
+export const AKHIRAN_KECIL = "-kecil";
+
+/**
+ * Benar kalau URL-nya menunjuk versi 800px yang dibuat saat unggah.
+ *
+ * Gambar seperti itu sudah berukuran tepat untuk kartu hasil pencarian, jadi
+ * ia disajikan apa adanya — tidak ada gunanya membayar pengubah ukuran untuk
+ * memperkecil sesuatu yang sudah kecil. Foto lama dan isi seed tidak punya
+ * versi kecil, dan untuk mereka jawabannya false: biarkan diperkecil.
+ */
+export function sudahDiperkecil(url: string): boolean {
+  return new RegExp(`${AKHIRAN_KECIL}\\.(webp|jpg|jpeg|png)$`, "i").test(url);
+}
+
 export type RuangDenganFoto = HasilRuang & { foto: string | null };
 
 /**
@@ -122,20 +145,42 @@ export async function cariRuang(
  * punya "ambil satu baris per grup", dan `urutan = 0` tidak dijamin ada kalau
  * foto pertamanya dihapus host.
  */
-async function fotoPertama(
+export async function fotoPertama(
   db: SupabaseClient,
   ruangIds: string[]
 ): Promise<Map<string, string>> {
-  const { data, error } = await db
-    .from("ruang_foto_publik")
-    .select("ruang_id, url, urutan")
-    .in("ruang_id", ruangIds)
-    .order("urutan");
+  if (ruangIds.length === 0) return new Map();
+
+  const ambil = (kolom: string) =>
+    db
+      .from("ruang_foto_publik")
+      .select(kolom)
+      .in("ruang_id", ruangIds)
+      .order("urutan");
+
+  let { data, error } = await ambil("ruang_id, url, urutan, url_kecil");
+
+  // `url_kecil` baru ada sejak 14_foto_kecil.sql. Database yang belum
+  // dijalankan migrasinya menjawab 42703, dan yang benar di situ adalah
+  // mundur ke kolom lama — bukan mematikan seluruh hasil pencarian. Migrasi
+  // di proyek ini dijalankan tangan, terpisah dari deploy aplikasinya, jadi
+  // keadaan "kode sudah tayang, kolomnya belum ada" pasti terjadi.
+  if (error && kolomBelumAda(error)) {
+    ({ data, error } = await ambil("ruang_id, url, urutan"));
+  }
   if (error) throw error;
 
   const peta = new Map<string, string>();
-  for (const row of (data ?? []) as { ruang_id: string; url: string }[]) {
-    if (!peta.has(row.ruang_id)) peta.set(row.ruang_id, row.url);
+  const baris = (data ?? []) as unknown as {
+    ruang_id: string;
+    url: string;
+    url_kecil?: string | null;
+  }[];
+  for (const row of baris) {
+    // Versi kecil kalau ada. Kalau belum — foto lama, atau isi seed yang masih
+    // menunjuk picsum — pakai yang biasa; kartunya tetap tampil, cuma lebih
+    // berat untuk baris itu saja.
+    if (!peta.has(row.ruang_id)) peta.set(row.ruang_id, row.url_kecil ?? row.url);
   }
   return peta;
 }

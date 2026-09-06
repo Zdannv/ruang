@@ -88,7 +88,14 @@ export default function KelolaFoto({
           {foto.map((f) => (
             <li key={f.id} className="group relative">
               <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-line">
-                <Image src={f.url} alt={f.keterangan} fill sizes="200px" className="object-cover" />
+                <Image
+                  src={f.url_kecil ?? f.url}
+                  alt={f.keterangan}
+                  fill
+                  sizes="200px"
+                  unoptimized={f.url_kecil !== null}
+                  className="object-cover"
+                />
               </div>
               <p className="mt-1.5 truncate text-xs text-muted">{f.keterangan}</p>
               <button

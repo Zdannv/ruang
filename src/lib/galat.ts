@@ -27,3 +27,23 @@ export function tabelBelumAda(e: unknown): boolean {
     pesan.includes("does not exist")
   );
 }
+
+/**
+ * Benar kalau galatnya berarti KOLOMNYA yang belum ada, bukan tabelnya.
+ *
+ * Bedanya dengan `tabelBelumAda` bukan soal kerapian: tabel yang hilang
+ * membuat sebuah fitur mustahil dan layak ditolak dengan layar penjelasan,
+ * sedangkan kolom yang hilang biasanya cuma menghilangkan penyempurnaan —
+ * dan yang benar di situ adalah mundur diam-diam ke perilaku lama, bukan
+ * menghentikan halamannya.
+ *
+ * Postgres menjawab `42703` "column ... does not exist"; PostgREST memakai
+ * `PGRST204` "Could not find the 'x' column" saat yang gagal penulisan.
+ */
+export function kolomBelumAda(e: unknown): boolean {
+  if (!e || typeof e !== "object") return false;
+  const g = e as { code?: string; message?: string };
+  if (g.code === "42703" || g.code === "PGRST204") return true;
+  const pesan = (g.message ?? "").toLowerCase();
+  return /column .+ does not exist/.test(pesan) || pesan.includes("could not find the '");
+}

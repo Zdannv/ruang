@@ -249,6 +249,36 @@ Kerjakan berurutan. Jangan lompat.
     berversi mencatat nama, kategori, jumlah, dan nilai taksiran per barang,
     dan `akses_log` mencatat setiap kedatangan.
 
+19. **Foto versi kecil — selesai** (6 Sep 2026). Lihat `14_foto_kecil.sql`.
+    Setiap layar menarik berkas yang sama, 1600px, untuk kartu yang di layar
+    lebarnya 360px. Yang habis duluan di paket gratis bukan penyimpanan
+    melainkan bandwidth, dan inilah sumbernya.
+
+    Versi kecil dibuat di peramban saat unggah — canvas yang sudah dipakai
+    membuang EXIF dipanggil dua kali — bukan oleh layanan pengubah ukuran
+    yang ditagih per gambar. Diukur pada satu foto HP sungguhan (900×1600):
+
+    | | Ukuran |
+    |---|---|
+    | Sebelumnya, JPEG q0.85 | 174 KB |
+    | Versi penuh, WebP q0.82 | 102 KB |
+    | Versi kecil 800px, WebP q0.75 | **27 KB** |
+
+    Jadi menyimpan DUA berkas (129 KB) tetap lebih hemat daripada satu berkas
+    lama (174 KB), dan kartu hasil pencarian jadi 6,4 kali lebih ringan.
+
+    Kartu memakai `unoptimized` **hanya** kalau URL-nya berakhiran
+    `AKHIRAN_KECIL` — gambar 800px sudah berukuran tepat, dan menyerahkannya
+    ke pengubah ukuran berarti membayar per gambar untuk memperkecil sesuatu
+    yang sudah kecil. Foto lama tidak punya versi kecil, dan untuk mereka
+    pengubah ukurannya tetap dipakai.
+
+    `url_kecil` nullable, dan `fotoPertama()` mundur ke kolom lama saat
+    databasenya menjawab `42703`. Tanpa itu, jarak antara push dan menjalankan
+    migrasinya membuat SELURUH hasil pencarian mati — bukan sekadar
+    kehilangan penghematan. Kemunduran itu diuji terhadap database sungguhan
+    yang kolomnya memang belum ada.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris
