@@ -375,6 +375,35 @@ Kerjakan berurutan. Jangan lompat.
     `http://localhost:3000`. Cara memeriksanya tanpa dashboard ada di SETUP.md
     langkah 6.
 
+24. **Titik awal pencarian tidak lagi selalu Kampus UB — selesai**
+    (6 Sep 2026). Lihat `src/lib/lokasiTersimpan.ts`.
+
+    `/cari` dulu selalu mulai dari `TITIK_BAWAAN`, dan lokasi sungguhan hanya
+    dipakai kalau tombol "Lokasiku" ditekan — termasuk bagi orang yang sudah
+    pernah memberi izin lokasi, dan termasuk saat ia baru saja mencari dari
+    titik lain semenit sebelumnya.
+
+    Urutan penentuannya sekarang: parameter URL, lalu lokasi sungguhan **kalau
+    izinnya sudah pernah diberikan**, lalu titik terakhir yang dipakai di
+    perangkat itu, lalu titik bawaan. Kueri pertama ditahan `siapCari` sampai
+    keputusannya jatuh — tanpa itu halaman menjalankan satu pencarian dari
+    Kampus UB, menampilkan hasilnya, lalu menggantinya.
+
+    **Yang TIDAK dilakukan: memanggil `getCurrentPosition()` saat halaman
+    terbuka.** Dialog izin yang muncul tanpa interaksi diredam Chrome, dan
+    penolakannya MELEKAT — sekali ditolak, tombol "Lokasiku" pun tidak bisa
+    lagi bertanya. Jadi kunjungan pertama tetap butuh satu ketukan; yang
+    diperbaiki adalah membuat ketukan itu terlihat (ada tawaran khusus yang
+    muncul hanya di keadaan itu), bukan tersembunyi di antara kendali lain.
+
+    Catatan untuk siapa pun yang menyentuh efek ini lagi: versi pertama
+    memakai `useRef` sebagai kunci sekali-jalan, dan **ref bertahan melewati
+    pelepasan komponen**. React memasang-melepas-memasang ulang setiap efek di
+    mode ketat, jadi jalur pertama dibatalkan cleanup-nya sementara jalur
+    kedua menemukan kuncinya sudah terpakai — hasilnya `siapCari` selamanya
+    false dan pencarian tidak pernah dijalankan sama sekali. Ketahuan saat
+    halamannya dibuka, bukan dari membaca kodenya.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris

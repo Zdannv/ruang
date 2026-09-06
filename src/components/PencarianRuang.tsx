@@ -17,6 +17,7 @@ import {
   VOLUME_PILIHAN,
   presetDari,
 } from "@/lib/titik";
+import { bacaTitik, izinLokasiSudahAda, simpanTitik } from "@/lib/lokasiTersimpan";
 
 const PIL =
   "cursor-pointer rounded-full px-3.5 py-2 text-sm font-medium transition-colors " +
@@ -88,6 +89,7 @@ export default function PencarianRuang() {
       return;
     }
     setGalatLokasi(null);
+    setTawarkanLokasi(false);
     navigator.geolocation.getCurrentPosition(
       (pos) =>
         ubah({
@@ -98,6 +100,104 @@ export default function PencarianRuang() {
       { timeout: 8000 }
     );
   };
+
+  /*
+    Titik awal ditentukan sekali, sebelum kueri pertama jalan.
+
+    Sebelum ini halaman selalu mulai dari Kampus UB dan lokasi asli baru
+    dipakai kalau tombolnya ditekan — termasuk untuk orang yang sudah pernah
+    memberi izin lokasi, dan termasuk saat ia baru saja mencari dari titik
+    lain semenit sebelumnya.
+
+    Urutannya:
+      1. Parameter URL — menang mutlak, karena itu tautan yang orangnya
+         sengaja buka atau bagikan.
+      2. Lokasi sungguhan, TAPI hanya kalau izinnya sudah pernah diberikan.
+         Lihat `izinLokasiSudahAda()` untuk alasan kenapa tidak boleh
+         bertanya sendiri di sini.
+      3. Titik terakhir yang ia pakai di perangkat ini.
+      4. Titik bawaan.
+
+    `siapCari` menahan kueri pertama sampai keputusannya jatuh. Tanpa itu,
+    halaman menjalankan satu pencarian dari Kampus UB, menampilkan hasilnya,
+    lalu menggantinya begitu lokasi aslinya masuk — satu kueri terbuang dan
+    satu lompatan yang terlihat.
+  */
+  const [siapCari, setSiapCari] = useState(
+    () => searchParams.has("lat") || searchParams.has("lng")
+  );
+  // true hanya di keadaan "benar-benar kunjungan pertama": izinnya belum
+  // pernah diberikan DAN tidak ada titik yang diingat.
+  const [tawarkanLokasi, setTawarkanLokasi] = useState(false);
+
+  useEffect(() => {
+    /*
+      Tidak ada penjaga `useRef` di sini, dan itu bukan kelalaian. Versi
+      pertama memakainya sebagai kunci sekali-jalan — dan ref BERTAHAN
+      melewati pelepasan komponen. React memasang lalu melepas lalu memasang
+      ulang setiap efek di mode ketat: jalur pertama dibatalkan cleanup-nya,
+      jalur kedua menemukan kuncinya sudah terpakai dan langsung keluar. Yang
+      tersisa adalah `siapCari` yang selamanya false, jadi pencarian tidak
+      pernah dijalankan sama sekali. Ketahuan saat halamannya benar-benar
+      dibuka, bukan dari membaca kodenya.
+
+      Yang menahan pengulangan cukup `siapCari` sendiri: sekali ia true,
+      efek ini keluar di baris pertama.
+    */
+    if (siapCari) return;
+
+    let hidup = true;
+    const pakai = (t: { lat: number; lng: number; radiusKm?: number }) => {
+      if (!hidup) return;
+      ubah({
+        lat: t.lat.toFixed(6),
+        lng: t.lng.toFixed(6),
+        ...(t.radiusKm && t.radiusKm !== RADIUS_BAWAAN
+          ? { radius: String(t.radiusKm) }
+          : {}),
+      });
+      setSiapCari(true);
+    };
+
+    izinLokasiSudahAda().then((ada) => {
+      if (!hidup) return;
+      if (!ada) {
+        const ingat = bacaTitik();
+        if (ingat) {
+          pakai(ingat);
+        } else {
+          setTawarkanLokasi(true);
+          setSiapCari(true);
+        }
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => pakai({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => {
+          // Izinnya ada tapi perangkatnya gagal membaca posisi — GPS mati,
+          // atau di dalam gedung. Jatuh ke titik terakhir, bukan ke layar
+          // kosong.
+          if (!hidup) return;
+          const ingat = bacaTitik();
+          if (ingat) pakai(ingat);
+          else setSiapCari(true);
+        },
+        { timeout: 8000, maximumAge: 5 * 60 * 1000 }
+      );
+    });
+
+    return () => {
+      hidup = false;
+    };
+  }, [siapCari, ubah]);
+
+  // Titik yang dipakai diingat untuk kunjungan berikutnya — hanya kalau ia
+  // memang pilihan eksplisit (ada di URL), bukan titik bawaan.
+  useEffect(() => {
+    if (searchParams.has("lat") && searchParams.has("lng")) {
+      simpanTitik({ lat, lng, radiusKm });
+    }
+  }, [searchParams, lat, lng, radiusKm]);
 
   // Hasil disimpan bersama kombinasi filter yang menghasilkannya, jadi keadaan
   // "sedang memuat" bisa diturunkan dari perbandingan kunci — tanpa memanggil
@@ -115,6 +215,7 @@ export default function PencarianRuang() {
   );
 
   useEffect(() => {
+    if (!siapCari) return;
     const id = ++permintaan.current;
     cariRuang(klienBrowser(), filter)
       .then((daftar) => {
@@ -128,9 +229,9 @@ export default function PencarianRuang() {
           galat: e instanceof Error ? e.message : "Gagal memuat hasil.",
         });
       });
-  }, [filter, kunci]);
+  }, [filter, kunci, siapCari]);
 
-  const memuat = hasil?.kunci !== kunci;
+  const memuat = !siapCari || hasil?.kunci !== kunci;
   const galat = memuat ? null : hasil?.galat;
   // Dibungkus useMemo supaya rujukan arraynya stabil; `tipeTersedia` di bawah
   // bergantung padanya, dan array baru tiap render membuat memo itu tidak ada
@@ -266,6 +367,31 @@ export default function PencarianRuang() {
             </button>
           )}
         </div>
+
+        {/* Peramban tidak boleh dimintai izin lokasi tanpa orangnya menekan
+            apa pun — dialog yang muncul sendiri diredam Chrome, dan
+            penolakannya melekat sehingga tombol "Lokasiku" pun tidak bisa lagi
+            bertanya. Jadi kunjungan pertama tetap butuh satu ketukan; yang
+            bisa diperbaiki adalah membuat ketukan itu terlihat, bukan
+            tersembunyi di antara kendali lain. Sesudahnya izinnya tersimpan di
+            peramban dan halaman ini memakainya sendiri. */}
+        {tawarkanLokasi && (
+          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl bg-brand-soft px-4 py-3">
+            <Crosshair className="h-4 w-4 shrink-0 text-brand-dark" />
+            <p className="min-w-0 flex-1 text-xs leading-relaxed text-brand-dark">
+              Hasil di bawah dihitung dari <strong>{TITIK_BAWAAN.nama}</strong>. Pakai
+              lokasimu sendiri supaya jaraknya benar — cukup sekali, kunjungan
+              berikutnya otomatis.
+            </p>
+            <button
+              type="button"
+              onClick={pakaiLokasiSaya}
+              className="cursor-pointer rounded-full bg-brand px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-brand-dark"
+            >
+              Pakai lokasiku
+            </button>
+          </div>
+        )}
 
         {(!preset || galatLokasi) && (
           <div className="mx-auto max-w-6xl px-4 pb-3 sm:px-6 lg:px-8">
