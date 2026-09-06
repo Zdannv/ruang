@@ -300,6 +300,49 @@ Kerjakan berurutan. Jangan lompat.
     tidak mengambil apa pun, jadi host akan mengunggah foto lalu menatap kotak
     kosong.
 
+21. **Wilayah dipilih dari daftar, bukan diketik — selesai** (6 Sep 2026).
+    Lihat `src/app/api/wilayah/route.ts` dan `PilihWilayah.tsx`.
+
+    Kelurahan, kecamatan, dan kota dulunya kolom teks bebas. Itu bukan cuma
+    soal kenyamanan host: `permintaan_kecamatan()` dan facet pencarian
+    mengelompokkan wilayah **sebagai teks**, jadi "Lowokwaru", "lowokwaru",
+    dan "Kec. Lowokwaru" adalah tiga wilayah berbeda menurut database — dan
+    tidak ada satu pun layar yang bisa menyadari hitungannya sudah pecah.
+    Ruang sungguhan pertama di database produksi masuk dengan kecamatan
+    `test`, yang menunjukkan persis betapa mudahnya itu terjadi.
+
+    Sumbernya **wilayah.id** (data Kemendagri, Permendagri 72/2019), gratis
+    dan tanpa kunci. Dipanggil lewat Route Handler sendiri, bukan langsung
+    dari peramban, karena dua alasan: wilayah.id tidak mengirim
+    `Access-Control-Allow-Origin`, dan satu-satunya alternatif yang mengirim
+    header itu (emsifa) menuliskan seluruh nama HURUF BESAR — yang justru
+    merusak hal yang sedang diperbaiki.
+
+    Parameter `kode` diperiksa dengan `/^\d{2}(\.\d{2}){0,2}$/` sebelum
+    disambung ke URL upstream. Tanpa itu, siapa pun bisa mengarahkan
+    permintaan server kita ke tempat lain.
+
+    Daftarnya boleh gagal: `PilihWilayah` berpindah ke tiga kolom teks
+    beserta peringatannya, bukan menyandera formulirnya. Host yang sedang
+    mendaftarkan ruang tidak boleh terhenti gara-gara layanan pihak ketiga.
+
+22. **Data contoh dihapus — selesai** (6 Sep 2026). Lihat `15_hapus_seed.sql`,
+    dan bagian 3 di SETUP.md. `02_seed.sql` sekarang opsional dan tidak lagi
+    ada di daftar migrasi wajib.
+
+    Penghapusannya menyebut id satu per satu, bukan `truncate` atau
+    `delete from ruang`: pada saat migrasi itu ditulis, database sasarannya
+    sudah memuat satu ruang sungguhan beserta fotonya di Storage. Urutannya
+    juga bukan selera — `pemesanan.ruang_id` dan `pemesanan.penyewa_id` tidak
+    cascade, jadi menghapus ruang atau profil lebih dulu akan ditolak
+    Postgres.
+
+    Profil seed yang sudah diklaim akun sungguhan (`user_id is not null`)
+    sengaja ditinggalkan. Petunjuk lama menyarankan mengklaim profil host
+    seed untuk mencoba dasbornya; menghapusnya berarti menghapus baris profil
+    akun yang sedang dipakai, dan pemiliknya akan mendapati layar "Profilmu
+    belum terbentuk" tanpa tahu sebabnya.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris
@@ -395,11 +438,13 @@ satu pun kueri yang jalan.
    dibangun.
 3. **Properti dan ruang masih satu tabel.** Satu properti dengan tiga ruang sewa
    sekarang harus jadi tiga baris `ruang` dengan alamat yang diulang.
-4. **Foto isi seed masih `picsum.photos`.** Unggahan host sudah masuk Supabase
-   Storage (bucket `ruang-foto`) dan EXIF-nya dibuang di peramban lewat canvas —
-   penting, karena EXIF foto HP hampir selalu memuat GPS. Yang belum: kamera
-   in-app untuk foto serah terima, dan bucket terpisah untuk foto bukti, yang
-   tidak boleh publik.
+4. **Kamera in-app dan bucket bukti belum ada.** Unggahan host sudah masuk
+   Supabase Storage (bucket `ruang-foto`), EXIF-nya dibuang di peramban lewat
+   canvas — penting, karena EXIF foto HP hampir selalu memuat GPS — dan versi
+   kecilnya dibuat sekaligus (migrasi 14). Yang belum: kamera in-app untuk foto
+   serah terima, dan bucket terpisah untuk foto bukti, yang tidak boleh publik.
+   Foto `picsum.photos` sudah tidak jadi soal sejak seed-nya dibuang (nomor 22
+   di urutan bangun).
 5. **Nomor HP belum diverifikasi.** Diisi saat daftar dan disimpan apa adanya;
    verifikasinya menunggu jalur WhatsApp/SMS.
 

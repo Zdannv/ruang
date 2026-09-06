@@ -10,17 +10,25 @@ pihak luar, bukan karena sengaja dipalsukan.
 ## Cara pasang
 
 1. Buat project Supabase baru (region **Southeast Asia / Singapore**).
-2. SQL Editor → jalankan berurutan: `01_schema.sql`, `02_seed.sql`,
-   `03_auth_rls.sql`, `04_pesan.sql`, `05_host.sql`, `06_akses.sql`,
-   `07_advisor.sql`, `08_jendela.sql`, `09_notifikasi.sql`, `10_push.sql`,
-   `11_pesan_chat.sql`, `12_balasan_cepat.sql`, `13_umkm.sql`,
-   `14_foto_kecil.sql`. **Keempat belasnya wajib.**
-   Aplikasi membaca lewat view yang dibuat di `03`–`05` dan menulis lewat
-   fungsi di `04`; tanpa itu layarnya menjawab "relation does not exist".
-   `05` juga membuat bucket Storage `ruang-foto` beserta policy-nya.
-3. Isi Malang siap pakai: 6 host, 4 penyewa, 14 ruang, 84 foto,
-   6 pemesanan di lima status berbeda, manifes, log akses, ulasan,
-   dan 5 permintaan ruang.
+2. SQL Editor → jalankan berurutan: `01_schema.sql`, `03_auth_rls.sql`,
+   `04_pesan.sql`, `05_host.sql`, `06_akses.sql`, `07_advisor.sql`,
+   `08_jendela.sql`, `09_notifikasi.sql`, `10_push.sql`, `11_pesan_chat.sql`,
+   `12_balasan_cepat.sql`, `13_umkm.sql`, `14_foto_kecil.sql`.
+   **Semuanya wajib.** Aplikasi membaca lewat view yang dibuat di `03`–`05`
+   dan menulis lewat fungsi di `04`; tanpa itu layarnya menjawab "relation
+   does not exist". `05` juga membuat bucket Storage `ruang-foto` beserta
+   policy-nya.
+3. **`02_seed.sql` sengaja tidak ada di daftar itu.** Ia berisi data contoh
+   Malang — 6 host, 4 penyewa, 14 ruang, 84 foto berpenunjuk picsum.photos,
+   6 pemesanan, manifes, log akses, ulasan, 5 permintaan — dan gunanya cuma
+   untuk melihat aplikasinya terisi. Jalankan hanya kalau itu yang kamu mau,
+   dan **sebelum** ada isi sungguhan.
+
+   Kalau seed sudah pernah dijalankan dan sekarang isinya harus bersih:
+   jalankan `15_hapus_seed.sql`. Ia menghapus **hanya** baris dengan id yang
+   tertulis di `02_seed.sql`, jadi ruang sungguhan yang sudah ada tidak ikut
+   terbawa. Profil seed yang sudah diklaim akun sungguhan ditinggalkan, dan
+   jumlah yang dihapus dicetak sebagai NOTICE.
 4. `cp .env.example .env.local`, lalu isi URL + **anon key**.
 5. Authentication → Sign In / Providers → pastikan **Email** aktif dan
    *Confirm email* menyala.

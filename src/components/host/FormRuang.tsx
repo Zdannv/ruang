@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Crosshair, Loader2, Trash2 } from "lucide-react";
 import { Bagian, Kolom, KotakCentangGanda, Pilihan } from "@/components/host/Kolom";
+import PilihWilayah from "@/components/host/PilihWilayah";
 import { klienBrowser } from "@/lib/supabase/browser";
 import { buatRuang, hapusRuang, ubahRuang, type IsiRuang } from "@/lib/host";
 import {
@@ -36,7 +37,7 @@ const AWAL: IsiRuang = {
   patokan: "",
   kelurahan: "",
   kecamatan: "",
-  kota: "Malang",
+  kota: "",
   lat: -7.9666,
   lng: 112.6326,
   terbuka_alamat: false,
@@ -127,6 +128,12 @@ export default function FormRuang({
     e.preventDefault();
     if (isi.kategori_diterima.length === 0) {
       setGalat("Pilih minimal satu kategori barang yang kamu terima.");
+      return;
+    }
+    // Wilayah dipilih lewat select berjenjang, dan `required` pada select tidak
+    // menahan apa pun kalau nilainya string kosong dari <option> pertama.
+    if (!isi.kelurahan || !isi.kecamatan || !isi.kota) {
+      setGalat("Lengkapi wilayahnya sampai kelurahan.");
       return;
     }
     setKirim(true);
@@ -233,26 +240,13 @@ export default function FormRuang({
           placeholder="Seberang warung Bu Tini"
           bantuan="Dibuka bersamaan dengan alamat."
         />
-        <Kolom
-          id="kelurahan"
-          label="Kelurahan"
-          required
-          value={isi.kelurahan}
-          onChange={(e) => ubah("kelurahan", e.target.value)}
-        />
-        <Kolom
-          id="kecamatan"
-          label="Kecamatan"
-          required
-          value={isi.kecamatan}
-          onChange={(e) => ubah("kecamatan", e.target.value)}
-        />
-        <Kolom
-          id="kota"
-          label="Kota"
-          required
-          value={isi.kota}
-          onChange={(e) => ubah("kota", e.target.value)}
+        <PilihWilayah
+          nilai={{
+            kelurahan: isi.kelurahan,
+            kecamatan: isi.kecamatan,
+            kota: isi.kota,
+          }}
+          onGanti={(w) => setIsi((v) => ({ ...v, ...w }))}
         />
         <Kolom
           id="lat"
