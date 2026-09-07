@@ -1,25 +1,36 @@
 /**
  * Titik awal pencarian dan pilihan filternya.
  *
- * Isi demo seluruhnya Malang (lihat 02_seed.sql), jadi preset-nya patokan yang
- * dikenal orang Malang. Waktu presentasi, "Kampus UB" jauh lebih cepat dipilih
- * daripada mengetik koordinat — dan hasilnya pasti terisi, tidak bergantung
- * pada di mana laptop presenter sedang berada.
+ * Patokannya Sidoarjo dan Surabaya Selatan — wilayah tempat aplikasi ini
+ * benar-benar akan diisi lebih dulu (diputuskan 7 September 2026, menggantikan
+ * preset Malang yang berasal dari data contoh `02_seed.sql` dan sudah dibuang).
+ * Preset bukan hiasan: ia satu-satunya cara orang memulai pencarian sebelum
+ * memberi izin lokasi, jadi kota yang salah di sini berarti hasil kosong pada
+ * kunjungan pertama.
+ *
+ * Bobotnya sengaja ke Sidoarjo, bukan dibagi rata dengan Surabaya. Kepadatan
+ * yang membuat "1 km dari rumahmu" benar, dan satu wilayah yang terisi lebih
+ * berguna daripada dua wilayah yang setengah-setengah.
+ *
+ * Koordinatnya diambil dari Nominatim, bukan ditebak.
  */
 export type Titik = { id: string; nama: string; lat: number; lng: number };
 
 export const TITIK_PRESET: Titik[] = [
-  { id: "ub", nama: "Kampus UB / Ketawanggede", lat: -7.9526, lng: 112.6142 },
-  { id: "umm", nama: "Kampus UMM / Tlogomas", lat: -7.9217, lng: 112.5993 },
-  { id: "dinoyo", nama: "Dinoyo / Merjosari", lat: -7.9389, lng: 112.6055 },
-  { id: "blimbing", nama: "Blimbing / L.A. Sucipto", lat: -7.9415, lng: 112.6389 },
-  { id: "klojen", nama: "Alun-alun / Klojen", lat: -7.9822, lng: 112.6308 },
-  { id: "sukun", nama: "Sukun / Tanjungrejo", lat: -7.9805, lng: 112.6183 },
+  { id: "waru", nama: "Waru / Aloha", lat: -7.3527, lng: 112.7294 },
+  { id: "gedangan", nama: "Gedangan", lat: -7.389, lng: 112.7286 },
+  { id: "sidoarjo", nama: "Kota Sidoarjo", lat: -7.454, lng: 112.6594 },
+  { id: "sepanjang", nama: "Sepanjang / Taman", lat: -7.3469, lng: 112.6984 },
+  { id: "krian", nama: "Krian", lat: -7.403, lng: 112.5895 },
+  { id: "rungkut", nama: "Rungkut / Surabaya Timur", lat: -7.3197, lng: 112.7905 },
 ];
 
 export const TITIK_BAWAAN = TITIK_PRESET[0];
 
-/** Radius dalam km. 5 km menutup satu sisi kota Malang — cukup untuk bawaan. */
+/**
+ * Radius dalam km. 5 km menutup satu kecamatan beserta tetangganya di
+ * Sidoarjo — cukup untuk bawaan, dan masih terasa "dekat rumah".
+ */
 export const RADIUS_PILIHAN = [1, 3, 5, 10, 15];
 export const RADIUS_BAWAAN = 5;
 

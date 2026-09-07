@@ -81,9 +81,9 @@ export async function izinLokasiSudahAda(): Promise<boolean> {
 /**
  * Titik dari wilayah yang orangnya sebut saat mendaftar.
  *
- * Dipakai sebagai cadangan sebelum titik bawaan: untuk orang Malang, "Kampus
- * UB" kebetulan masuk akal, tapi untuk orang Surabaya ia salah — padahal
- * wilayahnya sudah ditanyakan waktu mendaftar.
+ * Dipakai sebagai cadangan sebelum titik bawaan: untuk orang Sidoarjo, preset
+ * "Waru / Aloha" kebetulan masuk akal, tapi untuk orang Semarang ia salah —
+ * padahal wilayahnya sudah ditanyakan waktu mendaftar.
  *
  * Mengembalikan null untuk siapa pun yang belum masuk, dan untuk profil yang
  * wilayahnya tidak bisa dikenali. Pemanggilnya jatuh ke titik bawaan.

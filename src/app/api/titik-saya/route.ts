@@ -86,7 +86,7 @@ function namaWilayah(p: Profil): string {
 async function geokode(p: Profil): Promise<{ lat: number; lng: number } | null> {
   // Dari yang paling sempit ke yang paling luas. Kelurahan memberi titik yang
   // benar-benar berguna; kota saja masih jauh lebih baik daripada titik
-  // bawaan yang menganggap semua orang ada di Malang.
+  // bawaan yang menganggap semua orang ada di wilayah peluncuran.
   const bagian = [p.kelurahan, p.kecamatan, p.kota].filter(Boolean) as string[];
   if (bagian.length === 0) return null;
 

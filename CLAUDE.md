@@ -479,6 +479,23 @@ Kerjakan berurutan. Jangan lompat.
     pendaftaran akun, `"kecamatan"` untuk permintaan ruang, `"kelurahan"`
     untuk ruang.
 
+27. **Wilayah peluncuran: Sidoarjo dan Surabaya Selatan** (7 Sep 2026),
+    menggantikan Malang. Malang berasal dari data contoh `02_seed.sql` yang
+    sudah dibuang — bukan dari keputusan pasar. Yang menentukan: pemiliknya
+    berdomisili di Sidoarjo, dan lima belas host pertama harus bisa didatangi
+    sendiri.
+
+    `TITIK_PRESET` sekarang Waru/Aloha, Gedangan, Kota Sidoarjo,
+    Sepanjang/Taman, Krian, dan Rungkut. Bobotnya sengaja ke Sidoarjo, bukan
+    dibagi rata dengan Surabaya: kepadatan yang membuat "1 km dari rumahmu"
+    benar, dan satu wilayah yang terisi lebih berguna daripada dua wilayah
+    yang setengah-setengah.
+
+    Preset bukan hiasan — ia satu-satunya cara orang memulai pencarian sebelum
+    memberi izin lokasi, jadi kota yang salah di sini berarti hasil kosong pada
+    kunjungan pertama. Titik awal peta di formulir ruang baru ikut dipindah.
+    Koordinatnya diambil dari Nominatim, bukan ditebak.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris

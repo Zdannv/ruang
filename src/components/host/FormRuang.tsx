@@ -28,7 +28,12 @@ import {
 
 const opsi = (peta: Record<string, string>): [string, string][] => Object.entries(peta);
 
-/** Titik tengah Malang — dipakai kalau host belum menempelkan lokasinya. */
+/**
+ * Titik awal peta ruang baru, dipakai sampai host menempelkan lokasinya —
+ * Waru, gerbang antara Surabaya dan Sidoarjo. Sengaja bukan 0,0: koordinat nol
+ * mendarat di Samudra Atlantik, dan jarak yang dihitung dari sana menghasilkan
+ * angka yang salah tanpa terlihat seperti galat.
+ */
 const AWAL: IsiRuang = {
   judul: "",
   tipe: "garasi",
@@ -38,8 +43,8 @@ const AWAL: IsiRuang = {
   kelurahan: "",
   kecamatan: "",
   kota: "",
-  lat: -7.9666,
-  lng: 112.6326,
+  lat: -7.3527,
+  lng: 112.7294,
   terbuka_alamat: false,
   panjang_m: 3,
   lebar_m: 3,
