@@ -17,7 +17,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Ruang — sewa ruang kosong di dekatmu",
     short_name: "Ruang",
     description:
-      "Marketplace ruang antarwarga. Sewa garasi, kamar, atau lantai ruko kosong di dekatmu — untuk barang kosan, stok jualan, atau pindahan.",
+      "Marketplace ruang antarwarga di Sidoarjo dan Surabaya. Sewa garasi, lantai ruko, atau gudang kecil di dekatmu — untuk stok jualan, alat usaha, atau pindahan.",
     lang: "id",
     dir: "ltr",
     start_url: "/",

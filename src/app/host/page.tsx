@@ -112,13 +112,15 @@ export default async function DasborHost() {
         <div className="mt-8 rounded-2xl bg-card p-8 text-center ring-1 ring-line">
           <p className="text-sm font-semibold">Mulai dari satu ruang</p>
           <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted">
-            Garasi yang mobilnya sudah dijual, kamar belakang, lantai dua ruko yang
-            kosong. Kamu yang menentukan harga, jendela akses, dan barang apa yang
-            boleh masuk — dan tetap berhak menolak permintaan.
+            Lantai dua ruko yang belum tersewa, garasi yang mobilnya sudah dijual,
+            gudang belakang yang separuh kosong. Kamu yang menentukan harga, jendela
+            akses, dan barang apa yang boleh masuk — dan tetap berhak menolak
+            permintaan.
           </p>
           <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted">
-            Yang menyewa biasanya mahasiswa yang kosannya kesempitan, penjual online
-            yang stoknya menumpuk di rumah, atau keluarga yang sedang pindahan.
+            Satu ruang tidak harus disewakan utuh ke satu orang. Yang menyewa biasanya
+            penjual online yang stoknya menumpuk di rumah, usaha rumahan, atau
+            keluarga yang sedang pindahan.
           </p>
           <Link
             href="/host/ruang/baru"

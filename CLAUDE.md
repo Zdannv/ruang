@@ -496,6 +496,20 @@ Kerjakan berurutan. Jangan lompat.
     kunjungan pertama. Titik awal peta di formulir ruang baru ikut dipindah.
     Koordinatnya diambil dari Nominatim, bukan ditebak.
 
+    **Copy-nya ikut disesuaikan, dan urutannya yang paling berubah.** Sidoarjo
+    bukan kota mahasiswa; ia padat penjual online dan usaha rumahan. Jadi
+    segmen "Jualan online" dan "Usaha rumahan" naik ke depan dan "Kos
+    kesempitan" turun ke belakang, dan di daftar tipe ruang "Lantai ruko"
+    naik ke atas "Kamar" — di sana lantai ruko yang kosong jauh lebih banyak
+    daripada kamar kos yang disewakan sebagian.
+
+    Ajakan ke host juga berubah sasaran, dari "ruang yang cuma jadi gudang
+    barang lama" menjadi **lantai dua ruko yang belum tersewa**, berikut
+    kalimat yang mengisi kegagalan mereka: satu lantai tidak harus disewakan
+    utuh ke satu penyewa, ia bisa dibagi ke beberapa orang. Pemilik ruko yang
+    iklannya sudah berbulan-bulan tidak laku adalah daftar host paling hangat
+    yang tersedia di wilayah itu.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris

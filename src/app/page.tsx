@@ -27,16 +27,22 @@ import type { TipeRuang } from "@/lib/ruang";
 export const metadata: Metadata = {
   title: "Ruang — sewa ruang kosong di dekatmu",
   description:
-    "Marketplace ruang antarwarga. Sewa garasi, kamar, atau lantai ruko kosong di sekitarmu — untuk barang kosan, stok jualan, atau pindahan. Kondisi ruangnya dijelaskan apa adanya.",
+    "Marketplace ruang antarwarga di Sidoarjo dan Surabaya. Sewa garasi, lantai ruko, atau gudang kecil di dekatmu — untuk stok jualan, alat usaha, atau pindahan. Kondisi ruangnya dijelaskan apa adanya.",
 };
 
+/*
+  Urutannya mengikuti wilayah peluncuran, bukan selera. Di Sidoarjo dan
+  Surabaya Selatan, lantai ruko yang kosong dan gudang kecil jauh lebih banyak
+  daripada kamar kos yang disewakan sebagian — kebalikan dari Malang, tempat
+  daftar ini pertama disusun.
+*/
 const TIPE_UNGGULAN: TipeRuang[] = [
   "garasi",
-  "kamar",
-  "gudang",
   "lantai_ruko",
-  "kontainer",
+  "gudang",
+  "kamar",
   "loteng",
+  "kontainer",
 ];
 
 /**
@@ -53,18 +59,18 @@ const TIPE_UNGGULAN: TipeRuang[] = [
  */
 const SEGMEN = [
   {
-    ikon: GraduationCap,
-    judul: "Kos kesempitan",
-    isi: "Pulang kampung sebulan, atau kamar tidak cukup untuk kardus dan sepeda. Sewa per bulan, ambil kapan pun dalam jendela akses.",
-    tautan: "/cari?kategori=kardus&radius=5",
-    ajakan: "Ruang untuk kardus",
-  },
-  {
     ikon: Store,
     judul: "Jualan online",
     isi: "Stok menumpuk di ruang tamu dan perlu diambil beberapa kali seminggu. Cari yang memang menerima stok dagangan, bukan yang akan menolaknya.",
-    tautan: "/cari?kategori=stok_dagangan&radius=15",
+    tautan: "/cari?kategori=stok_dagangan&radius=10",
     ajakan: "Ruang untuk stok",
+  },
+  {
+    ikon: Wrench,
+    judul: "Usaha rumahan",
+    isi: "Bahan, alat jahit, cetakan, arsip yang tidak boleh lembap. Kelembapan dan riwayat banjir tiap ruang ikut tertulis — dan di sini itu bukan pertanyaan sepele.",
+    tautan: "/cari?kategori=ban_perkakas&radius=10",
+    ajakan: "Ruang untuk alat",
   },
   {
     ikon: Truck,
@@ -74,11 +80,11 @@ const SEGMEN = [
     ajakan: "Ruang untuk perabot",
   },
   {
-    ikon: Wrench,
-    judul: "Usaha kecil",
-    isi: "Ban, perkakas, alat pameran, arsip yang tidak boleh lembap. Kelembapan dan riwayat banjir tiap ruang ikut tertulis.",
-    tautan: "/cari?kategori=ban_perkakas&radius=15",
-    ajakan: "Ruang untuk alat",
+    ikon: GraduationCap,
+    judul: "Kos kesempitan",
+    isi: "Pulang kampung sebulan, atau kamar tidak cukup untuk kardus dan sepeda. Sewa per bulan, ambil kapan pun dalam jendela akses.",
+    tautan: "/cari?kategori=kardus&radius=5",
+    ajakan: "Ruang untuk kardus",
   },
 ];
 
@@ -165,10 +171,10 @@ export default async function Beranda() {
             </h1>
 
             <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-muted">
-              Buat yang kosannya kesempitan, yang stok jualannya menumpuk di ruang
-              tamu, atau yang perabotnya perlu tempat selama pindahan. Lebih dekat dan
-              lebih murah daripada gudang penitipan — dan kondisi ruangnya dijelaskan
-              apa adanya, bukan cuma difoto.
+              Buat yang stok jualannya menumpuk di ruang tamu, yang alat usahanya
+              tidak kebagian tempat, atau yang perabotnya perlu titik aman selama
+              pindahan. Lebih dekat dan lebih murah daripada gudang penitipan — dan
+              kondisi ruangnya dijelaskan apa adanya, bukan cuma difoto.
             </p>
 
             <div className="mt-7">
@@ -331,7 +337,7 @@ export default async function Beranda() {
         <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-[#0b2560] via-brand to-[#4d86ff] p-8 sm:p-12">
           <div className="max-w-2xl">
             <h2 className="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
-              Punya ruang yang cuma jadi gudang barang lama?
+              Lantai dua ruko yang belum tersewa? Garasi yang mobilnya sudah dijual?
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-white/80">
               Kamu yang menentukan harganya, jendela aksesnya, dan barang apa yang
@@ -339,8 +345,10 @@ export default async function Beranda() {
               permintaannya sampai ke kamu — dan kamu tetap berhak menolak.
             </p>
             <p className="mt-2.5 text-sm leading-relaxed text-white/80">
-              Yang mencari sebagian besar tetangga sekecamatan: mahasiswa yang kosannya
-              kesempitan, penjual online yang stoknya menumpuk, keluarga yang sedang
+              Tidak perlu menunggu satu penyewa yang mau mengambil semuanya — satu
+              lantai bisa dibagi ke beberapa orang. Yang mencari sebagian besar
+              tetangga sekecamatan: penjual online yang stoknya menumpuk, usaha
+              rumahan yang alatnya tidak kebagian tempat, keluarga yang sedang
               pindahan.
             </p>
 
