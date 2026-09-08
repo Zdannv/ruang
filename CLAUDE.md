@@ -594,6 +594,56 @@ Kerjakan berurutan. Jangan lompat.
     JavaScript sama sekali, dan orang yang sedang membaca satu kartu tidak
     direbut oleh kartu berikutnya.
 
+30. **Video lahan — selesai** (8 Sep 2026). Lihat `18_video.sql`,
+    `src/lib/video.ts`, dan `PemutarVideo`. Diminta client; sebelumnya
+    ditunda karena host diperkirakan tidak akan merekam sendiri, tapi
+    permintaan yang nyata mengalahkan perkiraan.
+
+    **Yang menentukan rancangannya bukan tabelnya melainkan kuota.** Satu
+    video 30 detik dari HP sekitar 8 MB; paket gratis Supabase memberi 1 GB
+    penyimpanan dan 5 GB egress per bulan. Kalau pemutarnya memuat sendiri,
+    5 GB habis di sekitar 600 kunjungan halaman lahan.
+
+    Tiga hal menahannya, dan yang ketiga paling besar:
+
+    1. Bucket dibatasi 20 MB per berkas.
+    2. Peramban menolak video lebih dari 45 detik **sebelum** mengunggah —
+       host merekam pakai data seluler, dan ditolak setelah 20 MB terkirim
+       adalah pengalaman yang membuat orang berhenti mencoba.
+    3. **`preload="none"` dengan poster.** Biaya berpindah dari "setiap
+       pengunjung" ke "setiap penonton", dan sebagian besar pengunjung tidak
+       menonton. Posternya satu bingkai yang diambil di peramban saat unggah;
+       tanpa itu yang perlu ditekan cuma kotak hitam.
+
+    Videonya **tidak** dikompres ulang di peramban. Satu-satunya cara yang
+    bisa diandalkan adalah ffmpeg.wasm — unduhan 25 MB demi menghemat
+    beberapa MB, pertukaran yang arahnya salah.
+
+    Kalau egress-nya tetap sempit, bucket-nya dipindah ke penyimpanan objek
+    lain **tanpa migrasi data**: `url` disimpan per baris, jadi video lama dan
+    baru boleh tinggal di tempat berbeda — persis seperti foto.
+
+    Pengambilan posternya boleh gagal (sebagian peramban HP menolak menggambar
+    bingkai video ke canvas) dan itu tidak membatalkan unggahan. Pemuatan
+    videonya di halaman lahan juga dijawab daftar kosong saat migrasinya belum
+    dijalankan — halaman terpenting di aplikasi ini tidak boleh mati karena
+    penyempurnaan yang belum dipasang.
+
+31. **Empat hak view yang tidak seharusnya ada — ditutup** (8 Sep 2026).
+    Ketemu saat menulis migrasi 18, bukan dicari. Lihat catatan penjaga di
+    bagian "Bentuk keamanannya sekarang".
+
+    Tidak ada yang bisa dieksploitasi hari ini, dan itu **sudah diuji**:
+    ketiga view "milik saya" `security_invoker = true`, jadi RLS tetap
+    berlaku, dan percobaan mengubah lahan milik orang lain lewat `ruang_saya`
+    menghasilkan `UPDATE 0`. Empat view publik lainnya view atas JOIN, yang
+    Postgres tolak untuk ditulisi.
+
+    Dicabut tetap, karena `ruang_saya` adalah view SATU TABEL — Postgres
+    menerimanya sebagai bisa ditulis, dan yang menahannya cuma satu opsi.
+    Hari ada orang membuat view serupa tanpa `security_invoker`, hak tulis
+    yang menganggur itu langsung jadi jalan menembus RLS.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris
@@ -657,7 +707,18 @@ diubah: versi pertama memakai `update of lat, lng` dan bisa dilewati dengan
 penyamaran alamat tanpa jejak.
 
 **Setiap migrasi yang menambah view atau mengubah hak akses WAJIB diakhiri
-`select periksa_permukaan_publik();`.** Fungsi itu menggagalkan migrasi kalau
+`select periksa_permukaan_publik();`.** Sejak `18_video.sql` ia memeriksa
+**tiga** hal, bukan dua: kolom rahasia yang bisa dibaca anon, hak anon ke
+tabel dasar, dan — yang ketiga, baru — hak selain SELECT pada view mana pun.
+
+Pemeriksaan ketiga ditambahkan setelah cacat yang sama ketemu di **empat**
+view: `jendela_akses_publik` (migrasi 08), lalu `ruang_saya`,
+`pemesanan_saya`, dan `percakapan_saya`. Sebabnya struktural — Supabase
+memasang `alter default privileges ... grant all on tables to anon`, jadi
+setiap view baru LAHIR dengan INSERT/UPDATE/DELETE/TRUNCATE untuk anon.
+Lima view publik pertama selamat cuma karena `03_auth_rls.sql` mencabut
+semuanya SETELAH mereka dibuat. **`grant select` saja tidak cukup; harus
+`revoke all` lebih dulu.** Fungsi itu menggagalkan migrasi kalau
 ada kolom rahasia yang bisa dibaca anon, atau anon punya hak ke tabel dasar mana
 pun. Ia bukan hiasan: saat `08_jendela.sql` ditulis, ia menangkap bahwa tabel
 `jendela_akses` yang baru langsung bisa **ditulis anon**, karena Supabase

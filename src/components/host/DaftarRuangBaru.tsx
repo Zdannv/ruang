@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Check, Images, SlidersHorizontal } from "lucide-react";
 import FormRuang from "@/components/host/FormRuang";
 import KelolaFoto from "@/components/host/KelolaFoto";
+import KelolaVideo from "@/components/host/KelolaVideo";
 
 /**
  * Alur daftar ruang: keterangan dulu, foto kemudian, di satu halaman.
@@ -40,7 +41,7 @@ export default function DaftarRuangBaru({ hostId }: { hostId: string }) {
       <ol className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
         <Langkah nomor={1} label="Keterangan ruang" ikon={SlidersHorizontal} keadaan={ruangId ? "selesai" : "aktif"} />
         <span aria-hidden className="h-px w-6 bg-line" />
-        <Langkah nomor={2} label="Foto" ikon={Images} keadaan={ruangId ? "aktif" : "nanti"} />
+        <Langkah nomor={2} label="Foto & video" ikon={Images} keadaan={ruangId ? "aktif" : "nanti"} />
       </ol>
 
       {ruangId === null ? (
@@ -50,10 +51,11 @@ export default function DaftarRuangBaru({ hostId }: { hostId: string }) {
       ) : (
         <div className="mt-6 space-y-5">
           <p className="rounded-xl bg-good-soft px-3.5 py-2.5 text-sm text-good">
-            Ruangnya tersimpan sebagai draf. Sekarang fotonya.
+            Lahannya tersimpan sebagai draf. Sekarang fotonya.
           </p>
 
           <KelolaFoto hostId={hostId} ruangId={ruangId} awal={[]} />
+          <KelolaVideo hostId={hostId} ruangId={ruangId} awal={[]} />
 
           <div className="rounded-2xl bg-card p-5 ring-1 ring-line">
             <p className="text-sm font-semibold">Sudah cukup fotonya?</p>

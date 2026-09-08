@@ -4,11 +4,13 @@ import type { Metadata } from "next";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import FormRuang from "@/components/host/FormRuang";
 import KelolaFoto from "@/components/host/KelolaFoto";
+import KelolaVideo from "@/components/host/KelolaVideo";
 import KelolaJendela from "@/components/host/KelolaJendela";
 import LencanaStatus from "@/components/LencanaStatus";
 import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { daftarFoto, getRuangSaya, type IsiRuang } from "@/lib/host";
+import { daftarVideo } from "@/lib/video";
 import { daftarJendela } from "@/lib/jendela";
 
 export const metadata: Metadata = { title: "Kelola ruang — Ruang" };
@@ -20,10 +22,14 @@ export default async function KelolaRuang({ params }: PageProps<"/host/ruang/[id
   if (!sesi.profil) redirect("/host");
 
   const db = await klienServer();
-  const [ruang, foto, jendela] = await Promise.all([
+  const [ruang, foto, jendela, video] = await Promise.all([
     getRuangSaya(db, id),
     daftarFoto(db, id),
     daftarJendela(db, id),
+    // Tabelnya baru ada sejak 18_video.sql. Selama migrasinya belum
+    // dijalankan, halaman kelola lahan harus tetap terbuka — bukan 500 —
+    // jadi kegagalannya dijawab daftar kosong.
+    daftarVideo(db, id).catch(() => []),
   ]);
   // `null` berarti ruangnya tidak ada ATAU bukan milik pemanggil — RLS
   // menyaringnya lebih dulu. Dua-duanya dijawab 404 yang sama.
@@ -101,6 +107,7 @@ export default async function KelolaRuang({ params }: PageProps<"/host/ruang/[id
 
       <div className="mt-6 space-y-5">
         <KelolaFoto hostId={sesi.profil.id} ruangId={ruang.id} awal={foto} />
+        <KelolaVideo hostId={sesi.profil.id} ruangId={ruang.id} awal={video} />
         <KelolaJendela ruangId={ruang.id} jendela={jendela} />
         <FormRuang hostId={sesi.profil.id} ruangId={ruang.id} awal={isi} />
       </div>

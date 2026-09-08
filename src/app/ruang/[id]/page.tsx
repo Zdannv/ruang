@@ -24,6 +24,7 @@ import {
   Waves,
 } from "lucide-react";
 import GaleriFoto from "@/components/GaleriFoto";
+import PemutarVideo from "@/components/PemutarVideo";
 import TanyaHost from "@/components/TanyaHost";
 import BarisRubrik from "@/components/BarisRubrik";
 import { IKON_TIPE } from "@/components/IkonTipe";
@@ -89,7 +90,7 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
   const data = await ambilDetail(id);
   if (!data) notFound();
 
-  const { ruang, host, foto, ulasan, tersewaSampai, alamatLengkap } = data;
+  const { ruang, host, foto, video, ulasan, tersewaSampai, alamatLengkap } = data;
   const IkonTipe = IKON_TIPE[ruang.tipe];
 
   const skorRata =
@@ -322,6 +323,8 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
                   lat_publik/lng_publik, jangan pernah koordinat aslinya. */}
             </div>
           </section>
+
+          <PemutarVideo video={video} />
 
           {/* ── Ulasan ─────────────────────────────────────────────────────── */}
           <section className="mt-8">

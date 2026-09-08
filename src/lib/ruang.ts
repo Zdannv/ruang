@@ -282,6 +282,7 @@ export type DetailRuang = {
   alamatLengkap: { alamat: string; patokan: string | null } | null;
   host: HostRingkas;
   foto: FotoRuang[];
+  video: VideoRuang[];
   ulasan: UlasanRuang[];
   /** Tanggal ruangnya kosong lagi, kalau sedang tersewa. Tanpa menyebut siapa. */
   tersewaSampai: string | null;
@@ -295,6 +296,14 @@ export type DetailRuang = {
  * di dalam view. Jadi ruang yang belum siap tidak bisa dibuka lewat menebak
  * URL, dan itu ditegakkan di database, bukan di sini.
  */
+export type VideoRuang = {
+  id: string;
+  url: string;
+  poster_url: string | null;
+  durasi_detik: number | null;
+  keterangan: string | null;
+};
+
 export async function getDetailRuang(
   db: SupabaseClient,
   id: string
@@ -314,6 +323,17 @@ export async function getDetailRuang(
       .order("pada", { ascending: false }),
     db.from("ruang_ketersediaan").select("tersewa_sampai").eq("ruang_id", id).maybeSingle(),
   ]);
+
+  // View-nya baru ada sejak 18_video.sql, dan kegagalannya dijawab daftar
+  // kosong — bukan dilemparkan. Halaman lahan adalah halaman terpenting di
+  // aplikasi ini; ia tidak boleh mati karena penyempurnaan yang migrasinya
+  // belum dijalankan. Sengaja di luar `Promise.all` di atas supaya galatnya
+  // tidak ikut menggagalkan keempat kueri yang wajib.
+  const v = await db
+    .from("ruang_video_publik")
+    .select("id, url, poster_url, durasi_detik, keterangan")
+    .eq("ruang_id", id)
+    .then((h) => (h.error ? { data: [] } : h));
 
   if (r.error) throw r.error;
   if (f.error) throw f.error;
@@ -340,6 +360,7 @@ export async function getDetailRuang(
       kota: ruang.host_kota,
     },
     foto: (f.data ?? []) as FotoRuang[],
+    video: (v.data ?? []) as VideoRuang[],
     ulasan: (u.data ?? []) as unknown as UlasanRuang[],
     tersewaSampai:
       (k.data as { tersewa_sampai: string | null } | null)?.tersewa_sampai ?? null,
