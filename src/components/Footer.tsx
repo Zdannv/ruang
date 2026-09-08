@@ -18,7 +18,7 @@ export default function Footer() {
               <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-white">
                 <House className="h-4.5 w-4.5" />
               </span>
-              <span className="font-display text-xl font-bold tracking-tight">Ruang</span>
+              <span className="font-display text-xl font-bold tracking-tight">Cari Ruang</span>
             </div>
             <p className="mt-3 text-sm leading-relaxed text-muted">
               <strong className="text-ink">Lahan nganggur jadi cuan.</strong> Punya

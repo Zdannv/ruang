@@ -62,10 +62,10 @@ import {
 const ambilDetail = cache(async (id: string) => getDetailRuang(await klienServer(), id));
 
 export async function generateMetadata({ params }: PageProps<"/ruang/[id]">) {
-  if (!supabaseSiap) return { title: "Ruang" };
+  if (!supabaseSiap) return { title: "Cari Ruang" };
   const { id } = await params;
   const data = await ambilDetail(id).catch(() => null);
-  if (!data) return { title: "Ruang tidak ditemukan — Ruang" };
+  if (!data) return { title: "Lahan tidak ditemukan — Cari Ruang" };
 
   const { ruang } = data;
   return {

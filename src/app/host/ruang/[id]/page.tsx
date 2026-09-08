@@ -13,7 +13,7 @@ import { daftarFoto, getRuangSaya, type IsiRuang } from "@/lib/host";
 import { daftarVideo } from "@/lib/video";
 import { daftarJendela } from "@/lib/jendela";
 
-export const metadata: Metadata = { title: "Kelola ruang — Ruang" };
+export const metadata: Metadata = { title: "Kelola ruang — Cari Ruang" };
 
 export default async function KelolaRuang({ params }: PageProps<"/host/ruang/[id]">) {
   const { id } = await params;

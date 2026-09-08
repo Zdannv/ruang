@@ -10,7 +10,7 @@ import { tabelBelumAda } from "@/lib/galat";
 import MigrasiKurang from "@/components/MigrasiKurang";
 import { tanggalPendek } from "@/lib/label";
 
-export const metadata: Metadata = { title: "Pesan — Ruang" };
+export const metadata: Metadata = { title: "Pesan — Cari Ruang" };
 
 export default async function HalamanPesan() {
   const sesi = await sesiSaya();

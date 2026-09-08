@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import DaftarRuangBaru from "@/components/host/DaftarRuangBaru";
 import { sesiSaya } from "@/lib/auth";
 
-export const metadata: Metadata = { title: "Sewakan lahan — Ruang" };
+export const metadata: Metadata = { title: "Sewakan lahan — Cari Ruang" };
 
 export default async function RuangBaru() {
   const sesi = await sesiSaya();

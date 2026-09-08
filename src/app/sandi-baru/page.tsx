@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import FormSandiBaru from "./FormSandiBaru";
 
-export const metadata: Metadata = { title: "Sandi baru — Ruang" };
+export const metadata: Metadata = { title: "Sandi baru — Cari Ruang" };
 
 export default function HalamanSandiBaru() {
   return (

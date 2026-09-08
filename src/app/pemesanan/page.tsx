@@ -9,7 +9,7 @@ import { klienServer } from "@/lib/supabase/server";
 import { daftarPemesanan, type PemesananRingkas } from "@/lib/pemesanan";
 import { LABEL_TIPE, rupiah, tanggalPendek } from "@/lib/label";
 
-export const metadata: Metadata = { title: "Pemesanan — Ruang" };
+export const metadata: Metadata = { title: "Pemesanan — Cari Ruang" };
 
 /**
  * Daftar pemesanan, dua sisi dalam satu halaman.

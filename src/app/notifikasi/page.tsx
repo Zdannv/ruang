@@ -6,7 +6,7 @@ import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { daftarNotifikasi } from "@/lib/notifikasi";
 
-export const metadata: Metadata = { title: "Notifikasi — Ruang" };
+export const metadata: Metadata = { title: "Notifikasi — Cari Ruang" };
 
 export default async function HalamanNotifikasi() {
   const sesi = await sesiSaya();

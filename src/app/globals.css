@@ -20,21 +20,21 @@
  * saat keduanya membandingkan layar.
  */
 @theme inline {
-  --color-paper: #f7f8fa;
+  --color-paper: #faf8f6;
   --color-card: #ffffff;
-  --color-line: #e8eaf0;
-  --color-line-kuat: #d5d9e2;
-  --color-ink: #101828;
-  --color-muted: #667085;
+  --color-line: #ece5df;
+  --color-line-kuat: #dbd1c9;
+  --color-ink: #1a1512;
+  --color-muted: #6b625c;
 
-  --color-brand: #2563eb;
-  --color-brand-dark: #1d4ed8;
-  --color-brand-soft: #eef4ff;
+  --color-brand: #a93b20;
+  --color-brand-dark: #8a2e17;
+  --color-brand-soft: #fdeee8;
 
   --color-good: #067647;
   --color-good-soft: #ecfdf3;
   --color-warn: #b54708;
-  --color-warn-soft: #fffaeb;
+  --color-warn-soft: #fdf3e7;
 
   --font-sans: var(--font-inter);
   --font-display: var(--font-serif);

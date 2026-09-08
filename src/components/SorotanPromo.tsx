@@ -36,18 +36,18 @@ export default function SorotanPromo() {
       aria-label="Kenapa Ruang"
     >
       {KARTU.map((k) => (
-        <div key={k.berkas} className="w-[88%] shrink-0 snap-center sm:w-[92%] lg:w-full">
+        <div key={k.berkas} className="w-[94%] shrink-0 snap-center sm:w-[96%] lg:w-full">
           <Image
             src={`/promo/${k.berkas}.svg`}
             alt={k.alt}
-            width={800}
-            height={500}
+            width={880}
+            height={660}
             /* SVG tidak perlu — dan tidak boleh — lewat pengubah ukuran:
                ia sudah bebas resolusi, dan mengoptimalkannya berarti membayar
                per gambar untuk memperkecil berkas 3 KB. */
             unoptimized
             priority={k.berkas === KARTU[0].berkas}
-            className="h-auto w-full rounded-2xl"
+            className="h-auto w-full rounded-3xl"
           />
         </div>
       ))}

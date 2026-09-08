@@ -8,7 +8,7 @@ import { klienServer } from "@/lib/supabase/server";
 import { daftarRuangSaya } from "@/lib/host";
 import { LABEL_TIPE, rupiah, volume } from "@/lib/label";
 
-export const metadata: Metadata = { title: "Dasbor host — Ruang" };
+export const metadata: Metadata = { title: "Dasbor host — Cari Ruang" };
 
 /**
  * Dasbor host.

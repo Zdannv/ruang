@@ -18,16 +18,16 @@ const serif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "Ruang — lahan nganggur jadi cuan",
+  title: "Cari Ruang — lahan nganggur jadi cuan",
   description:
     "Sewa halaman depan atau lahan kosong di pinggir jalan buat jualan. Bulanan, langsung dari pemiliknya. Punya lahan nganggur? Sewakan.",
-  applicationName: "Ruang",
+  applicationName: "Cari Ruang",
   // Safari tidak membaca manifest untuk ikon layar utama; ia mencari
   // apple-touch-icon sendiri.
   icons: { apple: "/apple-touch-icon.png" },
   appleWebApp: {
     capable: true,
-    title: "Ruang",
+    title: "Cari Ruang",
     // Bilah status iOS memakai warna latar halaman, bukan warna merek —
     // "black-translucent" akan membuat isi halaman menyusup ke belakang jam.
     statusBarStyle: "default",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
  * area aman di perangkat berponi.
  */
 export const viewport: Viewport = {
-  themeColor: "#1f5fff",
+  themeColor: "#a93b20",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",

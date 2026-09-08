@@ -11,7 +11,7 @@
 import { deflateSync } from "node:zlib";
 import { writeFileSync } from "node:fs";
 
-const BRAND = [0x1f, 0x5f, 0xff]; // --color-brand
+const BRAND = [0xa9, 0x3b, 0x20]; // --color-brand
 const PUTIH = [0xff, 0xff, 0xff];
 
 // ── PNG ──────────────────────────────────────────────────────────────────────

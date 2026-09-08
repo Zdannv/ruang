@@ -9,7 +9,7 @@ import { klienServer } from "@/lib/supabase/server";
 import { jumlahBelumDibaca } from "@/lib/notifikasi";
 import { pesanBelumDibaca } from "@/lib/percakapan";
 
-export const metadata: Metadata = { title: "Profil — Ruang" };
+export const metadata: Metadata = { title: "Profil — Cari Ruang" };
 
 type UsahaProfil = { nama_usaha: string | null; npwp: string | null };
 type WilayahProfil = { kelurahan: string | null; kecamatan: string | null };

@@ -14,7 +14,11 @@ ruang penyimpanan, tapi model data dan penamaan harus tetap netral supaya bisa
 meluas nanti — sewa ruang untuk keperluan lain, atau jual-beli. Hindari kata
 "titip" di nama tabel, rute, dan komponen.
 
-Catatan penamaan: nama aplikasi `Ruang` dan tabel `ruang` sama. Di kode aplikasi
+**Nama aplikasi: Cari Ruang** (diputuskan 8 September 2026, sebelumnya
+`Ruang`). Slogannya *lahan nganggur jadi cuan*, dan judul halaman depannya
+*"Halaman depan nganggur? Jadikan cuan."*
+
+Catatan penamaan: nama tabel `ruang` tetap. Di kode aplikasi
 pakai istilah yang lebih spesifik untuk tipe dan rute — `Listing` / `/ruang/[id]`
 — supaya tidak tertukar dengan nama produk.
 
@@ -791,9 +795,22 @@ Dua aturan turunannya:
 
 ## Arah tampilan — diputuskan 4 September 2026
 
-Terang, tenang, dan **warna dipakai hemat**. Latar nyaris putih (`--color-paper`
-#f7f8fa), kartu putih bergaris tipis, dan biru merek (#2563eb) hanya muncul di
-tombol utama, tautan, dan keadaan terpilih.
+Terang, tenang, dan **warna dipakai hemat**. Latar krem nyaris putih
+(`--color-paper` #faf8f6), kartu putih bergaris tipis, dan terakota
+(`--color-brand` #a93b20) hanya muncul di tombol utama, tautan, dan keadaan
+terpilih.
+
+**Warnanya diganti 8 September 2026**, dari #2563eb — yang persis `blue-600`
+Tailwind, dan itulah keluhannya: warna bawaan kerangka kerja terlihat sebagai
+warna bawaan. Terakota dipilih karena tiga alasan sekaligus: ia bukan nilai
+palet Tailwind mana pun, ia warna tanah — dan yang disewakan di sini memang
+lahan — dan ia berdiri sendiri di antara pesaing yang biru (Traveloka), hijau
+(Tokopedia, Gojek), atau oranye terang (Shopee).
+
+Kontrasnya dihitung, bukan dikira: putih di atas terakota 6,30:1, terakota di
+atas kertas 5,95:1, `muted` di atas kertas 5,62:1 — ketiganya lewat AA. Kalau
+warnanya diubah lagi, hitung ulang; `#b2411f` yang sempat dicoba cuma
+5,72:1 dan sudah menipis untuk teks kecil.
 
 Ini menggantikan versi sebelumnya yang memakai gradien biru pekat sebagai
 bidang besar — hero halaman depan dan seluruh bagian atas `/cari`. Alasannya

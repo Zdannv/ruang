@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import KonfirmasiIsi from "./KonfirmasiIsi";
 
-export const metadata: Metadata = { title: "Konfirmasi email — Ruang" };
+export const metadata: Metadata = { title: "Konfirmasi email — Cari Ruang" };
 
 export default function HalamanKonfirmasi() {
   return (

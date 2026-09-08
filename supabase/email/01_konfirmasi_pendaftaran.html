@@ -19,7 +19,7 @@
 -->
 <body style="margin:0;padding:0;background:#eef2f9;">
   <!-- Cuplikan yang tampil di daftar inbox sebelum email dibuka. -->
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Satu langkah lagi untuk mengaktifkan akun Ruang kamu.</div>
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Satu langkah lagi untuk mengaktifkan akun Cari Ruang kamu.</div>
 
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
          style="background:#eef2f9;padding:32px 12px;">
@@ -31,7 +31,7 @@
           <tr>
             <td style="padding:28px 32px 0 32px;">
               <span style="font:700 20px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
-                           color:#0f172a;letter-spacing:-0.02em;">Ruang</span>
+                           color:#0f172a;letter-spacing:-0.02em;">Cari Ruang</span>
               <span style="font:400 12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
                            color:#64748b;padding-left:8px;">marketplace ruang antarwarga</span>
             </td>
@@ -44,7 +44,7 @@
           </tr>
           <tr>
             <td style="padding:12px 32px 0 32px;font:400 15px/1.65 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#334155;">
-              Akun Ruang untuk <strong style="color:#0f172a;">{{ .Email }}</strong> sudah
+              Akun Cari Ruang untuk <strong style="color:#0f172a;">{{ .Email }}</strong> sudah
               dibuat dan tinggal menunggu satu hal: memastikan alamat email ini benar
               milikmu.
             </td>
@@ -53,7 +53,7 @@
             <td style="padding:24px 32px 0 32px;">
               <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="border-radius:999px;background:#2563eb;">
+                  <td style="border-radius:999px;background:#a93b20;">
                     <a href="{{ .SiteURL }}/auth/konfirmasi?token_hash={{ .TokenHash }}&type=signup"
                        style="display:inline-block;padding:13px 28px;border-radius:999px;
                               font:600 15px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
@@ -66,7 +66,7 @@
           <tr>
             <td style="padding:20px 32px 0 32px;font:400 13px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#64748b;">
               Tombolnya tidak bisa diklik? Salin alamat ini ke peramban:<br>
-              <a href="{{ .SiteURL }}/auth/konfirmasi?token_hash={{ .TokenHash }}&type=signup" style="color:#2563eb;word-break:break-all;">{{ .SiteURL }}/auth/konfirmasi?token_hash={{ .TokenHash }}&type=signup</a>
+              <a href="{{ .SiteURL }}/auth/konfirmasi?token_hash={{ .TokenHash }}&type=signup" style="color:#a93b20;word-break:break-all;">{{ .SiteURL }}/auth/konfirmasi?token_hash={{ .TokenHash }}&type=signup</a>
             </td>
           </tr>
           <tr>

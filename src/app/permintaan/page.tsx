@@ -8,7 +8,7 @@ import { daftarPermintaanSaya, getPermintaanKecamatan } from "@/lib/permintaan";
 import { rupiah, volume } from "@/lib/label";
 
 export const metadata: Metadata = {
-  title: "Titipkan permintaan ruang — Ruang",
+  title: "Titipkan permintaan ruang — Cari Ruang",
   description:
     "Belum ada ruang yang cocok? Titipkan kriterianya, dan host di kecamatanmu akan melihat ada permintaan.",
 };

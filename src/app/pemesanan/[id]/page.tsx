@@ -26,7 +26,7 @@ import {
   tanggalJam,
 } from "@/lib/label";
 
-export const metadata: Metadata = { title: "Detail pemesanan — Ruang" };
+export const metadata: Metadata = { title: "Detail pemesanan — Cari Ruang" };
 
 /**
  * Satu pemesanan, dilihat dari sisi mana pun.

@@ -24,7 +24,7 @@ export default async function Header() {
           <Link href="/" className="flex items-center gap-2">
             <Lambang className="h-8 w-8 text-brand" />
             <span className="font-display text-xl font-bold tracking-tight text-ink">
-              Ruang
+              Cari Ruang
             </span>
           </Link>
 

@@ -25,9 +25,9 @@ import { supabaseSiap } from "@/lib/supabase/env";
 import type { TipeRuang } from "@/lib/ruang";
 
 export const metadata: Metadata = {
-  title: "Ruang — lahan nganggur jadi cuan",
+  title: "Cari Ruang — lahan nganggur jadi cuan",
   description:
-    "Sewa halaman depan atau lahan kosong di pinggir jalan buat jualan. Bulanan, langsung dari pemiliknya, di Sidoarjo dan Surabaya. Punya lahan nganggur? Sewakan.",
+    "Halaman depan nganggur? Sewakan bulanan ke pedagang di sekitarmu. Mau jualan di pinggir jalan? Sewa lahannya, tanpa beli tanah. Sidoarjo dan Surabaya.",
 };
 
 /*
@@ -95,21 +95,34 @@ const SEGMEN = [
   disebut di sini. Menjanjikannya sekarang berarti pengunjung pertama
   membuka listing dan tidak menemukannya.
 */
+/*
+  Manfaat, bukan pembelaan.
+
+  Versi sebelumnya berjudul "Kenapa nggak cari di grup jual-beli aja?" dan
+  isinya membandingkan diri dengan alternatif. Itu salah dua kali: ia
+  memancing orang memikirkan alternatifnya, dan nada "kami lebih baik" bikin
+  pembacanya bertahan, bukan tertarik. Marketplace besar tidak pernah
+  menjelaskan kenapa bukan pesaingnya — mereka cuma menyebut apa yang didapat.
+
+  Tetap dibatasi hal yang datanya benar-benar ada: rubrik yang paling
+  dibutuhkan pedagang (lebar muka jalan, listrik, air, atap) belum ada
+  kolomnya, jadi tidak disebut.
+*/
 const ALASAN = [
   {
     ikon: Ruler,
-    judul: "Bukan cuma foto cantik",
-    isi: "Enam belas hal wajib diisi pemilik sebelum listing tayang: muat truk apa, lebar pintu, tinggi lantai dari tanah, pernah banjir atau nggak, siapa yang pegang kunci. Penyewa menilai kejujurannya setelah sewa habis.",
+    judul: "Kondisinya jelas",
+    isi: "Muat gerobak atau nggak, pernah banjir atau nggak, siapa yang pegang kunci. Semua tertulis sebelum kamu berangkat.",
   },
   {
     ikon: CalendarClock,
-    judul: "Jam dan harinya disepakati",
-    isi: "Pemilik menentukan hari dan jam berapa lahannya boleh dipakai. Semua janjian lewat aplikasi dan tercatat — jadi nggak ada versi cerita yang beda-beda kalau ada masalah.",
+    judul: "Jam bukanya disepakati",
+    isi: "Pemilik menentukan hari dan jamnya. Janjian lewat aplikasi, tercatat, jadi nggak ada versi cerita yang beda.",
   },
   {
     ikon: ShieldAlert,
-    judul: "Alamat nggak langsung dibuka",
-    isi: "Yang kelihatan umum cuma kelurahan, kecamatan, dan jarak persisnya. Titik di peta digeser sekitar 200 meter. Alamat lengkap terbuka setelah deal.",
+    judul: "Alamat aman",
+    isi: "Yang umum lihat cuma kelurahan dan jarak. Alamat lengkap kebuka setelah deal.",
   },
 ];
 
@@ -117,27 +130,27 @@ const LANGKAH = [
   {
     ikon: Search,
     judul: "Cari dari titikmu",
-    isi: "Atur radius, ukuran, dan budget. Jaraknya dihitung dari lokasi asli lahannya, jadi angkanya beneran.",
+    isi: "Atur radius, ukuran, dan budget. Jaraknya dari titik asli lahannya.",
   },
   {
     ikon: MessageCircle,
     judul: "Tanya dulu, gratis",
-    isi: "\u201CBoleh gorengan nggak?\u201D, \u201Cada listrik?\u201D — chat pemiliknya sebelum pesan. Nggak perlu isi tanggal dulu cuma buat nanya.",
+    isi: "\u201CBoleh gorengan nggak?\u201D \u201CAda listrik?\u201D Chat dulu, gratis, tanpa isi tanggal.",
   },
   {
     ikon: ClipboardList,
     judul: "Ajukan sewa",
-    isi: "Isi tanggal dan apa yang mau kamu taruh di situ. Sistem mencocokkannya dengan aturan pemilik sebelum diteruskan.",
+    isi: "Isi tanggal dan barangnya. Dicocokkan dengan aturan pemilik dulu.",
   },
   {
     ikon: Handshake,
     judul: "Pemilik terima atau tolak",
-    isi: "Dia berhak menolak. Kalau diterima, alamat lengkapnya kebuka setelah pembayaran.",
+    isi: "Dia berhak menolak. Kalau diterima, alamatnya kebuka.",
   },
   {
     ikon: Wallet,
     judul: "Bayar — belum aktif",
-    isi: "Jalur pembayaran masih nunggu payment gateway. Sampai itu ada, pemesanan berhenti tepat sebelum tahap ini.",
+    isi: "Masih nunggu payment gateway. Pemesanan berhenti tepat sebelum tahap ini.",
   },
 ];
 
@@ -173,13 +186,12 @@ export default async function Beranda() {
             </span>
 
             <h1 className="mt-5 font-display text-[2.1rem] font-bold leading-[1.08] text-ink sm:text-5xl">
-              Jualan di pinggir jalan, tanpa beli lahan
+              Halaman depan nganggur? Jadikan cuan.
             </h1>
 
             <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-muted">
-              Sewa halaman depan rumah orang di jalan yang ramai — bulanan, langsung
-              dari pemiliknya. Nggak perlu beli tanah, nggak perlu kontrak ruko
-              setahun. Kondisi lahannya ditulis apa adanya, bukan cuma difoto bagus.
+              Sewakan bulanan ke pedagang di sekitarmu. Atau kalau kamu yang mau
+              jualan — sewa lahan di pinggir jalan, tanpa beli tanah.
             </p>
 
             <div className="mt-7">
@@ -281,7 +293,7 @@ export default async function Beranda() {
       <section className="bg-card py-14 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="max-w-2xl font-display text-2xl font-bold tracking-tight sm:text-3xl">
-            Kenapa nggak cari di grup jual-beli aja?
+            Yang kamu dapat
           </h2>
           <div className="mt-8 grid gap-6 sm:grid-cols-3">
             {ALASAN.map((a) => (
@@ -302,7 +314,7 @@ export default async function Beranda() {
       {/* ── Cara kerja ─────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
         <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-          Gampang kok
+          Cara pakainya
         </h2>
         <ol className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
           {LANGKAH.map((l, i) => {
@@ -341,7 +353,7 @@ export default async function Beranda() {
         <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-[#0b2560] via-brand to-[#4d86ff] p-8 sm:p-12">
           <div className="max-w-2xl">
             <h2 className="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
-              Halaman depan nganggur? Jadikan cuan.
+              Punya lahan? Pasang harganya sendiri.
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-white/80">
               Lahan 2×3 meter di depan rumah yang cuma jadi tempat parkir motor tamu

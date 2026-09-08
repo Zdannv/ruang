@@ -3,7 +3,7 @@ import { supabaseSiap } from "@/lib/supabase/env";
 import PencarianRuang from "@/components/PencarianRuang";
 
 export const metadata = {
-  title: "Cari ruang — Ruang",
+  title: "Cari ruang — Cari Ruang",
   description:
     "Telusuri ruang kosong terdekat: titik, radius, tipe, ukuran, dan harga.",
 };

@@ -7,7 +7,7 @@ import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { getRuangUntukPesan } from "@/lib/pemesanan";
 
-export const metadata: Metadata = { title: "Ajukan sewa — Ruang" };
+export const metadata: Metadata = { title: "Ajukan sewa — Cari Ruang" };
 
 /**
  * Formulir pengajuan sewa.

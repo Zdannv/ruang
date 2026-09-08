@@ -14,8 +14,8 @@ import type { MetadataRoute } from "next";
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Ruang — lahan nganggur jadi cuan",
-    short_name: "Ruang",
+    name: "Cari Ruang — lahan nganggur jadi cuan",
+    short_name: "Cari Ruang",
     description:
       "Sewa halaman depan atau lahan kosong di pinggir jalan buat jualan. Bulanan, langsung dari pemiliknya.",
     lang: "id",
@@ -28,7 +28,7 @@ export default function manifest(): MetadataRoute.Manifest {
     // Sama dengan --color-paper dan --color-brand di globals.css. Layar
     // pembuka memakai warna latar, jadi peralihannya tidak berkedip putih.
     background_color: "#eef2f9",
-    theme_color: "#1f5fff",
+    theme_color: "#a93b20",
     categories: ["shopping", "business", "lifestyle"],
     icons: [
       { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },

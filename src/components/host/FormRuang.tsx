@@ -288,7 +288,7 @@ export default function FormRuang({
               type="checkbox"
               checked={isi.terbuka_alamat}
               onChange={(e) => ubah("terbuka_alamat", e.target.checked)}
-              className="mt-0.5 h-4 w-4 cursor-pointer accent-[#1f5fff]"
+              className="mt-0.5 h-4 w-4 cursor-pointer accent-[var(--color-brand)]"
             />
             <span className="text-sm">
               Buka alamat lebih awal
