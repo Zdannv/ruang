@@ -2,7 +2,7 @@
  * Membuat ikon PWA tanpa dependensi apa pun.
  *
  * Kenapa digambar sendiri alih-alih memakai pustaka: satu-satunya bentuk yang
- * dibutuhkan adalah persegi membulat + siluet rumah, dan itu bisa dihitung per
+ * dibutuhkan adalah persegi membulat + siluet tenda, dan itu bisa dihitung per
  * piksel. Menambah pustaka pengolah gambar ke dependensi produksi demi empat
  * berkas statis yang tidak pernah berubah adalah harga yang tidak sepadan.
  *
@@ -69,27 +69,56 @@ function persegiMembulat(x, y, kiri, atas, kanan, bawah, jari) {
 }
 
 /**
- * Siluet rumah: atap segitiga + badan persegi.
+ * Siluet tenda warung: kanopi bergelombang di atas garis lahan.
  *
- * Bentuknya sengaja sama dengan lambang di header aplikasi, supaya ikon di
- * layar utama dan lambang di dalam aplikasi terbaca sebagai satu hal.
+ * Menggantikan siluet rumah (7 September 2026). Alasannya bukan selera:
+ * rumah menggambarkan tempatnya, sedangkan yang dijual aplikasi ini adalah
+ * apa yang TERJADI di tempat itu. Kanopi bergelombang terbaca dua arah
+ * sekaligus — warung bagi pedagang yang mencari lahan, atap bagi pemilik
+ * rumah yang menyewakan halamannya — dan itu persis dua sisi pasarnya.
+ *
+ * Bentuknya dihitung, bukan dijiplak: tepi bawah kanopi adalah tiga
+ * setengah-gelombang `sin`, jadi sambungannya mulus dan tetap rapi saat
+ * diperkecil ke 16 piksel.
+ *
+ * Sama dengan `public/ikon.svg`, supaya ikon di layar utama dan lambang di
+ * dalam aplikasi terbaca sebagai satu hal.
  */
-function didalamRumah(x, y, cx, cy, ukuran) {
+function didalamTenda(x, y, cx, cy, ukuran) {
   const u = ukuran;
   const px = (x - cx) / u;
   const py = (y - cy) / u;
 
-  // Atap: segitiga dari puncak (0, -0.5) ke dua sudut (±0.5, -0.05).
-  if (py >= -0.5 && py <= -0.05) {
-    const lebarDiSini = ((py + 0.5) / 0.45) * 0.5;
-    if (Math.abs(px) <= lebarDiSini) return true;
+  const ATAS = -0.38;
+  const TEKUK = -0.04;      // tempat kain mulai menggantung
+  const H_ATAS = 0.29;      // separuh lebar di pangkal
+  const H_BAWAH = 0.45;     // separuh lebar di tepi luar — kanopinya melebar
+  const LENGKUNG = 0.115;   // seberapa jauh kain menggantung
+
+  // Kanopi melebar ke bawah. Sisi yang miring inilah yang membuatnya terbaca
+  // sebagai kanopi yang menjorok, bukan sebagai persegi bergelombang.
+  if (py >= ATAS && py <= TEKUK) {
+    const h = H_ATAS + ((py - ATAS) / (TEKUK - ATAS)) * (H_BAWAH - H_ATAS);
+    return Math.abs(px) <= h;
   }
-  // Badan.
-  if (py > -0.05 && py <= 0.42 && Math.abs(px) <= 0.34) {
-    // Pintu dilubangi supaya siluetnya terbaca sebagai rumah, bukan panah.
-    const pintu = py > 0.1 && Math.abs(px) <= 0.12;
-    return !pintu;
+
+  // Tiga kain yang menggantung. Busur LINGKARAN, bukan sinus: sambungannya
+  // jadi bersudut tegas seperti kain yang dijahit, sedangkan sinus
+  // menghasilkan gelombang mulus yang terbaca sebagai air.
+  if (py > TEKUK && Math.abs(px) <= H_BAWAH) {
+    const t = (px + H_BAWAH) / (H_BAWAH * 2);
+    const uu = (t * 3) % 1;
+    const busur = Math.sqrt(Math.max(0, 1 - (2 * uu - 1) ** 2)) * LENGKUNG;
+    // Sengaja TIDAK `return py <= ...`: versi pertama begitu, dan cabang ini
+    // ikut menelan seluruh piksel di bawah kanopi — garis lahannya tidak
+    // pernah tergambar sama sekali.
+    if (py <= TEKUK + busur) return true;
   }
+
+  // Garis lahan: tipis, lebar, dan dekat — supaya terbaca sebagai tanah yang
+  // dinaungi kanopi, bukan sebagai tanda hubung yang mengambang.
+  if (py >= 0.26 && py <= 0.35 && Math.abs(px) <= 0.50) return true;
+
   return false;
 }
 
@@ -100,12 +129,12 @@ function buat(ukuran, { maskable = false } = {}) {
   // Ikon maskable dipotong sistem jadi lingkaran/squircle, jadi latarnya penuh
   // dan gambarnya dikecilkan ke zona aman 80%.
   const jariSudut = maskable ? 0 : ukuran * 0.22;
-  const ukuranRumah = ukuran * (maskable ? 0.46 : 0.58);
+  const ukuranTanda = ukuran * (maskable ? 0.52 : 0.66);
 
   for (let y = 0; y < ukuran; y++) {
     for (let x = 0; x < ukuran; x++) {
       let latar = 0;
-      let rumah = 0;
+      let tanda = 0;
       for (let sy = 0; sy < SS; sy++) {
         for (let sx = 0; sx < SS; sx++) {
           const px = x + (sx + 0.5) / SS;
@@ -113,16 +142,16 @@ function buat(ukuran, { maskable = false } = {}) {
           if (maskable || persegiMembulat(px, py, 0, 0, ukuran, ukuran, jariSudut) <= 0) {
             latar++;
           }
-          if (didalamRumah(px, py, ukuran / 2, ukuran / 2, ukuranRumah)) rumah++;
+          if (didalamTenda(px, py, ukuran / 2, ukuran / 2, ukuranTanda)) tanda++;
         }
       }
       const total = SS * SS;
       const aLatar = latar / total;
-      const aRumah = (rumah / total) * aLatar;
+      const aTanda = (tanda / total) * aLatar;
 
       const i = (y * ukuran + x) * 4;
       for (let k = 0; k < 3; k++) {
-        buf[i + k] = Math.round(BRAND[k] * (1 - aRumah) + PUTIH[k] * aRumah);
+        buf[i + k] = Math.round(BRAND[k] * (1 - aTanda) + PUTIH[k] * aTanda);
       }
       buf[i + 3] = Math.round(aLatar * 255);
     }

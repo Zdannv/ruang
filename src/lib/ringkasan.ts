@@ -8,7 +8,6 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { fotoPertama } from "@/lib/ruang";
 
 export type RingkasanPasar = {
   jumlahRuang: number;
@@ -55,45 +54,16 @@ export async function getRingkasanPasar(db: SupabaseClient): Promise<RingkasanPa
   }
 }
 
-export type RuangSorotan = {
-  id: string;
-  judul: string;
-  kecamatan: string;
-  harga_bulanan: number;
-  foto: string | null;
-};
+/*
+  `ruangSorotan()` dan `KolaseSorotan` dibuang 8 September 2026.
 
-/**
- * Beberapa ruang untuk dipajang di halaman depan.
- *
- * Ruang sungguhan dari database, bukan gambar hiasan. Halaman depan yang
- * memajang foto stok tidak memberi tahu apa pun tentang isi platformnya;
- * memajang tiga ruang yang benar-benar tayang langsung menjawab pertanyaan
- * pertama setiap pengunjung — "ada apa saja di sini?".
- */
-export async function ruangSorotan(
-  db: SupabaseClient,
-  jumlah = 3
-): Promise<RuangSorotan[]> {
-  try {
-    const { data, error } = await db
-      .from("ruang_publik")
-      .select("id, judul, kecamatan, harga_bulanan")
-      .order("dibuat_pada", { ascending: false })
-      .limit(jumlah);
-    if (error || !data || data.length === 0) return [];
+  Keduanya menumpuk foto ruang sungguhan di hero halaman depan. Setelah data
+  contoh dihapus, yang tersisa tidak punya foto — dan komponennya memang
+  mengembalikan `null` kalau tidak ada foto, jadi bagian terbesar halaman depan
+  jadi kosong sama sekali tanpa ada yang menyadarinya.
 
-    const ids = (data as { id: string }[]).map((r) => r.id);
-    // Sengaja memakai `fotoPertama` milik pencarian, bukan menyalin kuerinya:
-    // di sanalah kemunduran ke database tanpa kolom `url_kecil` ditangani,
-    // dan salinan kedua pasti akan lupa ikut diperbaiki.
-    const peta = await fotoPertama(db, ids);
-
-    return (data as Omit<RuangSorotan, "foto">[]).map((r) => ({
-      ...r,
-      foto: peta.get(r.id) ?? null,
-    }));
-  } catch {
-    return [];
-  }
-}
+  Penggantinya `SorotanPromo`, yang menjelaskan aplikasinya. Kalau nanti sudah
+  ada belasan lahan berfoto sungguhan dan kolase foto mau dihidupkan lagi,
+  tulis ulang dengan sengaja — jangan hidupkan kembali kode mati yang sudah
+  tidak pernah diuji terhadap skema yang berubah tiga kali sejak itu.
+*/

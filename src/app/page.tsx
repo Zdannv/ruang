@@ -16,10 +16,10 @@ import {
   Wrench,
 } from "lucide-react";
 import CariCepat from "@/components/CariCepat";
-import KolaseSorotan from "@/components/KolaseSorotan";
+import SorotanPromo from "@/components/SorotanPromo";
 import { IKON_TIPE } from "@/components/IkonTipe";
 import { LABEL_TIPE, rupiah } from "@/lib/label";
-import { getRingkasanPasar, ruangSorotan } from "@/lib/ringkasan";
+import { getRingkasanPasar } from "@/lib/ringkasan";
 import { klienServer } from "@/lib/supabase/server";
 import { supabaseSiap } from "@/lib/supabase/env";
 import type { TipeRuang } from "@/lib/ruang";
@@ -143,18 +143,17 @@ const LANGKAH = [
 
 export default async function Beranda() {
   const db = supabaseSiap ? await klienServer() : null;
-  const [ringkas, sorotan] = db
-    ? await Promise.all([getRingkasanPasar(db), ruangSorotan(db, 3)])
-    : [
-        {
-          jumlahRuang: 0,
-          jumlahKecamatan: 0,
-          hargaTermurah: null,
-          jumlahPencari: 0,
-          kecamatanTeratas: [],
-        },
-        [],
-      ];
+  // Sorotan tidak lagi mengambil foto ruang dari database — lihat
+  // `SorotanPromo`. Satu kueri lebih sedikit di jalur kritis halaman depan.
+  const ringkas = db
+    ? await getRingkasanPasar(db)
+    : {
+        jumlahRuang: 0,
+        jumlahKecamatan: 0,
+        hargaTermurah: null,
+        jumlahPencari: 0,
+        kecamatanTeratas: [],
+      };
 
   return (
     <>
@@ -212,7 +211,7 @@ export default async function Beranda() {
           </div>
 
           <div className="lg:pl-2">
-            <KolaseSorotan ruang={sorotan} />
+            <SorotanPromo />
           </div>
         </div>
       </section>
@@ -357,7 +356,7 @@ export default async function Beranda() {
 
             {ringkas.jumlahPencari > 0 && (
               <p className="angka mt-5 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white">
-                {ringkas.jumlahPencari} orang sedang mencari ruang
+                {ringkas.jumlahPencari} orang sedang mencari lahan
                 {ringkas.kecamatanTeratas[0] &&
                   ` — terbanyak di ${ringkas.kecamatanTeratas[0].kecamatan}`}
               </p>

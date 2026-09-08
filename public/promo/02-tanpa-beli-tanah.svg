@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Mau jualan di pinggir jalan? Sewa lahannya saja, sebulan-sebulan.">
+  <!-- Kartu promosi Ruang. Dihasilkan `skrip/buat-promo.py` — jangan disunting
+       langsung; ubah skripnya lalu jalankan ulang, supaya keempat kartu tidak
+       pernah berbeda margin atau ukuran huruf. -->
+  <rect width="800" height="500" rx="28" fill="#eef2f9"/>
+  <rect x="1" y="1" width="798" height="498" rx="27" fill="none" stroke="#dde3ec" stroke-width="2"/>
+
+  <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+    <text x="56" y="88" font-size="46" font-weight="800" fill="#0f172a" letter-spacing="-1"><tspan x="56" dy="0">Nggak perlu beli tanah</tspan></text>
+    <text x="56" y="134" font-size="21" fill="#64748b">Mau jualan di pinggir jalan? Sewa lahannya saja, sebulan-sebulan.</text>
+  </g>
+
+  <g>
+    <rect x="56" y="222" width="688" height="180" rx="16" fill="#ffffff" stroke="#dde3ec" stroke-width="2"/>
+    <text x="88" y="264" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-size="18" fill="#64748b">sebidang tanah</text>
+    <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+      <text x="88" y="322" font-size="34" font-weight="800" fill="#94a3b8">ratusan juta</text>
+      <line x1="86" y1="311" x2="282" y2="311" stroke="#94a3b8" stroke-width="3"/>
+      <text x="88" y="364" font-size="17" fill="#64748b">beli, sekali dan mahal</text>
+    </g>
+    <line x1="400" y1="248" x2="400" y2="376" stroke="#dde3ec" stroke-width="2"/>
+    <text x="432" y="264" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-size="18" fill="#64748b">2 × 3 meter di depan rumah orang</text>
+    <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+      <text x="432" y="322" font-size="34" font-weight="800" fill="#1f5fff">ratusan ribu</text>
+      <text x="432" y="364" font-size="17" fill="#64748b">sewa per bulan, berhenti kapan saja</text>
+    </g>
+  </g>
+
+  <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+    <rect x="56" y="424" width="30" height="30" rx="7" fill="#1f5fff"/>
+    <path fill="#ffffff" d="M65.3 431.5 H76.7 L79.9 438.2
+      A2.97 2.27 0 0 1 73.9 438.2 A2.97 2.27 0 0 1 68 438.2 A2.97 2.27 0 0 1 62.1 438.2 Z"/>
+    <rect x="61.1" y="443.4" width="19.8" height="1.8" fill="#ffffff"/>
+    <text x="96" y="445" font-size="20" font-weight="700" fill="#0f172a">Ruang</text>
+    <text x="163" y="445" font-size="17" fill="#64748b">· lahan nganggur jadi cuan</text>
+  </g>
+</svg>

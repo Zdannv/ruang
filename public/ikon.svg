@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Ruang">
+  <!--
+    Lambang Ruang: kanopi warung di atas garis lahan.
+
+    Geometrinya sama persis dengan `skrip/buat-ikon.mjs`, yang menghitung ikon
+    PWA per piksel dari rumus yang sama. Kalau salah satu diubah, ubah
+    keduanya — kalau tidak, lambang di dalam aplikasi dan ikon di layar utama
+    akan jadi dua bentuk yang berbeda.
+
+    Kanopinya MELEBAR ke bawah dan kainnya digantung sebagai tiga busur
+    lingkaran, bukan gelombang sinus: sambungan yang bersudut membuatnya
+    terbaca sebagai kain yang dijahit, sedangkan sinus terbaca sebagai air.
+
+    Garis lahan di bawahnya sengaja LEBIH LEBAR daripada kanopinya. Itu yang
+    membedakannya dari lambang storefront yang sudah lazim, dan sekaligus
+    benar artinya: yang disewakan adalah lahannya — kanopi cuma yang menaungi.
+  -->
+  <rect width="64" height="64" rx="14.1" fill="#1f5fff"/>
+  <path fill="#fff" d="M19.8 16 H44.2 L51 30.3
+    A6.33 4.85 0 0 1 38.33 30.3
+    A6.33 4.85 0 0 1 25.67 30.3
+    A6.33 4.85 0 0 1 13 30.3 Z"/>
+  <rect x="10.9" y="43" width="42.2" height="3.8" fill="#fff"/>
+</svg>

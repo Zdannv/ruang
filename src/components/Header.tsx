@@ -1,6 +1,6 @@
 import Link from "next/link";
+import Lambang from "@/components/Lambang";
 import { Suspense } from "react";
-import { House } from "lucide-react";
 import { sesiSaya } from "@/lib/auth";
 import LencanaHeader, { LencanaKosong } from "@/components/LencanaHeader";
 
@@ -22,9 +22,7 @@ export default async function Header() {
       <div className="naik mx-auto flex max-w-6xl items-center justify-between gap-4 rounded-2xl border border-line bg-card/90 px-4 py-3 backdrop-blur">
         <div className="flex items-center gap-1 sm:gap-6">
           <Link href="/" className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-white">
-              <House className="h-4.5 w-4.5" />
-            </span>
+            <Lambang className="h-8 w-8 text-brand" />
             <span className="font-display text-xl font-bold tracking-tight text-ink">
               Ruang
             </span>

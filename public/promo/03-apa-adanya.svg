@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Enam belas hal wajib diisi pemilik sebelum listing tayang — termasuk yang jelek.">
+  <!-- Kartu promosi Ruang. Dihasilkan `skrip/buat-promo.py` — jangan disunting
+       langsung; ubah skripnya lalu jalankan ulang, supaya keempat kartu tidak
+       pernah berbeda margin atau ukuran huruf. -->
+  <rect width="800" height="500" rx="28" fill="#eef2f9"/>
+  <rect x="1" y="1" width="798" height="498" rx="27" fill="none" stroke="#dde3ec" stroke-width="2"/>
+
+  <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+    <text x="56" y="88" font-size="46" font-weight="800" fill="#0f172a" letter-spacing="-1"><tspan x="56" dy="0">Ditulis apa adanya</tspan></text>
+    <text x="56" y="134" font-size="21" fill="#64748b">Enam belas hal wajib diisi pemilik sebelum listing tayang — termasuk yang jelek.</text>
+  </g>
+
+  <g><g>
+      <rect x="56" y="232" width="688" height="46" rx="12" fill="#ffffff" stroke="#dde3ec" stroke-width="2"/>
+      <circle cx="88" cy="255" r="13" fill="#dcfce7"/>
+      <path transform="translate(88 255)" d="M-5 0 l4 4 l7 -8" stroke="#15803d" stroke-width="2.6"
+            stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <text x="116" y="262" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-size="20" fill="#0f172a">Muat gerobak · lantai rata · kunci di penyewa</text>
+    </g><g>
+      <rect x="56" y="288" width="688" height="46" rx="12" fill="#ffffff" stroke="#dde3ec" stroke-width="2"/>
+      <circle cx="88" cy="311" r="13" fill="#dcfce7"/>
+      <path transform="translate(88 311)" d="M-5 0 l4 4 l7 -8" stroke="#15803d" stroke-width="2.6"
+            stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <text x="116" y="318" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-size="20" fill="#0f172a">Jendela akses Senin–Sabtu, 06.00–21.00</text>
+    </g><g>
+      <rect x="56" y="344" width="688" height="46" rx="12" fill="#ffffff" stroke="#dde3ec" stroke-width="2"/>
+      <circle cx="88" cy="367" r="13" fill="#fef3c7"/>
+      <path transform="translate(88 367)" d="M0 -6 v7 M0 4 v1" stroke="#b45309" stroke-width="2.6"
+            stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <text x="116" y="374" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif" font-size="20" fill="#0f172a">Pernah banjir dalam 5 tahun terakhir</text>
+    </g></g>
+
+  <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+    <rect x="56" y="424" width="30" height="30" rx="7" fill="#1f5fff"/>
+    <path fill="#ffffff" d="M65.3 431.5 H76.7 L79.9 438.2
+      A2.97 2.27 0 0 1 73.9 438.2 A2.97 2.27 0 0 1 68 438.2 A2.97 2.27 0 0 1 62.1 438.2 Z"/>
+    <rect x="61.1" y="443.4" width="19.8" height="1.8" fill="#ffffff"/>
+    <text x="96" y="445" font-size="20" font-weight="700" fill="#0f172a">Ruang</text>
+    <text x="163" y="445" font-size="17" fill="#64748b">· lahan nganggur jadi cuan</text>
+  </g>
+</svg>

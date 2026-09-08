@@ -554,6 +554,46 @@ Kerjakan berurutan. Jangan lompat.
     JENIS USAHA yang diizinkan pemilik — "boleh menggoreng" adalah pertanyaan
     yang jawabannya membatalkan sewa.
 
+29. **Lambang dan kartu sorotan** (8 Sep 2026).
+
+    Lambangnya **kanopi warung di atas garis lahan**, menggantikan siluet
+    rumah. Rumah menggambarkan tempatnya; yang dijual aplikasi ini adalah apa
+    yang TERJADI di tempat itu. Kanopi bergelombang terbaca dua arah — warung
+    bagi pedagang, atap bagi pemilik rumah — dan itu persis dua sisi pasarnya.
+    Garis lahan di bawahnya sengaja **lebih lebar** daripada kanopinya: itu
+    yang membedakannya dari lambang storefront yang sudah lazim, dan sekaligus
+    benar artinya, karena yang disewakan adalah lahannya.
+
+    **Geometrinya hidup di tiga tempat** dan harus diubah bersamaan:
+    `src/components/Lambang.tsx`, `public/ikon.svg`, dan
+    `skrip/buat-ikon.mjs` yang menghitung ikon PWA per piksel. Kalau salah
+    satu tertinggal, lambang di aplikasi dan ikon di layar utama jadi dua
+    bentuk berbeda.
+
+    Kanopinya digambar sebagai tiga busur **lingkaran**, bukan gelombang
+    sinus. Versi pertama memakai sinus dan hasilnya terbaca sebagai air, bukan
+    kain — ketahuan setelah PNG-nya dilihat, bukan dari membaca rumusnya.
+
+    **Empat kartu sorotan** di `public/promo/`, dihasilkan
+    `skrip/buat-promo.py`. Dihasilkan skrip, bukan ditulis tangan satu-satu:
+    yang membuat temanya seragam bukan kemiripan yang diusahakan per berkas,
+    melainkan satu kerangka yang dipakai keempatnya, jadi tidak mungkin ada
+    kartu yang meleset sendiri margin atau ukuran hurufnya.
+
+    SVG, bukan raster: keempatnya cuma bidang warna dan teks, jadi 3 KB
+    masing-masing, sementara JPEG setara akan 150 KB ke atas. Kartu ini muncul
+    di SETIAP kunjungan halaman depan — ia gambar yang paling sering diunduh
+    di seluruh aplikasi, jadi ia juga yang paling layak dihemat.
+
+    Isinya dibatasi hal yang datanya benar-benar ada. Satu kalimat sengaja
+    dibuang saat penulisan: "boleh dipakai tiap hari" — justru itu yang bentrok
+    dengan `kuota_akses_bulanan` yang masih berlaku. Diganti jendela akses,
+    yang memang ada datanya sejak `08_jendela.sql`.
+
+    Geseran mendatar dengan snap, bukan pemutar otomatis: tidak butuh
+    JavaScript sama sekali, dan orang yang sedang membaca satu kartu tidak
+    direbut oleh kartu berikutnya.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris
@@ -708,8 +748,13 @@ Aturan yang mengikutinya:
 
 - **Halaman alat kerja tidak punya hero.** `/cari`, `/pemesanan`, `/host`
   langsung ke isinya; kendalinya muat dalam satu bilah.
-- **Yang berwarna besar hanya foto**, dan fotonya ruang sungguhan dari
-  database — bukan gambar hiasan.
+- **Yang berwarna besar hanya foto**, dan fotonya lahan sungguhan dari
+  database — bukan gambar hiasan. **Satu perkecualian, 8 September 2026:**
+  sorotan di halaman depan sekarang kartu SVG penjelasan
+  (`public/promo/`, lihat `SorotanPromo`). Aturan ini benar saat isinya masih
+  14 ruang berfoto; setelah data contoh dibuang, kolase fotonya menampilkan
+  NOL gambar dan bagian terbesar halaman depan jadi kosong. Kartunya bukan
+  hiasan — keempatnya menyatakan hal yang benar-benar berlaku di aplikasi.
 - **Bayangan sangat halus, dua tingkat saja** (`.naik`, `.naik-hover` di
   globals.css). Halaman hasil menampilkan belasan kartu sekaligus; bayangan
   tebal membuatnya terasa berat.
