@@ -19,7 +19,19 @@ import type {
   TipeRuang,
 } from "@/lib/ruang";
 
+/*
+  Dua kelompok, dan urutannya bukan selera. Lahan terbuka lebih dulu karena
+  itulah fokus produknya sejak 7 September 2026; ruang tertutup tetap ada
+  karena penyimpanan bukan salah, ia cuma bukan lagi yang di depan.
+
+  Bedanya bukan cuma nama: lahan terbuka diukur dengan LUAS (m2) dan ruang
+  tertutup dengan VOLUME (m3). Lihat `pakaiLuas()`.
+*/
 export const LABEL_TIPE: Record<TipeRuang, string> = {
+  halaman_depan: "Halaman depan",
+  lahan_kosong: "Lahan kosong",
+  teras: "Teras",
+  kios: "Kios",
   kamar: "Kamar",
   garasi: "Garasi",
   gudang: "Gudang",
@@ -29,6 +41,25 @@ export const LABEL_TIPE: Record<TipeRuang, string> = {
   loteng: "Loteng",
   kontainer: "Kontainer",
 };
+
+/** Tipe yang disewa permukaannya, bukan isinya. */
+export const TIPE_LAHAN: TipeRuang[] = [
+  "halaman_depan",
+  "lahan_kosong",
+  "teras",
+  "kios",
+];
+
+/**
+ * Benar kalau ukuran yang berarti untuk tipe ini adalah luas, bukan volume.
+ *
+ * "18 m3" untuk sebuah halaman depan adalah angka yang benar secara
+ * aritmatika dan tidak berarti apa-apa bagi yang membacanya — pedagang
+ * memikirkan berapa meter muka jalannya, bukan berapa kubik udara di atasnya.
+ */
+export function pakaiLuas(tipe: TipeRuang): boolean {
+  return (TIPE_LAHAN as string[]).includes(tipe);
+}
 
 export const LABEL_AKSES: Record<AksesMasuk, string> = {
   truk_engkel: "Muat truk engkel",

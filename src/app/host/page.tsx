@@ -39,12 +39,12 @@ export default async function DasborHost() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-            Ruang yang kamu sewakan
+            Lahan yang kamu sewakan
           </h1>
           <p className="mt-1.5 text-sm text-muted">
             {ruang.length === 0
-              ? "Belum ada ruang terdaftar."
-              : `${ruang.length} ruang terdaftar.`}
+              ? "Belum ada lahan terdaftar."
+              : `${ruang.length} lahan terdaftar.`}
           </p>
         </div>
         <Link
@@ -52,7 +52,7 @@ export default async function DasborHost() {
           className="inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
         >
           <Plus className="h-4 w-4" />
-          Daftarkan ruang
+          Sewakan lahan
         </Link>
       </div>
 
@@ -127,7 +127,7 @@ export default async function DasborHost() {
             className="mt-5 inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
           >
             <Plus className="h-4 w-4" />
-            Daftarkan ruang pertama
+            Sewakan lahan pertama
           </Link>
         </div>
       ) : (

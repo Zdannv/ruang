@@ -64,7 +64,7 @@ function Kerangka() {
       <div className="h-7 w-56 max-w-full animate-pulse rounded-lg bg-line" />
       <div className="mt-6 h-40 animate-pulse rounded-2xl bg-card ring-1 ring-line" />
       <div className="mt-8 h-7 w-40 max-w-full animate-pulse rounded-lg bg-line" />
-      <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="h-80 animate-pulse rounded-2xl bg-card ring-1 ring-line" />
         ))}

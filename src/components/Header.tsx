@@ -35,13 +35,13 @@ export default async function Header() {
               href="/cari"
               className="rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-paper hover:text-ink"
             >
-              Cari ruang
+              Cari lahan
             </Link>
             <Link
               href="/host"
               className="rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-paper hover:text-ink"
             >
-              Sewakan ruang
+              Sewakan lahan
             </Link>
           </nav>
         </div>

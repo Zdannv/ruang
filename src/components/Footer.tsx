@@ -21,8 +21,9 @@ export default function Footer() {
               <span className="font-display text-xl font-bold tracking-tight">Ruang</span>
             </div>
             <p className="mt-3 text-sm leading-relaxed text-muted">
-              Marketplace ruang antarwarga. Siapa pun yang punya ruang kosong bisa
-              menyewakannya; siapa pun yang butuh tempat bisa menyewanya.
+              <strong className="text-ink">Lahan nganggur jadi cuan.</strong> Punya
+              halaman depan yang cuma jadi tempat parkir motor tamu? Sewakan bulanan.
+              Butuh tempat jualan di pinggir jalan? Sewa dari tetangga sendiri.
             </p>
           </div>
 
@@ -32,7 +33,7 @@ export default function Footer() {
                 Menyewa
               </p>
               <Link href="/cari" className="block text-ink hover:text-brand">
-                Cari ruang
+                Cari lahan
               </Link>
               <Link href="/permintaan" className="block text-ink hover:text-brand">
                 Titipkan permintaan
@@ -55,7 +56,7 @@ export default function Footer() {
                 Dasbor host
               </Link>
               <Link href="/host/ruang/baru" className="block text-ink hover:text-brand">
-                Daftarkan ruang
+                Sewakan lahan
               </Link>
             </div>
           </nav>
@@ -67,8 +68,9 @@ export default function Footer() {
             untuk semua orang, alamat setelah pembayaran, nomor kontak setelah itu.
           </p>
           <p>
-            Ruang disewakan langsung oleh pemiliknya. Platform menengahi kalau ada
-            sengketa, tapi tidak memberi ganti rugi — tidak ada asuransi barang.
+            Lahan disewakan langsung oleh pemiliknya. Kalau ada sengketa, platform
+            menengahi dan memutuskan siapa yang benar — tapi tidak membayar ganti
+            rugi. Tidak ada asuransi barang.
           </p>
           <p className="pt-2">Pembayaran belum aktif; menunggu payment gateway berlisensi.</p>
         </div>

@@ -18,6 +18,12 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { kolomBelumAda } from "@/lib/galat";
 
 export type TipeRuang =
+  // Lahan terbuka — yang disewa permukaannya. Fokus produk sejak 7 Sep 2026.
+  | "halaman_depan"
+  | "lahan_kosong"
+  | "teras"
+  | "kios"
+  // Ruang tertutup — yang disewa volumenya.
   | "kamar"
   | "garasi"
   | "gudang"
@@ -57,6 +63,8 @@ export type HasilRuang = {
   kota: string;
   lat_publik: number;
   lng_publik: number;
+  /** Untuk lahan terbuka, ini ukuran yang berarti — bukan volume. */
+  luas_m2: number;
   volume_m3: number;
   harga_bulanan: number;
   akses_masuk: AksesMasuk;
@@ -130,10 +138,12 @@ export async function cariRuang(
   const foto = await fotoPertama(db, hasil.map((r) => r.id));
   return hasil.map((r) => ({
     ...r,
-    // Kolom ini baru ada sejak 13_umkm.sql. Di database yang belum
-    // dijalankan migrasinya ia tidak terkirim sama sekali, dan hasil
-    // pencarian tidak boleh ikut mati karenanya.
+    // Dua kolom di bawah baru ada sejak 13_umkm.sql dan 17_lahan_usaha.sql.
+    // Di database yang belum dijalankan migrasinya keduanya tidak terkirim
+    // sama sekali, dan hasil pencarian tidak boleh ikut mati karenanya —
+    // `luas_m2` yang undefined akan tampil sebagai "NaN m²" di kartu.
     kategori_diterima: r.kategori_diterima ?? [],
+    luas_m2: r.luas_m2 ?? 0,
     foto: foto.get(r.id) ?? null,
   }));
 }

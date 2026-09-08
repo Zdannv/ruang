@@ -18,9 +18,9 @@ const serif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "Ruang — sewa ruang kosong di dekatmu",
+  title: "Ruang — lahan nganggur jadi cuan",
   description:
-    "Marketplace ruang antarwarga di Sidoarjo dan Surabaya. Sewa garasi, lantai ruko, atau gudang kecil di dekatmu — untuk stok jualan, alat usaha, atau pindahan.",
+    "Sewa halaman depan atau lahan kosong di pinggir jalan buat jualan. Bulanan, langsung dari pemiliknya. Punya lahan nganggur? Sewakan.",
   applicationName: "Ruang",
   // Safari tidak membaca manifest untuk ikon layar utama; ia mencari
   // apple-touch-icon sendiri.

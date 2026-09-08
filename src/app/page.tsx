@@ -4,7 +4,6 @@ import {
   ArrowRight,
   CalendarClock,
   ClipboardList,
-  GraduationCap,
   Handshake,
   MessageCircle,
   Ruler,
@@ -12,6 +11,7 @@ import {
   ShieldAlert,
   Store,
   Truck,
+  UtensilsCrossed,
   Wallet,
   Wrench,
 } from "lucide-react";
@@ -25,9 +25,9 @@ import { supabaseSiap } from "@/lib/supabase/env";
 import type { TipeRuang } from "@/lib/ruang";
 
 export const metadata: Metadata = {
-  title: "Ruang — sewa ruang kosong di dekatmu",
+  title: "Ruang — lahan nganggur jadi cuan",
   description:
-    "Marketplace ruang antarwarga di Sidoarjo dan Surabaya. Sewa garasi, lantai ruko, atau gudang kecil di dekatmu — untuk stok jualan, alat usaha, atau pindahan. Kondisi ruangnya dijelaskan apa adanya.",
+    "Sewa halaman depan atau lahan kosong di pinggir jalan buat jualan. Bulanan, langsung dari pemiliknya, di Sidoarjo dan Surabaya. Punya lahan nganggur? Sewakan.",
 };
 
 /*
@@ -37,12 +37,12 @@ export const metadata: Metadata = {
   daftar ini pertama disusun.
 */
 const TIPE_UNGGULAN: TipeRuang[] = [
+  "halaman_depan",
+  "lahan_kosong",
+  "teras",
+  "kios",
   "garasi",
-  "lantai_ruko",
   "gudang",
-  "kamar",
-  "loteng",
-  "kontainer",
 ];
 
 /**
@@ -59,50 +59,57 @@ const TIPE_UNGGULAN: TipeRuang[] = [
  */
 const SEGMEN = [
   {
+    ikon: UtensilsCrossed,
+    judul: "Makanan & minuman",
+    isi: "Gerobak, tenda, angkringan, es kopi. Yang penting ramai dan kelihatan dari jalan.",
+    tautan: "/cari?tipe=halaman_depan&radius=5",
+    ajakan: "Cari halaman depan",
+  },
+  {
     ikon: Store,
     judul: "Jualan online",
-    isi: "Stok menumpuk di ruang tamu dan perlu diambil beberapa kali seminggu. Cari yang memang menerima stok dagangan, bukan yang akan menolaknya.",
+    isi: "Stok numpuk di ruang tamu? Titipkan di dekat rumah, ambil kapan pun butuh.",
     tautan: "/cari?kategori=stok_dagangan&radius=10",
-    ajakan: "Ruang untuk stok",
+    ajakan: "Cari ruang stok",
   },
   {
     ikon: Wrench,
-    judul: "Usaha rumahan",
-    isi: "Bahan, alat jahit, cetakan, arsip yang tidak boleh lembap. Kelembapan dan riwayat banjir tiap ruang ikut tertulis — dan di sini itu bukan pertanyaan sepele.",
-    tautan: "/cari?kategori=ban_perkakas&radius=10",
-    ajakan: "Ruang untuk alat",
+    judul: "Jasa harian",
+    isi: "Cuci motor, tambal ban, laundry kiloan, potong rambut. Lahan kecil, pelanggan tetap.",
+    tautan: "/cari?tipe=lahan_kosong&radius=10",
+    ajakan: "Cari lahan kosong",
   },
   {
     ikon: Truck,
     judul: "Pindahan & renovasi",
-    isi: "Perabot butuh tempat satu sampai tiga bulan. Lebar pintu dan kendaraan terbesar yang bisa masuk tertulis di tiap ruang, jadi tidak ada kejutan saat truknya datang.",
+    isi: "Perabot butuh tempat 1-3 bulan. Lebar pintu dan muat truk apa, ada di tiap listing.",
     tautan: "/cari?kategori=perabot&radius=10",
-    ajakan: "Ruang untuk perabot",
-  },
-  {
-    ikon: GraduationCap,
-    judul: "Kos kesempitan",
-    isi: "Pulang kampung sebulan, atau kamar tidak cukup untuk kardus dan sepeda. Sewa per bulan, ambil kapan pun dalam jendela akses.",
-    tautan: "/cari?kategori=kardus&radius=5",
-    ajakan: "Ruang untuk kardus",
+    ajakan: "Cari ruang perabot",
   },
 ];
 
+/*
+  Ketiganya sengaja cuma menyebut hal yang datanya BENAR-BENAR ada di
+  database. Rubrik yang paling dibutuhkan pedagang — lebar muka jalan,
+  listrik, air, atap, jam boleh jualan — belum ada kolomnya, jadi tidak
+  disebut di sini. Menjanjikannya sekarang berarti pengunjung pertama
+  membuka listing dan tidak menemukannya.
+*/
 const ALASAN = [
   {
     ikon: Ruler,
-    judul: "Kondisi ruang, bukan cuma foto",
-    isi: "Enam belas hal diisi host sebelum ruangnya tayang: kendaraan terbesar yang bisa masuk, lebar pintu, tinggi lantai dari tanah, kelembapan, riwayat banjir, siapa yang memegang kunci. Penyewa menilai ketepatannya setelah sewa berakhir.",
+    judul: "Bukan cuma foto cantik",
+    isi: "Enam belas hal wajib diisi pemilik sebelum listing tayang: muat truk apa, lebar pintu, tinggi lantai dari tanah, pernah banjir atau nggak, siapa yang pegang kunci. Penyewa menilai kejujurannya setelah sewa habis.",
   },
   {
     ikon: CalendarClock,
-    judul: "Datang berkali-kali, bukan sekali titip",
-    isi: "Host menetapkan jendela akses dan kuota kunjungan per bulan. Kunjungan dijanjikan lewat aplikasi dan tercatat di log akses — itu yang menggantikan segel pada penitipan biasa.",
+    judul: "Jam dan harinya disepakati",
+    isi: "Pemilik menentukan hari dan jam berapa lahannya boleh dipakai. Semua janjian lewat aplikasi dan tercatat — jadi nggak ada versi cerita yang beda-beda kalau ada masalah.",
   },
   {
     ikon: ShieldAlert,
-    judul: "Alamat dibuka bertahap",
-    isi: "Yang terlihat semua orang cuma kelurahan, kecamatan, dan jarak persis; titik di peta digeser sekitar 200 meter. Alamat lengkap terbuka setelah pembayaran, nomor kontak setelah itu.",
+    judul: "Alamat nggak langsung dibuka",
+    isi: "Yang kelihatan umum cuma kelurahan, kecamatan, dan jarak persisnya. Titik di peta digeser sekitar 200 meter. Alamat lengkap terbuka setelah deal.",
   },
 ];
 
@@ -110,27 +117,27 @@ const LANGKAH = [
   {
     ikon: Search,
     judul: "Cari dari titikmu",
-    isi: "Atur radius, ukuran, anggaran, dan barang yang mau disimpan. Jaraknya dihitung dari lokasi asli ruangnya, jadi angkanya persis.",
+    isi: "Atur radius, ukuran, dan budget. Jaraknya dihitung dari lokasi asli lahannya, jadi angkanya beneran.",
   },
   {
     ikon: MessageCircle,
-    judul: "Tanya hostnya dulu",
-    isi: "\u201CMuat motor saya nggak?\u201D, \u201Cboleh lihat dulu?\u201D — percakapan bisa dibuka sebelum memesan, jadi kamu tidak perlu mengisi tanggal dan manifes hanya untuk bertanya.",
+    judul: "Tanya dulu, gratis",
+    isi: "\u201CBoleh gorengan nggak?\u201D, \u201Cada listrik?\u201D — chat pemiliknya sebelum pesan. Nggak perlu isi tanggal dulu cuma buat nanya.",
   },
   {
     ikon: ClipboardList,
-    judul: "Ajukan sewa dengan manifes",
-    isi: "Daftarkan barang yang akan disimpan. Kategorinya dicocokkan dengan kebijakan host sebelum permintaanmu diteruskan.",
+    judul: "Ajukan sewa",
+    isi: "Isi tanggal dan apa yang mau kamu taruh di situ. Sistem mencocokkannya dengan aturan pemilik sebelum diteruskan.",
   },
   {
     ikon: Handshake,
-    judul: "Host menerima atau menolak",
-    isi: "Host berhak melihat dan menolak barang. Kalau diterima, alamat lengkapnya terbuka setelah pembayaran.",
+    judul: "Pemilik terima atau tolak",
+    isi: "Dia berhak menolak. Kalau diterima, alamat lengkapnya kebuka setelah pembayaran.",
   },
   {
     ikon: Wallet,
-    judul: "Pembayaran — belum aktif",
-    isi: "Jalur pembayaran menunggu payment gateway berlisensi. Sampai itu ada, pemesanan berhenti tepat sebelum tahap ini.",
+    judul: "Bayar — belum aktif",
+    isi: "Jalur pembayaran masih nunggu payment gateway. Sampai itu ada, pemesanan berhenti tepat sebelum tahap ini.",
   },
 ];
 
@@ -163,18 +170,17 @@ export default async function Beranda() {
         <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:px-8 lg:py-20">
           <div>
             <span className="inline-flex items-center rounded-full border border-line bg-paper px-3 py-1 text-xs font-semibold text-muted">
-              Marketplace ruang antarwarga
+              Lahan nganggur jadi cuan
             </span>
 
             <h1 className="mt-5 font-display text-[2.1rem] font-bold leading-[1.08] text-ink sm:text-5xl">
-              Ruang kosong di dekatmu, disewakan tetangga sendiri
+              Jualan di pinggir jalan, tanpa beli lahan
             </h1>
 
             <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-muted">
-              Buat yang stok jualannya menumpuk di ruang tamu, yang alat usahanya
-              tidak kebagian tempat, atau yang perabotnya perlu titik aman selama
-              pindahan. Lebih dekat dan lebih murah daripada gudang penitipan — dan
-              kondisi ruangnya dijelaskan apa adanya, bukan cuma difoto.
+              Sewa halaman depan rumah orang di jalan yang ramai — bulanan, langsung
+              dari pemiliknya. Nggak perlu beli tanah, nggak perlu kontrak ruko
+              setahun. Kondisi lahannya ditulis apa adanya, bukan cuma difoto bagus.
             </p>
 
             <div className="mt-7">
@@ -185,7 +191,7 @@ export default async function Beranda() {
               <dl className="angka mt-7 flex flex-wrap items-end gap-x-8 gap-y-4">
                 <div>
                   <dd className="font-display text-2xl font-bold">{ringkas.jumlahRuang}</dd>
-                  <dt className="text-xs text-muted">ruang tayang</dt>
+                  <dt className="text-xs text-muted">lahan tayang</dt>
                 </div>
                 <div>
                   <dd className="font-display text-2xl font-bold">
@@ -214,12 +220,11 @@ export default async function Beranda() {
       {/* ── Buat siapa ─────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
         <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-          Kamu yang mana?
+          Mau jualan apa?
         </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-          Tiap tautan langsung menyaring ruang yang memang menerima barangmu — host
-          berhak menolak kategori yang tidak ia terima, dan lebih baik itu terpisah
-          sebelum kamu mengajukan, bukan sesudah.
+          Pemilik lahan berhak menolak jenis usaha yang dia nggak mau. Lebih enak
+          ketahuan sekarang daripada setelah kamu bolak-balik.
         </p>
         <div className="mt-7 grid gap-4 sm:grid-cols-2">
           {SEGMEN.map((g) => (
@@ -251,7 +256,7 @@ export default async function Beranda() {
       {/* ── Tipe ruang ─────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
         <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-          Ruang seperti apa yang kamu butuh?
+          Butuh lahan seperti apa?
         </h2>
         <div className="geser-x -mx-4 mt-6 overflow-x-auto px-4 sm:mx-0 sm:px-0">
           <div className="flex w-max gap-3 pb-1 sm:grid sm:w-auto sm:grid-cols-3 lg:grid-cols-6">
@@ -277,7 +282,7 @@ export default async function Beranda() {
       <section className="bg-card py-14 sm:py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="max-w-2xl font-display text-2xl font-bold tracking-tight sm:text-3xl">
-            Yang membedakannya dari iklan biasa
+            Kenapa nggak cari di grup jual-beli aja?
           </h2>
           <div className="mt-8 grid gap-6 sm:grid-cols-3">
             {ALASAN.map((a) => (
@@ -298,7 +303,7 @@ export default async function Beranda() {
       {/* ── Cara kerja ─────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
         <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-          Cara kerjanya
+          Gampang kok
         </h2>
         <ol className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
           {LANGKAH.map((l, i) => {
@@ -337,19 +342,17 @@ export default async function Beranda() {
         <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-[#0b2560] via-brand to-[#4d86ff] p-8 sm:p-12">
           <div className="max-w-2xl">
             <h2 className="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
-              Lantai dua ruko yang belum tersewa? Garasi yang mobilnya sudah dijual?
+              Halaman depan nganggur? Jadikan cuan.
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-white/80">
-              Kamu yang menentukan harganya, jendela aksesnya, dan barang apa yang
-              boleh masuk. Manifes penyewa dicocokkan dengan kebijakanmu sebelum
-              permintaannya sampai ke kamu — dan kamu tetap berhak menolak.
+              Lahan 2×3 meter di depan rumah yang cuma jadi tempat parkir motor tamu
+              bisa jadi penghasilan tiap bulan. Nggak perlu modal, nggak perlu
+              dibangun apa-apa.
             </p>
             <p className="mt-2.5 text-sm leading-relaxed text-white/80">
-              Tidak perlu menunggu satu penyewa yang mau mengambil semuanya — satu
-              lantai bisa dibagi ke beberapa orang. Yang mencari sebagian besar
-              tetangga sekecamatan: penjual online yang stoknya menumpuk, usaha
-              rumahan yang alatnya tidak kebagian tempat, keluarga yang sedang
-              pindahan.
+              Kamu yang tentukan harganya, jam bukanya, dan jenis usaha apa yang boleh
+              — mau yang nggak menggoreng saja, boleh. Setiap permintaan tetap harus
+              lewat kamu dulu.
             </p>
 
             {ringkas.jumlahPencari > 0 && (
@@ -365,7 +368,7 @@ export default async function Beranda() {
                 href="/host/ruang/baru"
                 className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink transition-transform hover:-translate-y-0.5"
               >
-                Daftarkan ruang
+                Sewakan lahanku
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link

@@ -608,7 +608,7 @@ export default function PencarianRuang() {
         </div>
 
         {memuat && (
-          <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="h-80 animate-pulse rounded-2xl bg-card ring-1 ring-line" />
             ))}
@@ -652,7 +652,7 @@ export default function PencarianRuang() {
         )}
 
         {!memuat && daftar.length > 0 && (
-          <ul className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
             {daftar.map((ruang) => (
               <li key={ruang.id}>
                 <KartuRuang ruang={ruang} />

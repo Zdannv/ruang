@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import DaftarRuangBaru from "@/components/host/DaftarRuangBaru";
 import { sesiSaya } from "@/lib/auth";
 
-export const metadata: Metadata = { title: "Daftarkan ruang — Ruang" };
+export const metadata: Metadata = { title: "Sewakan lahan — Ruang" };
 
 export default async function RuangBaru() {
   const sesi = await sesiSaya();
@@ -23,7 +23,7 @@ export default async function RuangBaru() {
       </Link>
 
       <h1 className="mt-4 font-display text-2xl font-bold tracking-tight sm:text-3xl">
-        Daftarkan ruang
+        Sewakan lahanmu
       </h1>
       <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
         Dua langkah: keterangan ruangnya dulu, lalu fotonya. Simpan sebagai draf

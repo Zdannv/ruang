@@ -83,7 +83,7 @@ export default function CariCepat() {
         className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark sm:ml-2"
       >
         <Search className="h-4 w-4" />
-        Cari ruang
+        Cari lahan
       </button>
     </form>
   );

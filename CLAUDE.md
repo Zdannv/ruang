@@ -1,7 +1,13 @@
 # Ruang
 
-Marketplace ruang P2P. Siapa pun yang punya ruang kosong bisa menyewakannya;
-siapa pun yang butuh tempat bisa menyewanya.
+**Lahan usaha pinggir jalan.** Halaman depan rumah yang menganggur, disewakan
+bulanan ke UMKM yang butuh tempat berjualan. Slogannya: *lahan nganggur jadi
+cuan.*
+
+Fokus itu dipersempit 7 September 2026, menggantikan "marketplace ruang P2P
+untuk apa pun". Penyimpanan tidak dibuang — tipe ruang tertutup tetap ada dan
+tetap bisa disewakan — tapi ia bukan lagi yang di depan, dan copy maupun
+urutan di seluruh layar mengikuti fokus baru itu.
 
 Nama produk sengaja **tidak** mengunci ke penitipan. Tahap pertama adalah sewa
 ruang penyimpanan, tapi model data dan penamaan harus tetap netral supaya bisa
@@ -509,6 +515,44 @@ Kerjakan berurutan. Jangan lompat.
     utuh ke satu penyewa, ia bisa dibagi ke beberapa orang. Pemilik ruko yang
     iklannya sudah berbulan-bulan tidak laku adalah daftar host paling hangat
     yang tersedia di wilayah itu.
+
+28. **Fokus dipersempit ke lahan usaha pinggir jalan** (7 Sep 2026). Lihat
+    `17_lahan_usaha.sql`.
+
+    Yang menghalangi pivot ini bukan copy melainkan skema: kedelapan tipe yang
+    ada seluruhnya ruang TERTUTUP, jadi halaman depan rumah secara harfiah
+    tidak bisa dimasukkan ke database. Ditambah empat tipe lahan terbuka —
+    `halaman_depan`, `lahan_kosong`, `teras`, `kios`.
+
+    **Dua kelompok tipe sekarang punya satuan berbeda, dan layar wajib
+    mengikutinya.** Lahan terbuka diukur LUAS (m²), ruang tertutup diukur
+    VOLUME (m³) — lihat `pakaiLuas()`. Bukan kerapian: halaman 3×2 meter
+    menghasilkan `volume_m3` = 0,60, angka yang benar secara aritmatika dan
+    tidak berarti apa-apa bagi pedagang yang memikirkan berapa meter muka
+    jalannya. `ruang_terdekat()` di-drop dan dibuat ulang supaya ikut
+    mengembalikan `luas_m2`.
+
+    **Kartu hasil dirancang untuk HP lebih dulu**, dan di lebar telepon ia
+    tampil DUA KOLOM. Versi satu kolom cuma memuat satu setengah kartu per
+    layar, dan menelusuri sepuluh pilihan terasa seperti pekerjaan. Urutan
+    bacanya dibalik: harga dulu, judul sesudahnya — di marketplace, harga yang
+    menentukan apakah sebuah kartu layak dibuka.
+
+    Copy-nya ditulis ulang dengan register yang jauh kurang baku ("nggak perlu
+    beli tanah", "gampang kok"), dan `ALASAN` sengaja **hanya menyebut hal
+    yang datanya benar-benar ada**. Rubrik yang paling dibutuhkan pedagang —
+    lebar muka jalan, listrik, air, atap, jam boleh jualan — belum ada
+    kolomnya, jadi tidak disebut. Menjanjikannya sekarang berarti pengunjung
+    pertama membuka listing dan tidak menemukannya.
+
+    **Empat hal yang sengaja belum dikerjakan**, ditulis juga di ekor
+    `17_lahan_usaha.sql`: rubrik khusus lahan usaha; `kuota_akses_bulanan`
+    yang untuk pedagang tidak berarti (ia di sana setiap hari, bukan beberapa
+    kali sebulan); manifes dan serah terima yang harus jadi opsional per tipe
+    karena pedagang membawa gerobaknya pulang; dan `kategori_diterima` yang
+    masih kategori BARANG padahal untuk lahan usaha yang menentukan adalah
+    JENIS USAHA yang diizinkan pemilik — "boleh menggoreng" adalah pertanyaan
+    yang jawabannya membatalkan sewa.
 
 ### Berikutnya, selama pembayaran belum ada
 

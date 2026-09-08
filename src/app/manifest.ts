@@ -14,10 +14,10 @@ import type { MetadataRoute } from "next";
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Ruang — sewa ruang kosong di dekatmu",
+    name: "Ruang — lahan nganggur jadi cuan",
     short_name: "Ruang",
     description:
-      "Marketplace ruang antarwarga di Sidoarjo dan Surabaya. Sewa garasi, lantai ruko, atau gudang kecil di dekatmu — untuk stok jualan, alat usaha, atau pindahan.",
+      "Sewa halaman depan atau lahan kosong di pinggir jalan buat jualan. Bulanan, langsung dari pemiliknya.",
     lang: "id",
     dir: "ltr",
     start_url: "/",
@@ -44,7 +44,7 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     shortcuts: [
       {
-        name: "Cari ruang",
+        name: "Cari lahan",
         short_name: "Cari",
         url: "/cari",
         icons: [{ src: "/icon-192.png", sizes: "192x192" }],
@@ -56,7 +56,7 @@ export default function manifest(): MetadataRoute.Manifest {
         icons: [{ src: "/icon-192.png", sizes: "192x192" }],
       },
       {
-        name: "Dasbor host",
+        name: "Lahan yang kusewakan",
         short_name: "Sewakan",
         url: "/host",
         icons: [{ src: "/icon-192.png", sizes: "192x192" }],

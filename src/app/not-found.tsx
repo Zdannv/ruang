@@ -16,7 +16,7 @@ export default function TidakDitemukan() {
         href="/cari"
         className="mt-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
       >
-        Cari ruang lain
+        Cari lahan lain
       </Link>
     </div>
   );
