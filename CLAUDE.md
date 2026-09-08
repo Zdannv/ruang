@@ -826,6 +826,17 @@ Aturan yang mengikutinya:
 
 - **Halaman alat kerja tidak punya hero.** `/cari`, `/pemesanan`, `/host`
   langsung ke isinya; kendalinya muat dalam satu bilah.
+
+  Aturan ini pernah dilanggar pelan-pelan, satu bagian filter setiap kali
+  fitur baru ditambah, sampai di layar 375×812 kartu hasil PERTAMA mulai di
+  y=809 — tiga piksel di bawah lipatan. Halaman yang satu-satunya alasan
+  dibuka adalah hasil pencarian menampilkan nol hasil sebelum orang
+  menggulir. Diukur, bukan dikira, 8 September 2026; sekarang y=419.
+
+  Penyaring rinci ada di balik satu tombol **Filter**, dan yang tersisa di
+  layar adalah barisan pilihan yang SEDANG aktif. Kalau nanti ada penyaring
+  baru, ia masuk ke dalam panel itu — bukan menambah satu bagian lagi di
+  atas hasil.
 - **Yang berwarna besar hanya foto**, dan fotonya lahan sungguhan dari
   database — bukan gambar hiasan. **Satu perkecualian, 8 September 2026:**
   sorotan di halaman depan sekarang kartu SVG penjelasan

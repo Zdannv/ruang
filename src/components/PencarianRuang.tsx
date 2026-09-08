@@ -2,12 +2,20 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { AlertCircle, ChevronDown, Crosshair, MapPin, Search, SearchX } from "lucide-react";
+import {
+  AlertCircle,
+  ChevronDown,
+  Crosshair,
+  MapPin,
+  Search,
+  SearchX,
+  SlidersHorizontal,
+} from "lucide-react";
 import KartuRuang from "@/components/KartuRuang";
 import { IKON_TIPE } from "@/components/IkonTipe";
 import { cariRuang, type RuangDenganFoto, type TipeRuang } from "@/lib/ruang";
 import { klienBrowser } from "@/lib/supabase/browser";
-import { LABEL_KATEGORI, LABEL_TIPE } from "@/lib/label";
+import { LABEL_KATEGORI, LABEL_TIPE, rupiah } from "@/lib/label";
 import {
   HARGA_PILIHAN,
   RADIUS_BAWAAN,
@@ -140,6 +148,19 @@ export default function PencarianRuang() {
   // pernah diberikan, tidak ada titik yang diingat, DAN wilayah pendaftarannya
   // tidak diketahui.
   const [tawarkanLokasi, setTawarkanLokasi] = useState(false);
+  /*
+    Panel filter TERTUTUP secara bawaan, dan itu bukan selera.
+
+    Diukur di layar 375×812: dengan keempat bagian filter terbentang, kartu
+    hasil pertama mulai di y=809 — tiga piksel di bawah lipatan. Artinya di
+    HP, halaman yang satu-satunya alasan dibuka adalah hasil pencarian
+    menampilkan NOL hasil sebelum orang menggulir.
+
+    Aturan di CLAUDE.md sudah menyebutnya sejak awal ("halaman alat kerja
+    tidak punya hero; kendalinya muat dalam satu bilah") — pelaksanaannya yang
+    menyimpang, satu bagian filter setiap kali fitur baru ditambah.
+  */
+  const [bukaFilter, setBukaFilter] = useState(false);
 
   useEffect(() => {
     /*
@@ -299,18 +320,28 @@ export default function PencarianRuang() {
     return Object.keys(LABEL_KATEGORI).filter((k) => ada.has(k));
   }, [semua, kategori]);
 
+  // Dipakai bilah ringkas: apa saja yang sedang menyaring, dalam kata yang
+  // bisa dibaca. Radius dan titik TIDAK ikut — keduanya selalu ada nilainya,
+  // jadi menghitungnya sebagai "filter" membuat angkanya tidak pernah nol.
+  const ringkasanFilter = [
+    tipe ? LABEL_TIPE[tipe] : null,
+    kategori ? LABEL_KATEGORI[kategori] : null,
+    volumeMin > 0 ? `≥ ${volumeMin} m³` : null,
+    hargaMaks > 0 ? `≤ ${rupiah(hargaMaks)}` : null,
+  ].filter((v): v is string => Boolean(v));
+  const jumlahFilter = ringkasanFilter.length;
+
   const bersihkan = () => router.replace(pathname, { scroll: false });
 
-  // "Hapus filter" mengembalikan SEMUANYA ke bawaan, termasuk titik dan radius
-  // — jadi tombolnya baru berguna kalau ada satu saja yang bukan bawaan.
-  const adaFilter =
-    searchParams.toString() !== "" &&
-    (Boolean(tipe) ||
-      Boolean(kategori) ||
-      volumeMin > 0 ||
-      hargaMaks > 0 ||
-      radiusKm !== RADIUS_BAWAAN ||
-      preset?.id !== TITIK_BAWAAN.id);
+  /*
+    `adaFilter` dibuang bersama tombol "Hapus filter" yang kedua.
+
+    Perhatikan bedanya dari `jumlahFilter` di atas, karena keduanya mudah
+    tertukar: yang lama ikut menghitung titik dan radius, jadi ia menyala
+    untuk pencarian yang sama sekali belum disaring — cukup titik yang bukan
+    bawaan. Yang sekarang cuma menghitung penyaring sungguhan, dan itulah yang
+    benar untuk angka di sebelah tombol Filter.
+  */
 
   return (
     <>
@@ -327,7 +358,10 @@ export default function PencarianRuang() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-3 sm:px-6 lg:px-8">
           <h1 className="sr-only">Cari ruang</h1>
 
-          <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 rounded-full border border-line bg-card px-3.5 py-2 sm:flex-none sm:min-w-56">
+          {/* Titik mengambil satu baris penuh di layar telepon. Bertiga dalam
+              satu baris di lebar 375px membuat namanya terpangkas jadi satu
+              huruf — "Waru / Aloha" terbaca "W…". */}
+          <label className="flex w-full min-w-0 cursor-pointer items-center gap-2 rounded-full border border-line bg-card px-3.5 py-2 sm:w-auto sm:min-w-56 sm:flex-none">
             <MapPin className="h-4 w-4 shrink-0 text-brand" />
             <span className="sr-only">Titik pencarian</span>
             <span className="relative flex min-w-0 flex-1 items-center">
@@ -339,7 +373,10 @@ export default function PencarianRuang() {
                 }}
                 className="w-full cursor-pointer appearance-none truncate bg-transparent pr-5 text-sm font-medium text-ink focus:outline-none"
               >
-                {!preset && <option value="custom">Lokasi saya</option>}
+                {/* `namaTitik`, bukan selalu "Lokasi saya": titik bisa datang
+                    dari wilayah pendaftaran atau dari tautan yang dibagikan,
+                    dan keduanya bukan "lokasi saya". */}
+                {!preset && <option value="custom">{namaTitik}</option>}
                 {TITIK_PRESET.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.nama}
@@ -358,6 +395,15 @@ export default function PencarianRuang() {
                 onChange={(e) => ubah({ radius: e.target.value })}
                 className="angka cursor-pointer appearance-none bg-transparent pr-5 text-sm font-medium text-ink focus:outline-none"
               >
+                {/* Radius dari tautan bisa di luar daftar — `?radius=20`
+                    misalnya. Tanpa opsi ini, `<select>` jatuh ke pilihan
+                    pertama dan menampilkan "1 km" sementara hasilnya dihitung
+                    20 km, lengkap dengan judul "1 ruang dalam 20 km" di
+                    bawahnya. Kendali yang berbohong tentang keadaannya sendiri
+                    lebih buruk daripada kendali yang tidak ada. */}
+                {!RADIUS_PILIHAN.includes(radiusKm) && (
+                  <option value={radiusKm}>{radiusKm} km</option>
+                )}
                 {RADIUS_PILIHAN.map((km) => (
                   <option key={km} value={km}>
                     {km} km
@@ -378,15 +424,10 @@ export default function PencarianRuang() {
             <span className="sm:hidden">Lokasiku</span>
           </button>
 
-          {adaFilter && (
-            <button
-              type="button"
-              onClick={bersihkan}
-              className="ml-auto cursor-pointer rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-paper hover:text-ink"
-            >
-              Hapus filter
-            </button>
-          )}
+          {/* "Hapus filter" dulu di sini juga. Dibuang: bilah ringkas di bawah
+              sudah punya tombol yang memanggil `bersihkan()` yang sama, dan
+              sejak titik mengambil baris penuh di HP, yang di sini terlempar
+              ke barisnya sendiri — satu baris terbuang untuk tombol kembar. */}
         </div>
 
         {/* Peramban tidak boleh dimintai izin lokasi tanpa orangnya menekan
@@ -435,7 +476,54 @@ export default function PencarianRuang() {
             seluruh hasil ke bawah tepat saat orang mulai membacanya. Pergeseran
             seperti itu paling terasa justru di koneksi lambat — persis keadaan
             saat orang paling tidak sabar. */}
-        <section aria-label="Tipe ruang" className="pt-8 sm:pt-10">
+        {/* Bilah ringkas. Marketplace besar menaruh penyaring rinci di balik
+            satu tombol dan menyisakan barisan pilihan yang sedang aktif —
+            karena yang dibutuhkan orang di layar hasil adalah HASILNYA, dan
+            penyaring cuma sesekali. */}
+        <div className="geser-x -mx-4 flex items-center gap-2 overflow-x-auto px-4 pt-5 pb-1 sm:mx-0 sm:px-0">
+          <button
+            type="button"
+            onClick={() => setBukaFilter((b) => !b)}
+            aria-expanded={bukaFilter}
+            className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+              jumlahFilter > 0
+                ? "bg-brand text-white hover:bg-brand-dark"
+                : "bg-card text-ink ring-1 ring-line hover:bg-paper"
+            }`}
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            Filter
+            {jumlahFilter > 0 && <span className="angka">({jumlahFilter})</span>}
+            <ChevronDown
+              className={`h-3.5 w-3.5 transition-transform ${bukaFilter ? "rotate-180" : ""}`}
+            />
+          </button>
+
+          {ringkasanFilter.map((r) => (
+            <span
+              key={r}
+              className="inline-flex shrink-0 items-center rounded-full bg-brand-soft px-3 py-2 text-xs font-semibold text-brand-dark"
+            >
+              {r}
+            </span>
+          ))}
+
+          {jumlahFilter > 0 && (
+            <button
+              type="button"
+              onClick={bersihkan}
+              className="shrink-0 cursor-pointer rounded-full px-3 py-2 text-xs font-medium text-muted transition-colors hover:bg-paper hover:text-ink"
+            >
+              Hapus
+            </button>
+          )}
+        </div>
+
+        <section
+          aria-label="Tipe ruang"
+          hidden={!bukaFilter}
+          className="pt-3 sm:pt-4"
+        >
           {/* Judulnya dulu "Mau menyimpan apa?" — pertanyaan tentang barang yang
               dijawab dengan bentuk ruang. Sejak penyaring kategori barang ada di
               bawah, keduanya bertabrakan: dua judul menanyakan hal yang sama dan
@@ -498,7 +586,11 @@ export default function PencarianRuang() {
         </section>
 
         {/* ── Filter lain ────────────────────────────────────────────────── */}
-        <section aria-label="Filter ukuran dan harga" className="mt-8 space-y-4">
+        <section
+          aria-label="Filter ukuran dan harga"
+          hidden={!bukaFilter}
+          className="mt-4 space-y-4"
+        >
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
               Ukuran minimum
