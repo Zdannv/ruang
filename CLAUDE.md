@@ -578,25 +578,49 @@ Kerjakan berurutan. Jangan lompat.
     sinus. Versi pertama memakai sinus dan hasilnya terbaca sebagai air, bukan
     kain — ketahuan setelah PNG-nya dilihat, bukan dari membaca rumusnya.
 
-    **Empat kartu sorotan** di `public/promo/`, dihasilkan
-    `skrip/buat-promo.py`. Dihasilkan skrip, bukan ditulis tangan satu-satu:
-    yang membuat temanya seragam bukan kemiripan yang diusahakan per berkas,
-    melainkan satu kerangka yang dipakai keempatnya, jadi tidak mungkin ada
-    kartu yang meleset sendiri margin atau ukuran hurufnya.
+    **Kartu sorotannya** dulu empat berkas SVG yang dihasilkan
+    `skrip/buat-promo.py`. Diganti **dua ilustrasi** 9 September 2026 — SVG-nya
+    terlalu datar untuk halaman utama meski sudah dirancang ulang sekali.
+    Skrip dan keempat SVG-nya dibuang, bukan ditinggalkan mati.
 
-    SVG, bukan raster: keempatnya cuma bidang warna dan teks, jadi 3 KB
-    masing-masing, sementara JPEG setara akan 150 KB ke atas. Kartu ini muncul
-    di SETIAP kunjungan halaman depan — ia gambar yang paling sering diunduh
-    di seluruh aplikasi, jadi ia juga yang paling layak dihemat.
-
-    Isinya dibatasi hal yang datanya benar-benar ada. Satu kalimat sengaja
-    dibuang saat penulisan: "boleh dipakai tiap hari" — justru itu yang bentrok
-    dengan `kuota_akses_bulanan` yang masih berlaku. Diganti jendela akses,
-    yang memang ada datanya sejak `08_jendela.sql`.
+    Dua pesan yang hilang bersamanya — rubrik jujur dan alamat bertahap —
+    sudah dinyatakan sebagai teks HTML di bagian "Yang kamu dapat", jadi tidak
+    ada keterangan yang benar-benar lenyap.
 
     Geseran mendatar dengan snap, bukan pemutar otomatis: tidak butuh
     JavaScript sama sekali, dan orang yang sedang membaca satu kartu tidak
     direbut oleh kartu berikutnya.
+
+32. **Gambar sorotan: dua ilustrasi** (9 Sep 2026). Sumbernya di
+    `desain/sorotan/`; yang disajikan hasil `skrip/pasang-sorotan.mjs`.
+
+    **Jangan pernah menaruh JPEG aslinya langsung ke `public/`.** Aslinya
+    1948 KB dan 2036 KB; setelah diperkecil ke 1400px dan dijadikan WebP
+    q80 keduanya jadi 93 KB dan 96 KB — **95% lebih kecil**. Gambar ini
+    diunduh di SETIAP kunjungan halaman depan, jadi ia berkas paling sering
+    diunduh di seluruh aplikasi.
+
+    **Rasionya diseragamkan, dan caranya bukan memangkas.** Versi pertama
+    skrip itu memangkas dari tengah ke rasio terlebar — dan itu memotong judul
+    di atas serta lambang di bawah, persis dua bagian terpenting. Ketahuan
+    saat diuji dengan gambar berbingkai, bukan dari membaca kodenya.
+
+    Yang dipakai: rasio bersama = rata-rata geometris rasio semua gambar
+    (1,79 dan 1,31 → 1,53), lalu setiap gambar diberi bingkai `contain` ke
+    sana dengan warna yang diambil dari piksel sudutnya sendiri. Keduanya cuma
+    dapat bingkai 8-9% dan tidak satu piksel pun dibuang. Menyeragamkan ke
+    rasio tertinggi akan memberi bingkai 18% pada yang lebar — cukup besar
+    untuk terbaca sebagai kesalahan.
+
+    **Yang PERTAMA harus memuat slogan utama**: di layar telepon cuma satu
+    kartu yang terlihat sebelum digeser.
+
+    Berbeda dari kartu SVG dan dari foto hasil pencarian, gambar ini **tidak**
+    memakai `unoptimized`. Untuk SVG penghematan pengubah ukuran nol — ia
+    bebas resolusi. Di sini berkasnya 1400px sementara slotnya 352px di
+    telepon, jadi pengubah ukurannya benar-benar memotong dua pertiga, dan
+    telepon adalah sasaran utamanya. Diperiksa: Next meminta varian `w=750`
+    di layar kecil.
 
 30. **Video lahan — selesai** (8 Sep 2026). Lihat `18_video.sql`,
     `src/lib/video.ts`, dan `PemutarVideo`. Diminta client; sebelumnya
