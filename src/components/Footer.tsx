@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { House } from "lucide-react";
+import Lambang from "@/components/Lambang";
 
 /**
  * Kaki halaman.
@@ -15,9 +15,7 @@ export default function Footer() {
         <div className="flex flex-col gap-8 sm:flex-row sm:justify-between">
           <div className="max-w-sm">
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-white">
-                <House className="h-4.5 w-4.5" />
-              </span>
+              <Lambang className="h-8 w-8 text-brand" />
               <span className="font-display text-xl font-bold tracking-tight">Cari Ruang</span>
             </div>
             <p className="mt-3 text-sm leading-relaxed text-muted">

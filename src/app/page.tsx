@@ -14,9 +14,10 @@ import {
 } from "lucide-react";
 import KartuRuang from "@/components/KartuRuang";
 import SorotanPromo from "@/components/SorotanPromo";
+import SuaraPenyewa from "@/components/SuaraPenyewa";
 import { IKON_TIPE } from "@/components/IkonTipe";
 import { LABEL_TIPE } from "@/lib/label";
-import { getRingkasanPasar, ruangContoh } from "@/lib/ringkasan";
+import { getRingkasanPasar, ruangContoh, ulasanSorotan } from "@/lib/ringkasan";
 import { klienServer } from "@/lib/supabase/server";
 import { supabaseSiap } from "@/lib/supabase/env";
 import type { TipeRuang } from "@/lib/ruang";
@@ -155,8 +156,12 @@ export default async function Beranda() {
   const db = supabaseSiap ? await klienServer() : null;
   // Sorotan tidak lagi mengambil foto ruang dari database — lihat
   // `SorotanPromo`. Satu kueri lebih sedikit di jalur kritis halaman depan.
-  const [ringkas, contoh] = db
-    ? await Promise.all([getRingkasanPasar(db), ruangContoh(db, 4)])
+  const [ringkas, contoh, ulasan] = db
+    ? await Promise.all([
+        getRingkasanPasar(db),
+        ruangContoh(db, 4),
+        ulasanSorotan(db, 6),
+      ])
     : [
         {
           jumlahRuang: 0,
@@ -166,6 +171,7 @@ export default async function Beranda() {
           kecamatanTeratas: [],
         },
         [],
+        { daftar: [], rata: null, jumlahTotal: 0 },
       ];
 
   return (
@@ -465,6 +471,11 @@ export default async function Beranda() {
           </div>
         </div>
       </section>
+      <SuaraPenyewa
+        ulasan={ulasan.daftar}
+        rata={ulasan.rata}
+        jumlahTotal={ulasan.jumlahTotal}
+      />
     </>
   );
 }

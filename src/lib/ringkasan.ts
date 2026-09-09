@@ -117,3 +117,53 @@ export async function ruangContoh(
     return [];
   }
 }
+export type UlasanSorotan = {
+  id: string;
+  skor: number;
+  akurasi: number | null;
+  komentar: string;
+  penulis_nama: string;
+  penulis_foto_url: string | null;
+};
+
+/**
+ * Ulasan penyewa untuk dipamerkan di halaman depan.
+ *
+ * Hanya yang PUNYA KOMENTAR — bintang tanpa kalimat tidak menambah apa pun di
+ * bagian yang gunanya menunjukkan pengalaman orang.
+ *
+ * Arahnya `untuk_host` saja: yang berguna di halaman depan adalah penilaian
+ * penyewa terhadap lahan dan pemiliknya, bukan penilaian pemilik terhadap
+ * penyewa.
+ *
+ * Akan mengembalikan array kosong untuk waktu yang cukup lama, dan itu bukan
+ * kegagalan: `boleh_ulas()` mensyaratkan pemesanan yang SUDAH DIBAYAR, dan
+ * alur pembayaran belum bisa dilewati. Pemanggilnya wajib menangani keadaan
+ * kosong dengan jujur — jangan pernah mengisinya dengan ulasan karangan.
+ */
+export async function ulasanSorotan(
+  db: SupabaseClient,
+  jumlah = 6
+): Promise<{ daftar: UlasanSorotan[]; rata: number | null; jumlahTotal: number }> {
+  try {
+    const { data, error, count } = await db
+      .from("ulasan_publik")
+      .select("id, skor, akurasi, komentar, penulis_nama, penulis_foto_url", {
+        count: "exact",
+      })
+      .eq("arah", "untuk_host")
+      .not("komentar", "is", null)
+      .order("pada", { ascending: false })
+      .limit(jumlah);
+    if (error || !data || data.length === 0) {
+      return { daftar: [], rata: null, jumlahTotal: 0 };
+    }
+
+    const daftar = data as unknown as UlasanSorotan[];
+    const rata =
+      daftar.reduce((t, u) => t + u.skor, 0) / daftar.length;
+    return { daftar, rata, jumlahTotal: count ?? daftar.length };
+  } catch {
+    return { daftar: [], rata: null, jumlahTotal: 0 };
+  }
+}

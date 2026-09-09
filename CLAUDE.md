@@ -741,6 +741,40 @@ Kerjakan berurutan. Jangan lompat.
     ditulis lepas di `bg-[...]` dan `from-[...]`** — token ikut berubah
     sendiri, hex lepas tidak.
 
+36. **Bagian kepercayaan di dasar halaman depan** (9 Sep 2026). Lihat
+    `SuaraPenyewa`.
+
+    Bentuknya mengikuti pola marketplace — blok berwarna penuh dengan kutipan
+    penyewa yang bisa digeser. **Isinya tidak**, selama belum ada ulasannya.
+
+    **Ulasan karangan tidak ditulis, dan itu bukan kehati-hatian
+    berlebihan.** `boleh_ulas()` mensyaratkan pemesanan yang SUDAH DIBAYAR,
+    dan alur pembayaran belum bisa dilewati — jadi nol ulasan bukan keadaan
+    sementara yang bisa "diisi dulu", ia konsekuensi struktural. Nama,
+    kutipan, dan angka "4,9/5 dari N ulasan" yang tidak ada orangnya
+    menyesatkan orang menuju keputusan uang, dan itu jenis kebohongan yang
+    persis dilarang di bagian atas berkas ini.
+
+    Yang dipakai sebagai gantinya: keadaan kosong yang **menjelaskan
+    mekanismenya** — ulasan hanya bisa ditulis penyewa yang sewanya selesai,
+    dan yang dinilai adalah ketepatan keterangan pemilik dibanding
+    kenyataannya. Ditambah tiga hal yang memang sudah ada dan bisa diperiksa:
+    manifes berfoto berversi, log kedatangan, dan keterbukaan alamat
+    bertahap.
+
+    Kenapa keadaan kosongnya panjang dan tidak disembunyikan saja: ini
+    satu-satunya tempat di halaman depan yang tugasnya menjawab "kenapa saya
+    harus percaya". Menyembunyikannya berarti pertanyaan itu tidak terjawab.
+
+    Kalimat "tidak ada ganti rugi, tidak ada asuransi" **wajib tetap ada di
+    situ** dan tidak boleh diperhalus. Justru di bagian yang gunanya
+    membangun kepercayaan, menyembunyikannya paling merugikan.
+
+    Cabang "sudah ada ulasan" **sudah diuji** dengan props tiruan lewat rute
+    sementara, bukan dibiarkan pertama jalan berbulan-bulan kemudian: bintang,
+    ringkasan "23 ulasan · 4,6/5", kartu kutipan yang benar-benar bisa
+    digeser, dan "Ketepatan keterangan 5/5" di bawah nama.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris
