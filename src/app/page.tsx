@@ -1,18 +1,15 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import {
   ArrowRight,
   CalendarClock,
-  ClipboardList,
-  Handshake,
-  MessageCircle,
   Ruler,
   Search,
   ShieldAlert,
   Store,
   Truck,
   UtensilsCrossed,
-  Wallet,
   Wrench,
 } from "lucide-react";
 import KartuRuang from "@/components/KartuRuang";
@@ -128,27 +125,27 @@ const ALASAN = [
 
 const LANGKAH = [
   {
-    ikon: Search,
+    gambar: "1-cari",
     judul: "Cari dari titikmu",
     isi: "Atur radius, ukuran, dan budget. Jaraknya dari titik asli lahannya.",
   },
   {
-    ikon: MessageCircle,
+    gambar: "2-tanya",
     judul: "Tanya dulu, gratis",
     isi: "\u201CBoleh gorengan nggak?\u201D \u201CAda listrik?\u201D Chat dulu, gratis, tanpa isi tanggal.",
   },
   {
-    ikon: ClipboardList,
+    gambar: "3-ajukan",
     judul: "Ajukan sewa",
     isi: "Isi tanggal dan barangnya. Dicocokkan dengan aturan pemilik dulu.",
   },
   {
-    ikon: Handshake,
+    gambar: "4-jawab",
     judul: "Pemilik terima atau tolak",
     isi: "Dia berhak menolak. Kalau diterima, alamatnya kebuka.",
   },
   {
-    ikon: Wallet,
+    gambar: "5-bayar",
     judul: "Bayar — belum aktif",
     isi: "Masih nunggu payment gateway. Pemesanan berhenti tepat sebelum tahap ini.",
   },
@@ -180,7 +177,7 @@ export default async function Beranda() {
           orang — kalah menonjol. Warnanya sekarang cuma tersisa sebagai kilau
           tipis di sudut. */}
       <section className="relative -mt-[var(--tinggi-header)] overflow-hidden border-b border-line bg-card pt-[var(--tinggi-header)]">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(110%_75%_at_88%_-10%,#e6eeff_0%,transparent_58%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(110%_75%_at_88%_-10%,#f7e3d9_0%,transparent_58%)]" />
 
         <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:px-8 lg:py-20">
           <div>
@@ -377,31 +374,46 @@ export default async function Beranda() {
         <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
           Cara pakainya
         </h2>
-        <ol className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+        {/* Dua kolom di telepon, bukan satu. Lima kartu berilustrasi satu
+            kolom membuat bagian ini sekitar 1750px — orang berhenti
+            menggulir sebelum sampai langkah lima. Bentuk ilustrasinya
+            sengaja tegas supaya tetap terbaca di lebar 150px. */}
+        <ol className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-5">
           {LANGKAH.map((l, i) => {
             const belumAktif = i === LANGKAH.length - 1;
             return (
               <li
                 key={l.judul}
-                className={`rounded-2xl p-5 ring-1 ${
+                className={`rounded-2xl p-3 ring-1 sm:p-5 ${
                   belumAktif
                     ? "bg-paper ring-line/70"
                     : "bg-card ring-line"
                 }`}
               >
-                <div className="flex items-center gap-3">
+                {/* Ilustrasi menggantikan ikon lucide yang dulu di sini.
+                    SVG, bukan raster seperti kartu sorotan, karena ukuran
+                    tampilnya: kartu ini lebarnya sekitar 210px di laptop dan
+                    165px di telepon — di ukuran itu ilustrasi berdetail tidak
+                    terbaca, dan kelimanya muncul sekaligus di satu halaman.
+                    Kelimanya 0,8-0,9 KB. */}
+                <Image
+                  src={`/langkah/${l.gambar}.svg`}
+                  alt=""
+                  width={400}
+                  height={300}
+                  unoptimized
+                  className="mb-3 h-auto w-full rounded-xl"
+                />
+                <div className="flex items-center gap-2.5">
                   <span
-                    className={`angka flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+                    className={`angka flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
                       belumAktif ? "bg-line text-muted" : "bg-brand text-white"
                     }`}
                   >
                     {i + 1}
                   </span>
-                  <l.ikon
-                    className={`h-5 w-5 ${belumAktif ? "text-muted" : "text-brand"}`}
-                  />
+                  <h3 className="text-sm font-bold leading-snug">{l.judul}</h3>
                 </div>
-                <h3 className="mt-3 text-sm font-bold">{l.judul}</h3>
                 <p className="mt-1.5 text-xs leading-relaxed text-muted">{l.isi}</p>
               </li>
             );
@@ -411,7 +423,7 @@ export default async function Beranda() {
 
       {/* ── Sisi host ──────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
-        <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-[#0b2560] via-brand to-[#4d86ff] p-8 sm:p-12">
+        <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-ink via-brand-dark to-brand p-8 sm:p-12">
           <div className="max-w-2xl">
             <h2 className="font-display text-2xl font-bold tracking-tight text-white sm:text-3xl">
               Punya lahan? Pasang harganya sendiri.

@@ -707,6 +707,40 @@ Kerjakan berurutan. Jangan lompat.
     sedang tayang" dengan nol kartu lebih merugikan daripada tidak ada
     bagiannya sama sekali.
 
+34. **Ilustrasi per langkah** (9 Sep 2026). `public/langkah/`, dihasilkan
+    `skrip/buat-langkah.py`. Menggantikan ikon lucide di bagian "Cara
+    pakainya".
+
+    **SVG, bukan raster seperti kartu sorotan — dan alasannya ukuran
+    tampilnya.** Kartu langkah lebarnya sekitar 210px di laptop dan 142px di
+    telepon. Di ukuran itu ilustrasi berdetail tidak terbaca, dan yang bekerja
+    adalah satu bentuk tegas per kartu. Kelimanya 0,8-0,9 KB, dan kelima-
+    limanya muncul di satu halaman sekaligus — jadi berkas berat di sini
+    dikalikan lima.
+
+    Aturan turunannya: **kalau gambar tampil kecil, buat SVG; kalau ia
+    memenuhi lebar layar, ilustrasi raster boleh.** Bukan preferensi format,
+    melainkan konsekuensi ukuran.
+
+    Langkah kelima digambar **abu-abu** sengaja: ia langkah "Bayar — belum
+    aktif", dan kartunya memang dirender pudar. Ilustrasi berwarna di kartu
+    pudar akan terbaca sebagai kesalahan render.
+
+    Kisinya **dua kolom di telepon**, bukan satu. Lima kartu berilustrasi satu
+    kolom membuat bagian itu 1750px — orang berhenti menggulir sebelum sampai
+    langkah lima. Dua kolom: 807px, diukur.
+
+35. **Dua sisa palet biru** (9 Sep 2026). Ketemu saat memeriksa halaman depan
+    di layar, bukan dicari: blok ajakan host masih `from-[#0b2560] via-brand
+    to-[#4d86ff]` dan kilau sudut hero masih `#e6eeff`. Setelah brand jadi
+    terakota, gradiennya membaca biru → terakota — dua warna yang tidak
+    pernah ada bersama di palet mana pun.
+
+    Sekarang `from-ink via-brand-dark to-brand`, memakai token alih-alih hex
+    lepas. Pelajarannya: **saat mengganti warna merek, cari juga hex yang
+    ditulis lepas di `bg-[...]` dan `from-[...]`** — token ikut berubah
+    sendiri, hex lepas tidak.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris

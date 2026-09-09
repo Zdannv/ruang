@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Tanya dulu, gratis">
+  <!-- Dihasilkan `skrip/buat-langkah.py`. Jangan disunting langsung. -->
+  <rect width="400" height="300" rx="20" fill="#f6ead9"/>
+  
+  <g>
+    <path d="M52 66 h206 a20 20 0 0 1 20 20 v66 a20 20 0 0 1 -20 20 h-150 l-32 26 v-26 h-24
+             a20 20 0 0 1 -20 -20 v-66 a20 20 0 0 1 20 -20z" fill="#ffffff"/>
+    <g fill="#e8e2dc">
+      <rect x="78" y="96" width="150" height="13" rx="6.5"/>
+      <rect x="78" y="122" width="104" height="13" rx="6.5"/>
+    </g>
+  </g>
+  <g>
+    <path d="M348 152 h-158 a20 20 0 0 0 -20 20 v58 a20 20 0 0 0 20 20 h124 l34 26 v-26
+             a20 20 0 0 0 20 -20 v-58 a20 20 0 0 0 -20 -20z" fill="#a93b20"/>
+    <g fill="#ffffff" fill-opacity="0.85">
+      <rect x="192" y="180" width="132" height="13" rx="6.5"/>
+      <rect x="192" y="206" width="86" height="13" rx="6.5"/>
+    </g>
+  </g>
+</svg>
