@@ -672,6 +672,41 @@ Kerjakan berurutan. Jangan lompat.
     Hari ada orang membuat view serupa tanpa `security_invoker`, hak tulis
     yang menganggur itu langsung jadi jalan menembus RLS.
 
+33. **Halaman depan: contoh listing, bukan deret angka** (9 Sep 2026).
+
+    **Yang dibuang dari hero:** deret "N lahan tayang · N kecamatan · termurah
+    Rp X", dan kotak pencarian `CariCepat`.
+
+    Deret angka itu tidak menjawab pertanyaan yang sedang dipikirkan
+    pengunjung. Dengan dua lahan di database ia bahkan membaca sebagai
+    aplikasi yang kosong — dan tetap tidak berguna pada lima belas.
+
+    Kotak pencarian dipindah ke `/cari` saja: di halaman depan ia meminta
+    orang memilih titik dan radius **sebelum** mereka tahu isi aplikasinya
+    seperti apa. `CariCepat` ikut dihapus, bukan ditinggalkan mati —
+    `/cari` punya bilah kendalinya sendiri di `PencarianRuang`.
+
+    **Yang menggantikannya:** dua tombol di hero (Cari lahan / Sewakan
+    lahanku), lalu bagian **"Yang sedang tayang"** — kartu listing sungguhan
+    dari database, diambil `ruangContoh()`. Itu yang paling cepat menjawab
+    "isinya apa", jauh lebih cepat daripada angka. Di bawahnya ajakan bikin
+    akun.
+
+    Diambil **acak**, dan itu sementara: pilihannya nanti dikelola dari CMS
+    lewat kolom `unggulan`. Sampai itu ada, acak lebih baik daripada
+    "terbaru" — dengan lima belas lahan, "terbaru" berarti halaman depan
+    menampilkan tiga lahan yang sama sepanjang minggu. Diacak di aplikasi,
+    bukan database: PostgREST tidak punya `order by random()`, dan menambah
+    RPC demi ini berarti satu migrasi untuk sesuatu yang akan diganti CMS.
+
+    `KartuRuang` dapat prop **`tanpaJarak`**. Halaman depan tidak tahu di mana
+    pengunjungnya, dan "0 m" adalah angka yang SALAH — bukan angka yang
+    kosong. Dengan prop itu kartunya menampilkan kecamatan dan kota.
+
+    Bagian ini disembunyikan seluruhnya kalau belum ada isinya: judul "Yang
+    sedang tayang" dengan nol kartu lebih merugikan daripada tidak ada
+    bagiannya sama sekali.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris

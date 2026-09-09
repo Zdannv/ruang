@@ -34,7 +34,18 @@ import {
  * Yang ditampilkan berhenti di kecamatan; alamat lengkap baru terbuka nanti.
  * Jaraknya tetap persis, karena itu yang paling menentukan saat memilih.
  */
-export default function KartuRuang({ ruang }: { ruang: RuangDenganFoto }) {
+export default function KartuRuang({
+  ruang,
+  tanpaJarak = false,
+}: {
+  ruang: RuangDenganFoto;
+  /**
+   * Sembunyikan jaraknya. Dipakai halaman depan, yang tidak tahu di mana
+   * pengunjungnya — dan "0 m" adalah angka yang SALAH, bukan angka yang
+   * kosong.
+   */
+  tanpaJarak?: boolean;
+}) {
   const Ikon = IKON_TIPE[ruang.tipe];
   const banjirWaspada = banjirPerluPerhatian(ruang.riwayat_banjir);
 
@@ -101,7 +112,9 @@ export default function KartuRuang({ ruang }: { ruang: RuangDenganFoto }) {
         <p className="angka mt-1.5 flex items-center gap-1 text-[11px] text-muted sm:text-xs">
           <MapPin className="h-3 w-3 shrink-0 sm:h-3.5 sm:w-3.5" />
           <span className="truncate">
-            {ruang.kecamatan} · {jarak(ruang.jarak_km)}
+            {tanpaJarak
+              ? `${ruang.kecamatan}, ${ruang.kota}`
+              : `${ruang.kecamatan} · ${jarak(ruang.jarak_km)}`}
           </span>
         </p>
 

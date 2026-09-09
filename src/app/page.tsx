@@ -15,11 +15,11 @@ import {
   Wallet,
   Wrench,
 } from "lucide-react";
-import CariCepat from "@/components/CariCepat";
+import KartuRuang from "@/components/KartuRuang";
 import SorotanPromo from "@/components/SorotanPromo";
 import { IKON_TIPE } from "@/components/IkonTipe";
-import { LABEL_TIPE, rupiah } from "@/lib/label";
-import { getRingkasanPasar } from "@/lib/ringkasan";
+import { LABEL_TIPE } from "@/lib/label";
+import { getRingkasanPasar, ruangContoh } from "@/lib/ringkasan";
 import { klienServer } from "@/lib/supabase/server";
 import { supabaseSiap } from "@/lib/supabase/env";
 import type { TipeRuang } from "@/lib/ruang";
@@ -158,15 +158,18 @@ export default async function Beranda() {
   const db = supabaseSiap ? await klienServer() : null;
   // Sorotan tidak lagi mengambil foto ruang dari database — lihat
   // `SorotanPromo`. Satu kueri lebih sedikit di jalur kritis halaman depan.
-  const ringkas = db
-    ? await getRingkasanPasar(db)
-    : {
-        jumlahRuang: 0,
-        jumlahKecamatan: 0,
-        hargaTermurah: null,
-        jumlahPencari: 0,
-        kecamatanTeratas: [],
-      };
+  const [ringkas, contoh] = db
+    ? await Promise.all([getRingkasanPasar(db), ruangContoh(db, 4)])
+    : [
+        {
+          jumlahRuang: 0,
+          jumlahKecamatan: 0,
+          hargaTermurah: null,
+          jumlahPencari: 0,
+          kecamatanTeratas: [],
+        },
+        [],
+      ];
 
   return (
     <>
@@ -194,32 +197,32 @@ export default async function Beranda() {
               jualan — sewa lahan di pinggir jalan, tanpa beli tanah.
             </p>
 
-            <div className="mt-7">
-              <CariCepat />
+            {/* Kotak pencarian dulu di sini. Dipindah ke `/cari` saja: di
+                halaman depan ia meminta orang memilih titik dan radius sebelum
+                mereka tahu isi aplikasinya seperti apa. Yang menggantikannya
+                dua tombol, dan contoh listing di bawah. */}
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link
+                href="/cari"
+                className="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+              >
+                <Search className="h-4 w-4" />
+                Cari lahan
+              </Link>
+              <Link
+                href="/host/ruang/baru"
+                className="inline-flex items-center gap-2 rounded-full bg-card px-6 py-3 text-sm font-semibold text-ink ring-1 ring-line transition-colors hover:bg-paper"
+              >
+                Sewakan lahanku
+              </Link>
             </div>
 
-            {ringkas.jumlahRuang > 0 && (
-              <dl className="angka mt-7 flex flex-wrap items-end gap-x-8 gap-y-4">
-                <div>
-                  <dd className="font-display text-2xl font-bold">{ringkas.jumlahRuang}</dd>
-                  <dt className="text-xs text-muted">lahan tayang</dt>
-                </div>
-                <div>
-                  <dd className="font-display text-2xl font-bold">
-                    {ringkas.jumlahKecamatan}
-                  </dd>
-                  <dt className="text-xs text-muted">kecamatan</dt>
-                </div>
-                {ringkas.hargaTermurah != null && (
-                  <div>
-                    <dd className="font-display text-2xl font-bold">
-                      {rupiah(ringkas.hargaTermurah)}
-                    </dd>
-                    <dt className="text-xs text-muted">termurah per bulan</dt>
-                  </div>
-                )}
-              </dl>
-            )}
+            {/* Deret angka "N lahan tayang · N kecamatan · termurah Rp X"
+                dibuang 9 September 2026. Dengan dua lahan di database ia
+                membaca sebagai aplikasi yang kosong, dan bahkan dengan lima
+                belas ia tidak menjawab pertanyaan yang sedang dipikirkan
+                pengunjung. Yang menggantikannya contoh listing sungguhan di
+                bawah — itu yang benar-benar memberi tahu isinya seperti apa. */}
           </div>
 
           <div className="lg:pl-2">
@@ -227,6 +230,64 @@ export default async function Beranda() {
           </div>
         </div>
       </section>
+
+      {/* ── Contoh listing ─────────────────────────────────────────────────
+          Kartu listing sungguhan dari database, bukan gambar contoh. Ini yang
+          paling cepat menjawab "aplikasinya isinya apa" — jauh lebih cepat
+          daripada deret angka yang dulu ada di hero.
+
+          Disembunyikan seluruhnya kalau belum ada isinya: bagian berjudul
+          "Contoh lahan yang tayang" dengan nol kartu di bawahnya lebih
+          merugikan daripada tidak ada bagiannya sama sekali. */}
+      {contoh.length > 0 && (
+        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+              Yang sedang tayang
+            </h2>
+            <Link
+              href="/cari"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:text-brand-dark"
+            >
+              Lihat semua
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+            {contoh.map((r) => (
+              /* `tanpaJarak`: halaman depan tidak tahu di mana pengunjungnya,
+                 dan "0 m" adalah angka yang salah, bukan yang kosong. */
+              <KartuRuang key={r.id} ruang={r} tanpaJarak />
+            ))}
+          </div>
+
+          <div className="mt-8 rounded-2xl border border-line bg-card p-5 sm:flex sm:items-center sm:justify-between sm:gap-6">
+            <div className="min-w-0">
+              <p className="font-display text-lg font-bold tracking-tight">
+                Mau sewa salah satunya?
+              </p>
+              <p className="mt-1 text-sm leading-relaxed text-muted">
+                Bikin akun dulu — gratis, dan sekalian dipakai buat chat pemiliknya.
+              </p>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2 sm:mt-0 sm:shrink-0">
+              <Link
+                href="/daftar"
+                className="inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+              >
+                Daftar
+              </Link>
+              <Link
+                href="/masuk"
+                className="inline-flex items-center gap-2 rounded-full bg-paper px-5 py-2.5 text-sm font-semibold text-ink ring-1 ring-line transition-colors hover:bg-card"
+              >
+                Sudah punya akun
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── Buat siapa ─────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">

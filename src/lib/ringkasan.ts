@@ -8,6 +8,7 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { fotoPertama, type RuangDenganFoto } from "@/lib/ruang";
 
 export type RingkasanPasar = {
   jumlahRuang: number;
@@ -55,15 +56,64 @@ export async function getRingkasanPasar(db: SupabaseClient): Promise<RingkasanPa
 }
 
 /*
-  `ruangSorotan()` dan `KolaseSorotan` dibuang 8 September 2026.
+  `ruangSorotan()` dan `KolaseSorotan` dibuang 8 September 2026; sorotannya
+  sekarang dua ilustrasi (lihat `SorotanPromo`).
 
-  Keduanya menumpuk foto ruang sungguhan di hero halaman depan. Setelah data
-  contoh dihapus, yang tersisa tidak punya foto — dan komponennya memang
-  mengembalikan `null` kalau tidak ada foto, jadi bagian terbesar halaman depan
-  jadi kosong sama sekali tanpa ada yang menyadarinya.
-
-  Penggantinya `SorotanPromo`, yang menjelaskan aplikasinya. Kalau nanti sudah
-  ada belasan lahan berfoto sungguhan dan kolase foto mau dihidupkan lagi,
-  tulis ulang dengan sengaja — jangan hidupkan kembali kode mati yang sudah
-  tidak pernah diuji terhadap skema yang berubah tiga kali sejak itu.
+  `ruangContoh()` di bawah bukan pengembaliannya. Yang dulu itu menumpuk foto
+  jadi hero; yang ini menampilkan KARTU LISTING utuh di tengah halaman depan,
+  supaya pengunjung tahu bentuk isinya sebelum menekan apa pun.
 */
+
+/**
+ * Beberapa lahan tayang untuk dipamerkan di halaman depan.
+ *
+ * Diambil acak, dan itu memang keputusan sementara: nanti pilihannya dikelola
+ * dari CMS lewat kolom `unggulan`. Sampai itu ada, acak lebih baik daripada
+ * "terbaru" — dengan lima belas lahan pertama, "terbaru" berarti halaman
+ * depan menampilkan tiga lahan yang sama sepanjang minggu.
+ *
+ * Diacaknya di sini, bukan di database: PostgREST tidak punya `order by
+ * random()`, dan menambah fungsi RPC demi ini berarti satu migrasi untuk
+ * sesuatu yang akan diganti CMS.
+ *
+ * Tanpa `jarak_km`, karena halaman depan tidak tahu di mana pengunjungnya —
+ * lihat prop `tanpaJarak` di `KartuRuang`. Menampilkan "0 m" akan jadi angka
+ * yang salah, bukan angka yang kosong.
+ */
+export async function ruangContoh(
+  db: SupabaseClient,
+  jumlah = 4
+): Promise<RuangDenganFoto[]> {
+  try {
+    const { data, error } = await db
+      .from("ruang_publik")
+      .select(
+        "id, judul, tipe, kecamatan, kota, lat_publik, lng_publik, " +
+          "luas_m2, volume_m3, harga_bulanan, akses_masuk, riwayat_banjir, " +
+          "penguncian, kategori_diterima"
+      )
+      .order("dibuat_pada", { ascending: false })
+      // Ambil sekumpulan dulu, baru diacak — supaya yang tampil tidak selalu
+      // lahan terlama di database.
+      .limit(24);
+    if (error || !data || data.length === 0) return [];
+
+    const acak = [...(data as unknown as Omit<RuangDenganFoto, "foto" | "jarak_km">[])];
+    for (let i = acak.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [acak[i], acak[j]] = [acak[j], acak[i]];
+    }
+    const dipilih = acak.slice(0, jumlah);
+
+    const foto = await fotoPertama(db, dipilih.map((r) => r.id));
+    return dipilih.map((r) => ({
+      ...r,
+      luas_m2: r.luas_m2 ?? 0,
+      kategori_diterima: r.kategori_diterima ?? [],
+      jarak_km: 0,
+      foto: foto.get(r.id) ?? null,
+    })) as RuangDenganFoto[];
+  } catch {
+    return [];
+  }
+}
