@@ -6,6 +6,7 @@ import FormRuang from "@/components/host/FormRuang";
 import KelolaFoto from "@/components/host/KelolaFoto";
 import KelolaVideo from "@/components/host/KelolaVideo";
 import KelolaJendela from "@/components/host/KelolaJendela";
+import KelolaVerifikasi from "@/components/host/KelolaVerifikasi";
 import LencanaStatus from "@/components/LencanaStatus";
 import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
@@ -124,6 +125,18 @@ export default async function KelolaRuang({ params }: PageProps<"/host/ruang/[id
           ruangId={ruang.id}
           jendela={jendela}
           terbuka={pakaiLuas(ruang.tipe)}
+        />
+        {/* `?? "belum"` menjaga halaman ini tetap terbuka di database yang
+            belum menjalankan migrasi 20 — kolomnya belum ada di view, dan
+            halaman kelola tidak boleh mati karena penyempurnaan yang belum
+            dipasang. Pengajuannya sendiri tetap ditolak RPC di sana. */}
+        <KelolaVerifikasi
+          ruangId={ruang.id}
+          status={ruang.verifikasi ?? "belum"}
+          diajukanPada={ruang.verifikasi_diajukan_pada ?? null}
+          diputuskanPada={ruang.verifikasi_pada ?? null}
+          catatan={ruang.verifikasi_catatan ?? null}
+          adaFoto={foto.length > 0}
         />
         <FormRuang hostId={sesi.profil.id} ruangId={ruang.id} awal={isi} />
       </div>

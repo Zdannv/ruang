@@ -14,12 +14,27 @@ pihak luar, bukan karena sengaja dipalsukan.
    `04_pesan.sql`, `05_host.sql`, `06_akses.sql`, `07_advisor.sql`,
    `08_jendela.sql`, `09_notifikasi.sql`, `10_push.sql`, `11_pesan_chat.sql`,
    `12_balasan_cepat.sql`, `13_umkm.sql`, `14_foto_kecil.sql`, `16_wilayah_profil.sql`, `17_lahan_usaha.sql`, `18_video.sql`,
-   `19_rubrik_usaha.sql`.
+   `19_rubrik_usaha.sql`, `20_verifikasi.sql`.
    **Semuanya wajib.** Aplikasi membaca lewat view yang dibuat di `03`–`05`
    dan menulis lewat fungsi di `04`; tanpa itu layarnya menjawab "relation
    does not exist". `05` juga membuat bucket Storage `ruang-foto` beserta
    policy-nya, dan `18` membuat bucket `ruang-video` (batas 20 MB per berkas).
    Periksa keduanya ada di Storage setelah migrasinya jalan.
+
+   `20` menambahkan verifikasi lahan oleh petugas beserta peran adminnya.
+   **Tidak ada satu pun layar yang bisa mengangkat admin** — layar seperti itu
+   bisa dipakai mengangkat diri sendiri. Jadikan dirimu petugas lewat SQL
+   Editor, setelah akunmu terdaftar:
+
+   ```sql
+   update profil set admin = true
+    where user_id = (select id from auth.users where email = 'emailmu@contoh.id');
+   ```
+
+   Sesudah itu tautan **Verifikasi** muncul di header, dan `/admin/verifikasi`
+   bisa dibuka. Halaman itu memuat alamat lengkap dan nomor telepon pemilik —
+   memang dibutuhkan petugas untuk datang — dan gerbangnya ada di database,
+   bukan di layar.
 
    `19` yang paling berdampak ke layar: ia menambah rubrik lahan usaha
    (jenis usaha yang diizinkan, lebar muka jalan, listrik, air, atap, kelas

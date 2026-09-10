@@ -21,7 +21,16 @@ export default function FormMasuk() {
   // query, jadi keadaan awalnya bukan selalu kosong.
   const [galat, setGalat] = useState<string | null>(searchParams.get("galat"));
 
-  const lanjut = searchParams.get("lanjut") ?? "/";
+  /*
+    Setelah masuk, tujuannya `/cari` — bukan halaman depan.
+
+    Halaman depan tugasnya meyakinkan orang yang belum kenal aplikasinya.
+    Orang yang baru saja masuk sudah lewat tahap itu; mendaratkannya di sana
+    berarti ia harus menekan satu tautan lagi untuk sampai ke satu-satunya
+    hal yang ia datangi. `?lanjut=` tetap menang, karena itu tempat yang
+    memang ia tuju sebelum diminta masuk.
+  */
+  const lanjut = searchParams.get("lanjut") ?? "/cari";
 
   const masuk = async (e: React.FormEvent) => {
     e.preventDefault();

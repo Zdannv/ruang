@@ -256,10 +256,14 @@ export async function batalkanPemesanan(
   if (error) throw error;
 }
 
+/** Jumlah bulan yang ditagih untuk sekian hari — dibulatkan ke atas. */
+export function bulanDari(hari: number): number {
+  return hari > 0 ? Math.ceil(hari / 30) : 0;
+}
+
 /** Jumlah bulan yang ditagih — dibulatkan ke atas, sama seperti di database. */
 export function bulanSewa(mulai: string, selesai: string): number {
-  const hari = Math.round(
-    (new Date(selesai).getTime() - new Date(mulai).getTime()) / 86_400_000
+  return bulanDari(
+    Math.round((new Date(selesai).getTime() - new Date(mulai).getTime()) / 86_400_000)
   );
-  return hari > 0 ? Math.ceil(hari / 30) : 0;
 }

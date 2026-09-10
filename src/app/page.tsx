@@ -63,7 +63,7 @@ const SEGMEN = [
   {
     gambar: "jasa",
     judul: "Jasa harian",
-    isi: "Cuci motor, tambal ban, laundry kiloan, potong rambut. Lahan kecil, pelanggan tetap.",
+    isi: "Cuci motor, tambal ban, tukang kunci. Lahan kecil di pinggir jalan, pelanggan tetap.",
     tautan: "/cari?tipe=lahan_kosong&radius=10",
     ajakan: "Cari lahan kosong",
   },

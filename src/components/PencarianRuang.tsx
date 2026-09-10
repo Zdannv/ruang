@@ -314,7 +314,7 @@ export default function PencarianRuang() {
           // saat penyaring ini menyala. Menampilkannya berarti pedagang membuka
           // lahan yang belum tentu selebar yang ia minta — dan yang ia minta
           // adalah satu-satunya alasan ia menyalakan penyaringnya.
-          (mukaMin === 0 || Number(r.lebar_muka_m ?? 0) >= mukaMin)
+          (mukaMin === 0 || Number(r.lebar_muka_m ?? r.lebar_m ?? 0) >= mukaMin)
       ),
     [semua, tipe, kategori, usaha, mukaMin]
   );
@@ -348,7 +348,12 @@ export default function PencarianRuang() {
   const usahaTersedia = useMemo(() => {
     const ada = new Set(semua.flatMap((r) => r.usaha_diizinkan));
     if (usaha) ada.add(usaha);
-    return Object.keys(LABEL_USAHA).filter((u) => ada.has(u));
+    const dikenal = Object.keys(LABEL_USAHA).filter((u) => ada.has(u));
+    // Pemilik boleh menulis jenis usahanya sendiri, dan yang ditulis itu ikut
+    // jadi penyaring — kalau tidak, satu-satunya lahan yang mengizinkan
+    // "warung kopi" tidak bisa ditemukan lewat penyaring apa pun.
+    const sendiri = [...ada].filter((u) => !(u in LABEL_USAHA)).sort();
+    return [...dikenal, ...sendiri];
   }, [semua, usaha]);
 
   // Penyaring lebar muka hanya berguna kalau memang ada lahan terbuka di
@@ -674,7 +679,7 @@ export default function PencarianRuang() {
                         onClick={() => ubah({ usaha: aktif ? null : kode })}
                         className={`${PIL} ${aktif ? PIL_AKTIF : PIL_MATI} whitespace-nowrap`}
                       >
-                        {LABEL_USAHA[kode]}
+                        {LABEL_USAHA[kode] ?? kode}
                       </button>
                     );
                   })}
@@ -689,8 +694,7 @@ export default function PencarianRuang() {
                 Lebar muka jalan
               </h3>
               <p className="mt-1 text-xs text-muted">
-                Yang menghadap jalan, bukan luas totalnya. Lahan yang lebar mukanya
-                belum diisi pemilik tidak ikut ditampilkan saat penyaring ini menyala.
+                Sisi yang menghadap jalan, bukan luas totalnya.
               </p>
               <div className="geser-x -mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
                 <div className="flex w-max gap-2 pb-1 sm:w-auto sm:flex-wrap">

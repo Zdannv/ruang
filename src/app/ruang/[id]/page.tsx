@@ -118,7 +118,7 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
     seolah lahannya berdinding.
   */
   const terbuka = pakaiLuas(ruang.tipe);
-  const muka = lebarMuka(ruang.lebar_muka_m);
+  const muka = lebarMuka(ruang.lebar_muka_m ?? ruang.lebar_m);
 
   const skorRata =
     ulasan.length > 0
@@ -150,6 +150,12 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
                 <IkonTipe className="h-3.5 w-3.5" />
                 {LABEL_TIPE[ruang.tipe]}
               </span>
+              {ruang.tempat_terverifikasi && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-good px-3 py-1 text-xs font-semibold text-white">
+                  <BadgeCheck className="h-3.5 w-3.5" />
+                  Terverifikasi petugas
+                </span>
+              )}
               {ruang.berbagi === "eksklusif" && (
                 <span className="rounded-full bg-good-soft px-3 py-1 text-xs font-semibold text-good">
                   Dipakai sendiri
@@ -450,6 +456,33 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
               </p>
             </div>
           </section>
+
+          {/*
+            Lencana verifikasi WAJIB disertai batasnya, dan batasnya sempit.
+            Yang diperiksa cuma kecocokan keterangan dengan kenyataan pada
+            satu hari. Tanpa kalimat ini, "terverifikasi" akan dibaca sebagai
+            "dijamin aman" — persis kalimat yang dilarang di CLAUDE.md, hanya
+            saja disimpulkan sendiri oleh pembacanya.
+          */}
+          {ruang.tempat_terverifikasi && (
+            <section className="mt-8">
+              <div className="flex items-start gap-3 rounded-2xl bg-good-soft p-5">
+                <BadgeCheck className="mt-0.5 h-5 w-5 shrink-0 text-good" />
+                <div>
+                  <p className="text-sm font-semibold text-good">
+                    Petugas kami sudah datang ke lahan ini
+                    {ruang.verifikasi_pada ? ` pada ${tanggal(ruang.verifikasi_pada)}` : ""}
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-good/85">
+                    Yang dicek: keterangan di halaman ini cocok dengan keadaan di
+                    lokasi — ukuran, foto, dan akses jalannya. Itu saja. Lencana
+                    ini bukan jaminan keamanan dan bukan asuransi; kalau ada
+                    sengketa, platform menengahi tapi tidak memberi ganti rugi.
+                  </p>
+                </div>
+              </div>
+            </section>
+          )}
 
           {/* ── Lokasi ─────────────────────────────────────────────────────── */}
           <section className="mt-8">

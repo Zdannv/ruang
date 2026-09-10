@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { klienBrowser } from "@/lib/supabase/browser";
+import { InputAngka } from "@/components/host/Kolom";
 import {
   buatPemesanan,
   bulanSewa,
@@ -24,7 +25,16 @@ function tambahHari(iso: string, hari: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-type Baris = BarisManifesBaru & { kunci: number };
+/*
+  Jumlah dan taksiran nilainya boleh KOSONG selama diketik — lihat
+  `InputAngka`. Yang dikirim ke database tetap angka; penerjemahannya di
+  `kirimkan()`, bukan di tiap ketikan.
+*/
+type Baris = Omit<BarisManifesBaru, "jumlah" | "taksiran_nilai"> & {
+  kunci: number;
+  jumlah: number | null;
+  taksiran_nilai: number | null;
+};
 
 export default function FormPesan({ ruang }: { ruang: RuangUntukPesan }) {
   const router = useRouter();
@@ -59,7 +69,7 @@ export default function FormPesan({ ruang }: { ruang: RuangUntukPesan }) {
   const total = bulan * ruang.harga_bulanan;
   const kurangDariMinimum = hari > 0 && hari < ruang.durasi_min_hari;
 
-  const ubahBaris = (kunci: number, patch: Partial<BarisManifesBaru>) =>
+  const ubahBaris = (kunci: number, patch: Partial<Baris>) =>
     setBaris((b) => b.map((x) => (x.kunci === kunci ? { ...x, ...patch } : x)));
 
   const kirimkan = async (e: React.FormEvent) => {
@@ -75,8 +85,10 @@ export default function FormPesan({ ruang }: { ruang: RuangUntukPesan }) {
           .map((x) => ({
             nama: x.nama.trim(),
             kategori: x.kategori,
-            jumlah: x.jumlah,
-            taksiran_nilai: x.taksiran_nilai,
+            // Kosong dibaca satu, bukan nol: baris manifes yang jumlahnya nol
+            // adalah baris yang tidak berarti apa-apa.
+            jumlah: x.jumlah ?? 1,
+            taksiran_nilai: x.taksiran_nilai ?? 0,
           }));
     if (terbuka && usaha === "") {
       setGalat("Pilih dulu jenis usaha yang mau kamu jalankan di lahan ini.");
@@ -260,14 +272,11 @@ export default function FormPesan({ ruang }: { ruang: RuangUntukPesan }) {
                           <label htmlFor={`jumlah-${b.kunci}`} className="sr-only">
                             Jumlah barang {i + 1}
                           </label>
-                          <input
+                          <InputAngka
                             id={`jumlah-${b.kunci}`}
-                            type="number"
                             min={1}
-                            value={b.jumlah}
-                            onChange={(e) =>
-                              ubahBaris(b.kunci, { jumlah: Number(e.target.value) || 1 })
-                            }
+                            nilai={b.jumlah}
+                            onNilai={(n) => ubahBaris(b.kunci, { jumlah: n })}
                             className="angka w-20 rounded-lg bg-card px-3 py-2 text-sm ring-1 ring-line focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                           />
                         </div>
@@ -290,15 +299,12 @@ export default function FormPesan({ ruang }: { ruang: RuangUntukPesan }) {
                     <label htmlFor={`nilai-${b.kunci}`} className="text-xs text-muted">
                       Taksiran nilai (opsional)
                     </label>
-                    <input
+                    <InputAngka
                       id={`nilai-${b.kunci}`}
-                      type="number"
                       min={0}
                       step={50000}
-                      value={b.taksiran_nilai}
-                      onChange={(e) =>
-                        ubahBaris(b.kunci, { taksiran_nilai: Number(e.target.value) || 0 })
-                      }
+                      nilai={b.taksiran_nilai}
+                      onNilai={(n) => ubahBaris(b.kunci, { taksiran_nilai: n })}
                       className="angka mt-1 w-40 rounded-lg bg-card px-3 py-2 text-sm ring-1 ring-line focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                     />
                   </div>

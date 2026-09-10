@@ -3,9 +3,16 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Crosshair, Loader2, Trash2 } from "lucide-react";
-import { Bagian, Kolom, KotakCentangGanda, Pilihan } from "@/components/host/Kolom";
+import {
+  Bagian,
+  Kolom,
+  KolomAngka,
+  KotakCentangGanda,
+  Pilihan,
+} from "@/components/host/Kolom";
 import PilihWilayah from "@/components/host/PilihWilayah";
 import { klienBrowser } from "@/lib/supabase/browser";
+import { bulanDari } from "@/lib/pemesanan";
 import { buatRuang, hapusRuang, ubahRuang, type IsiRuang } from "@/lib/host";
 import {
   LABEL_AKSES,
@@ -213,13 +220,77 @@ export default function FormRuang({
       setGalat("Lengkapi wilayahnya sampai kelurahan.");
       return;
     }
+    /*
+      Kolom angka boleh KOSONG di layar (lihat `KolomAngka`), padahal
+      kolomnya NOT NULL di database. Yang menahannya di sini, bukan tipe
+      datanya — dan yang kosong dijawab dengan nama kolomnya, bukan dengan
+      "ada isian yang belum lengkap" yang membuat orang menyisir formulir
+      sepanjang ini satu per satu.
+    */
+    const wajib: [string, number | null][] = [
+      ["Lebar", isi.lebar_m],
+      ["Panjang", isi.panjang_m],
+      ...(terbuka
+        ? []
+        : ([
+            ["Tinggi", isi.tinggi_m],
+            ["Lebar pintu", isi.lebar_pintu_cm],
+            ["Tinggi lantai dari tanah", isi.tinggi_lantai_cm],
+          ] as [string, number | null][])),
+      ["Sewa minimum", isi.durasi_min_hari],
+      ["Sewa per bulan", isi.harga_bulanan],
+    ];
+    const kosong = wajib.find(([, v]) => v == null);
+    if (kosong) {
+      setGalat(`"${kosong[0]}" belum diisi.`);
+      return;
+    }
+    /*
+      Batas bawahnya diperiksa di sini, bukan lewat atribut `min`.
+      `KolomAngka` merender kotak teks — supaya "2," bisa diketik dan koma
+      bisa dipakai sebagai pemisah desimal — dan peramban tidak memeriksa
+      `min` pada kotak teks. Database menolaknya juga lewat check constraint,
+      tapi galat dari sana sampai ke layar sebagai pesan Postgres.
+    */
+    const nol = ([
+      ["Lebar", isi.lebar_m],
+      ["Panjang", isi.panjang_m],
+      ["Sewa minimum", isi.durasi_min_hari],
+      ...(terbuka ? [] : [["Tinggi", isi.tinggi_m] as [string, number | null]]),
+    ] as [string, number | null][]).find(([, v]) => (v ?? 0) <= 0);
+    if (nol) {
+      setGalat(`"${nol[0]}" harus lebih dari nol.`);
+      return;
+    }
+
+    /*
+      Yang dikirim ke database, dengan yang boleh kosong diterjemahkan ke
+      nilai yang benar — bukan dibiarkan null menabrak NOT NULL.
+
+      `tinggi_m` dan `tinggi_lantai_cm` untuk lahan terbuka tidak pernah
+      ditanyakan: yang pertama karena lahan diukur luas bukan volume, yang
+      kedua karena riwayat banjir sudah menjawab hal yang sama tanpa alat
+      ukur. Keduanya dikirim sebagai angka yang tidak menyesatkan, dan
+      layar detail memang tidak menampilkan keduanya untuk tipe ini.
+    */
+    const payload: IsiRuang = {
+      ...isi,
+      tinggi_m: terbuka ? 2.5 : isi.tinggi_m,
+      lebar_pintu_cm: terbuka ? 0 : isi.lebar_pintu_cm,
+      tinggi_lantai_cm: terbuka ? 0 : isi.tinggi_lantai_cm,
+      deposit: isi.deposit ?? 0,
+      // Lebar muka jalan tidak ditanyakan lagi; untuk lahan terbuka ia sama
+      // dengan sisi yang menghadap jalan, yaitu `lebar_m`.
+      lebar_muka_m: terbuka ? isi.lebar_m : null,
+    };
+
     setKirim(true);
     setGalat(null);
     setTersimpan(false);
     try {
       const db = klienBrowser();
       if (ruangId) {
-        await ubahRuang(db, ruangId, isi);
+        await ubahRuang(db, ruangId, payload);
         // Versi sebelumnya memanggil `router.replace` ke alamat yang SEDANG
         // dibuka. Itu bukan perpindahan halaman, jadi komponennya tidak pernah
         // dilepas — dan karena `setKirim(false)` cuma ada di cabang galat,
@@ -229,7 +300,7 @@ export default function FormRuang({
         setTersimpan(true);
         router.refresh();
       } else {
-        const id = await buatRuang(db, hostId, isi);
+        const id = await buatRuang(db, hostId, payload);
         if (onDibuat) {
           // Tidak ada perpindahan halaman di jalur ini, jadi pemintalnya harus
           // dimatikan sendiri — persis jenis kelalaian yang dulu membuat
@@ -386,49 +457,62 @@ export default function FormRuang({
         </div>
       </Bagian>
 
+      {/*
+        Untuk lahan terbuka, LEBAR adalah lebar muka jalan — dan itu sebabnya
+        tidak ada isian "lebar muka jalan" tersendiri.
+
+        Sempat ada, dan dibuang 10 September 2026 karena formulirnya terlalu
+        panjang: pemiliknya harus mengukur satu angka lagi untuk sesuatu yang
+        sudah ia sebutkan. Aturan di CLAUDE.md sudah menyebutnya — kalau
+        sebuah keterangan bisa diturunkan dari kolom yang ada, turunkan,
+        jangan simpan salinannya. Yang berubah cuma labelnya, dan justru itu
+        yang membuat angkanya berarti: "lebar 3 m" jadi jawaban atas
+        pertanyaan yang benar-benar dipikirkan pedagang.
+      */}
       <Bagian
         judul="Ukuran"
         keterangan={
           terbuka
-            ? `Luasnya dihitung otomatis: ${luas(isi.panjang_m * isi.lebar_m)}. Tingginya tidak ditanyakan — untuk lahan terbuka yang berarti luas, bukan volume.`
+            ? `Kira-kira saja, tidak perlu diukur pita. Luasnya dihitung otomatis: ${luas(
+                (isi.panjang_m ?? 0) * (isi.lebar_m ?? 0)
+              )}.`
             : `Luas dan volume dihitung otomatis: ${luas(
-                isi.panjang_m * isi.lebar_m
-              )} · ${volume(isi.panjang_m * isi.lebar_m * isi.tinggi_m)}`
+                (isi.panjang_m ?? 0) * (isi.lebar_m ?? 0)
+              )} · ${volume((isi.panjang_m ?? 0) * (isi.lebar_m ?? 0) * (isi.tinggi_m ?? 0))}`
         }
       >
-        <Kolom
-          id="panjang"
-          label="Panjang"
-          type="number"
-          step="0.1"
-          min="0.5"
-          required
-          satuan="m"
-          value={isi.panjang_m}
-          onChange={(e) => ubah("panjang_m", angka(e.target.value))}
-        />
-        <Kolom
+        <KolomAngka
           id="lebar"
-          label="Lebar"
-          type="number"
+          label={terbuka ? "Lebar muka jalan" : "Lebar"}
           step="0.1"
           min="0.5"
           required
           satuan="m"
-          value={isi.lebar_m}
-          onChange={(e) => ubah("lebar_m", angka(e.target.value))}
+          nilai={isi.lebar_m}
+          onNilai={(n) => ubah("lebar_m", n)}
+          bantuan={terbuka ? "Sisi yang menghadap jalan." : undefined}
+        />
+        <KolomAngka
+          id="panjang"
+          label={terbuka ? "Panjang ke dalam" : "Panjang"}
+          step="0.1"
+          min="0.5"
+          required
+          satuan="m"
+          nilai={isi.panjang_m}
+          onNilai={(n) => ubah("panjang_m", n)}
+          bantuan={terbuka ? "Dari pinggir jalan sampai batas yang disewakan." : undefined}
         />
         {!terbuka && (
-          <Kolom
+          <KolomAngka
             id="tinggi"
             label="Tinggi"
-            type="number"
             step="0.1"
             min="0.5"
             required
             satuan="m"
-            value={isi.tinggi_m}
-            onChange={(e) => ubah("tinggi_m", angka(e.target.value))}
+            nilai={isi.tinggi_m}
+            onNilai={(n) => ubah("tinggi_m", n)}
           />
         )}
       </Bagian>
@@ -459,15 +543,14 @@ export default function FormRuang({
               }
               opsi={opsi(LABEL_POSISI)}
             />
-            <Kolom
+            <KolomAngka
               id="pintu"
               label="Lebar pintu"
-              type="number"
               min="30"
               required
               satuan="cm"
-              value={isi.lebar_pintu_cm}
-              onChange={(e) => ubah("lebar_pintu_cm", angka(e.target.value))}
+              nilai={isi.lebar_pintu_cm}
+              onNilai={(n) => ubah("lebar_pintu_cm", n)}
               bantuan="Ukur bagian tersempit yang harus dilewati barang."
             />
           </>
@@ -510,21 +593,29 @@ export default function FormRuang({
           opsi={opsi(LABEL_BANJIR)}
           bantuan="Ini ditampilkan menonjol di kartu hasil. Menyembunyikannya cuma menunda pembatalan."
         />
-        <Kolom
-          id="tinggilantai"
-          label={terbuka ? "Tinggi lahan dari jalan" : "Tinggi lantai dari tanah"}
-          type="number"
-          min="0"
-          required
-          satuan="cm"
-          value={isi.tinggi_lantai_cm}
-          onChange={(e) => ubah("tinggi_lantai_cm", angka(e.target.value))}
-          bantuan={
-            terbuka
-              ? "0 kalau rata dengan jalan. Lahan yang lebih tinggi lebih aman saat jalan tergenang."
-              : undefined
-          }
-        />
+        {/*
+          "Tinggi lahan dari jalan" dibuang untuk lahan terbuka, 10 September
+          2026. Ia menuntut pengukuran dalam sentimeter untuk sesuatu yang
+          hampir selalu nol atau satu anak tangga, dan pemiliknya berhenti
+          mengisi formulir di situ. Riwayat banjir di sebelahnya sudah
+          menjawab pertanyaan yang sama — apakah lahannya aman saat jalan
+          tergenang — dan itu bisa dijawab tanpa alat ukur.
+
+          Untuk ruang tertutup ia TETAP: di sana ia soal air yang masuk ke
+          barang orang lain, dan lantai 20 cm di atas tanah adalah keterangan
+          yang benar-benar dipakai penyewa memutuskan.
+        */}
+        {!terbuka && (
+          <KolomAngka
+            id="tinggilantai"
+            label="Tinggi lantai dari tanah"
+            min="0"
+            required
+            satuan="cm"
+            nilai={isi.tinggi_lantai_cm}
+            onNilai={(n) => ubah("tinggi_lantai_cm", n)}
+          />
+        )}
       </Bagian>
 
       <Bagian judul="Keamanan dan pemakaian">
@@ -555,6 +646,8 @@ export default function FormRuang({
             opsi={opsi(LABEL_PENGAWASAN)}
             nilai={isi.pengawasan}
             onChange={(v) => ubah("pengawasan", v)}
+            bolehLain
+            contohLain="mis. ada pos ronda depan gang"
           />
         </div>
         <div className="sm:col-span-2">
@@ -563,6 +656,8 @@ export default function FormRuang({
             opsi={opsi(LABEL_FASILITAS)}
             nilai={isi.fasilitas}
             onChange={(v) => ubah("fasilitas", v)}
+            bolehLain
+            contohLain="mis. kamar mandi boleh dipakai"
           />
         </div>
       </Bagian>
@@ -570,7 +665,7 @@ export default function FormRuang({
       {terbuka && (
         <Bagian
           judul="Lahan usaha"
-          keterangan="Enam hal yang paling menentukan bagi pedagang. Jenis usaha yang tidak kamu centang otomatis ditolak sistem sebelum permintaannya sampai ke kamu — termasuk yang menggoreng."
+          keterangan="Jenis usaha yang tidak kamu centang otomatis ditolak sistem sebelum permintaannya sampai ke kamu — termasuk yang menggoreng. Lebar muka jalannya sudah diisi di bagian Ukuran."
         >
           <div className="sm:col-span-2">
             <KotakCentangGanda
@@ -578,21 +673,10 @@ export default function FormRuang({
               opsi={opsi(LABEL_USAHA)}
               nilai={isi.usaha_diizinkan}
               onChange={(v) => ubah("usaha_diizinkan", v)}
+              bolehLain
+              contohLain="mis. jual pulsa, warung kopi"
             />
           </div>
-          <Kolom
-            id="lebar_muka"
-            label="Lebar muka jalan"
-            type="number"
-            min="0.5"
-            step="0.5"
-            satuan="m"
-            value={isi.lebar_muka_m ?? ""}
-            onChange={(e) =>
-              ubah("lebar_muka_m", e.target.value === "" ? null : angka(e.target.value))
-            }
-            bantuan="Yang menghadap jalan, bukan luasnya. Ini ukuran yang dipikirkan pedagang."
-          />
           <Pilihan
             id="kelas_jalan"
             label="Kelas jalan"
@@ -639,64 +723,70 @@ export default function FormRuang({
               opsi={opsi(LABEL_KATEGORI)}
               nilai={isi.kategori_diterima}
               onChange={(v) => ubah("kategori_diterima", v)}
+              bolehLain
+              contohLain="mis. alat musik"
             />
           </div>
         )}
-        <Kolom
+        <KolomAngka
           id="kuota"
           label={terbuka ? "Kuota kedatangan per bulan" : "Kuota kunjungan per bulan"}
-          type="number"
           min="1"
           satuan="x"
-          value={isi.kuota_akses_bulanan ?? ""}
-          onChange={(e) =>
-            ubah("kuota_akses_bulanan", e.target.value === "" ? null : angka(e.target.value))
-          }
+          nilai={isi.kuota_akses_bulanan}
+          onNilai={(n) => ubah("kuota_akses_bulanan", n)}
           bantuan={
             terbuka
               ? "Biarkan kosong — pedagang jualan setiap hari, bukan datang beberapa kali sebulan."
               : "Kosongkan untuk tanpa batas."
           }
         />
-        <Kolom
+        <KolomAngka
           id="durasi"
           label="Sewa minimum"
-          type="number"
           min="1"
           required
           satuan="hari"
-          value={isi.durasi_min_hari}
-          onChange={(e) => ubah("durasi_min_hari", angka(e.target.value))}
+          nilai={isi.durasi_min_hari}
+          onNilai={(n) => ubah("durasi_min_hari", n)}
         />
       </Bagian>
 
+      {/*
+        Keterangannya dulu berbunyi "yang sewa 3 bulan membayar ...", dan tiga
+        bulan itu angka karangan — tidak ada apa pun di aplikasi ini yang
+        mewajibkannya. Sekarang yang dipakai sewa MINIMUM yang pemiliknya
+        sendiri tetapkan sebaris di atas, jadi angkanya benar-benar berlaku.
+      */}
       <Bagian
         judul="Harga"
-        keterangan={`${terbuka ? "Pedagang" : "Penyewa"} yang sewa 3 bulan membayar ${rupiah(
-          isi.harga_bulanan * 3
-        )} sewa${isi.deposit > 0 ? `, plus deposit ${rupiah(isi.deposit)}` : ""}.`}
+        keterangan={
+          isi.harga_bulanan && isi.durasi_min_hari
+            ? `Sewa minimum ${isi.durasi_min_hari} hari berarti ${rupiah(
+                isi.harga_bulanan * bulanDari(isi.durasi_min_hari)
+              )}${isi.deposit ? `, plus deposit ${rupiah(isi.deposit)}` : ""}.`
+            : "Bulan dibulatkan ke atas: sewa 45 hari dihitung dua bulan."
+        }
       >
-        <Kolom
+        <KolomAngka
           id="harga"
           label="Sewa per bulan"
-          type="number"
           min="0"
           step="10000"
           required
           satuan="Rp"
-          value={isi.harga_bulanan}
-          onChange={(e) => ubah("harga_bulanan", angka(e.target.value))}
+          nilai={isi.harga_bulanan}
+          onNilai={(n) => ubah("harga_bulanan", n)}
         />
-        <Kolom
+        <KolomAngka
           id="deposit"
           label="Deposit"
-          type="number"
           min="0"
           step="10000"
           satuan="Rp"
-          value={isi.deposit}
-          onChange={(e) => ubah("deposit", angka(e.target.value))}
-          bantuan="Dikembalikan di akhir sewa. Isi 0 kalau tidak ada."
+          nilai={isi.deposit}
+          onNilai={(n) => ubah("deposit", n)}
+          bantuan="Dikembalikan di akhir sewa. Kosongkan kalau tidak ada."
         />
         <Pilihan
           id="status"

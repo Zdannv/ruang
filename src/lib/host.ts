@@ -22,10 +22,19 @@ import type {
   TipeRuang,
 } from "@/lib/ruang";
 import { AKHIRAN_KECIL } from "@/lib/ruang";
+import type { StatusVerifikasi } from "@/lib/verifikasi";
 
 export type StatusRuang = "draf" | "moderasi" | "tayang" | "ditangguhkan";
 
-/** Isi formulir ruang. Sama persis dengan kolom yang boleh ditulis host. */
+/**
+ * Isi formulir ruang. Sama persis dengan kolom yang boleh ditulis host.
+ *
+ * Kolom angkanya `number | null`, padahal di database semuanya NOT NULL.
+ * Itu disengaja: kolom angka yang tidak boleh kosong TIDAK BISA dikosongkan
+ * di layar — begitu karakter terakhir dihapus, nol muncul sendiri dan tidak
+ * bisa dibuang lagi. Lihat `KolomAngka`. Yang menjaga nilainya tetap ada
+ * adalah pemeriksaan sebelum kirim, bukan tipe datanya.
+ */
 export type IsiRuang = {
   judul: string;
   tipe: TipeRuang;
@@ -38,17 +47,17 @@ export type IsiRuang = {
   lat: number;
   lng: number;
   terbuka_alamat: boolean;
-  panjang_m: number;
-  lebar_m: number;
-  tinggi_m: number;
+  panjang_m: number | null;
+  lebar_m: number | null;
+  tinggi_m: number | null;
   akses_masuk: AksesMasuk;
   posisi_lantai: PosisiLantai;
-  lebar_pintu_cm: number;
+  lebar_pintu_cm: number | null;
   jarak_parkir: JarakParkir;
   kondisi_bangunan: KondisiBangunan;
   kelembapan: Kelembapan;
   riwayat_banjir: RiwayatBanjir;
-  tinggi_lantai_cm: number;
+  tinggi_lantai_cm: number | null;
   penguncian: Penguncian;
   berbagi: Berbagi;
   pengawasan: string[];
@@ -64,13 +73,38 @@ export type IsiRuang = {
   kelas_jalan: string | null;
   /** NULL berarti tanpa batas — yang benar untuk lahan usaha. */
   kuota_akses_bulanan: number | null;
-  durasi_min_hari: number;
-  harga_bulanan: number;
-  deposit: number;
+  durasi_min_hari: number | null;
+  harga_bulanan: number | null;
+  deposit: number | null;
   status: StatusRuang;
 };
 
-export type RuangSaya = IsiRuang & {
+/**
+ * Satu baris `ruang_saya`.
+ *
+ * Kolom angkanya dipulihkan jadi `number`: yang boleh kosong itu ISIAN di
+ * layar, bukan datanya — di database semuanya NOT NULL, jadi baris yang
+ * datang dari sana tidak pernah punya lubang.
+ */
+export type RuangSaya = Omit<
+  IsiRuang,
+  | "panjang_m"
+  | "lebar_m"
+  | "tinggi_m"
+  | "lebar_pintu_cm"
+  | "tinggi_lantai_cm"
+  | "durasi_min_hari"
+  | "harga_bulanan"
+  | "deposit"
+> & {
+  panjang_m: number;
+  lebar_m: number;
+  tinggi_m: number;
+  lebar_pintu_cm: number;
+  tinggi_lantai_cm: number;
+  durasi_min_hari: number;
+  harga_bulanan: number;
+  deposit: number;
   id: string;
   /**
    * Label tampilan yang DIHASILKAN dari tabel `jendela_akses` oleh trigger.
@@ -85,6 +119,12 @@ export type RuangSaya = IsiRuang & {
   jumlah_foto: number;
   permintaan_baru: number;
   sedang_terpakai: number;
+  /* Migrasi 20. Kolomnya tidak pernah bisa ditulis dari sini — lihat
+     `src/lib/verifikasi.ts`. */
+  verifikasi: StatusVerifikasi;
+  verifikasi_diajukan_pada: string | null;
+  verifikasi_pada: string | null;
+  verifikasi_catatan: string | null;
 };
 
 export async function daftarRuangSaya(db: SupabaseClient): Promise<RuangSaya[]> {

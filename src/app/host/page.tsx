@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { Camera, Inbox, Plus, Store, TrendingUp } from "lucide-react";
+import { BadgeCheck, Camera, Inbox, Plus, Store, TrendingUp } from "lucide-react";
 import LencanaStatus from "@/components/LencanaStatus";
 import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
@@ -155,7 +155,7 @@ export default async function DasborHost() {
           </p>
           <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted">
             Yang menyewa biasanya pedagang makanan dan minuman, kopi keliling yang
-            capek pindah-pindah, laundry kiloan, atau tukang cuci motor. Ruang
+            capek pindah-pindah, jualan buah, atau tukang tambal ban. Ruang
             tertutup — garasi, gudang, lantai ruko — juga tetap bisa didaftarkan di
             sini.
           </p>
@@ -177,7 +177,20 @@ export default async function DasborHost() {
               >
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold leading-snug">{r.judul}</p>
+                    <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-semibold leading-snug">
+                      {r.judul}
+                      {r.verifikasi === "terverifikasi" && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-good-soft px-2 py-0.5 text-[11px] font-semibold text-good">
+                          <BadgeCheck className="h-3 w-3" />
+                          Terverifikasi
+                        </span>
+                      )}
+                      {r.verifikasi === "diajukan" && (
+                        <span className="rounded-full bg-brand-soft px-2 py-0.5 text-[11px] font-semibold text-brand-dark">
+                          Menunggu petugas
+                        </span>
+                      )}
+                    </p>
                     <p className="angka mt-1 text-xs text-muted">
                       {LABEL_TIPE[r.tipe]} · {r.kecamatan}, {r.kota} ·{" "}
                       {/* Satuan ikut tipenya: "0,60 m³" untuk halaman depan

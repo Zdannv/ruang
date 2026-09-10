@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2 } from "lucide-react";
-import { Kolom, Pilihan } from "@/components/host/Kolom";
+import { Kolom, KolomAngka, Pilihan } from "@/components/host/Kolom";
 import PilihWilayah from "@/components/host/PilihWilayah";
 import { klienBrowser } from "@/lib/supabase/browser";
 import {
@@ -26,7 +26,18 @@ export default function FormPermintaan({
   milikSaya: PermintaanRuang[];
 }) {
   const router = useRouter();
-  const [isi, setIsi] = useState<IsiPermintaan>({
+  /*
+    Kedua kolom angkanya boleh KOSONG selama diisi — lihat `KolomAngka`.
+    Kalau induknya memaksa mereka jadi angka (`?? 0`), nol yang barusan
+    dihapus muncul kembali seketika, dan itu persis keluhan yang membuat
+    komponen itu dibuat.
+  */
+  const [isi, setIsi] = useState<
+    Omit<IsiPermintaan, "volume_m3" | "harga_maks"> & {
+      volume_m3: number | null;
+      harga_maks: number | null;
+    }
+  >({
     kecamatan: "",
     kota: "",
     volume_m3: 10,
@@ -44,10 +55,18 @@ export default function FormPermintaan({
       setGalat("Pilih kecamatan yang kamu cari.");
       return;
     }
+    if (isi.volume_m3 == null || isi.harga_maks == null) {
+      setGalat("Isi ukuran minimum dan anggaran maksimumnya.");
+      return;
+    }
     setKirim(true);
     setGalat(null);
     try {
-      await buatPermintaan(klienBrowser(), penyewaId, isi);
+      await buatPermintaan(klienBrowser(), penyewaId, {
+        ...isi,
+        volume_m3: isi.volume_m3,
+        harga_maks: isi.harga_maks,
+      });
       setIsi((v) => ({ ...v, kecamatan: "", kota: "" }));
       router.refresh();
     } catch (e: unknown) {
@@ -126,28 +145,26 @@ export default function FormPermintaan({
             }
             sampai="kecamatan"
           />
-          <Kolom
+          <KolomAngka
             id="volume"
             label="Ukuran minimum"
-            type="number"
             min="1"
             step="1"
             required
             satuan="m³"
-            value={isi.volume_m3}
-            onChange={(e) => setIsi((v) => ({ ...v, volume_m3: Number(e.target.value) || 0 }))}
+            nilai={isi.volume_m3}
+            onNilai={(n) => setIsi((v) => ({ ...v, volume_m3: n }))}
             bantuan="Kira-kira saja. 10 m³ kurang lebih isi satu kamar kos."
           />
-          <Kolom
+          <KolomAngka
             id="harga"
             label="Anggaran maksimum"
-            type="number"
             min="0"
             step="50000"
             required
             satuan="Rp"
-            value={isi.harga_maks}
-            onChange={(e) => setIsi((v) => ({ ...v, harga_maks: Number(e.target.value) || 0 }))}
+            nilai={isi.harga_maks}
+            onNilai={(n) => setIsi((v) => ({ ...v, harga_maks: n }))}
           />
           <Kolom
             id="mulai"

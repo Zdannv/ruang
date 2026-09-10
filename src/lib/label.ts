@@ -159,18 +159,28 @@ export const LABEL_KATEGORI: Record<string, string> = {
  * kerapian: "boleh menggoreng atau tidak" adalah pertanyaan yang jawabannya
  * membatalkan sewa. Asap dan minyak yang menempel di dinding rumah orang
  * adalah alasan penolakan paling sering di lahan pinggir jalan.
+ *
+ * **Dipangkas 10 Sep 2026.** Daftar pertama memuat `laundry` dan `pangkas`,
+ * dan keduanya salah tempat: keduanya butuh ruangan berdinding, listrik
+ * tetap, dan pelanggan yang duduk menunggu — bukan sepetak halaman depan.
+ * Menawarkannya membuat daftarnya terbaca seolah disusun tanpa melihat
+ * lahannya. `cuci_motor` dan `bengkel` tetap: keduanya justru khas halaman
+ * depan yang menghadap jalan.
+ *
+ * Daftarnya juga TIDAK tertutup — `KotakCentangGanda` mengizinkan isian
+ * sendiri, dan yang diketik pemilik masuk apa adanya ke `usaha_diizinkan`.
+ * Pencocokan di `buat_pemesanan` membandingkan teksnya, jadi pedagang tetap
+ * bisa memilihnya dari kartu lahannya.
  */
 export const LABEL_USAHA: Record<string, string> = {
   makanan: "Makanan (tanpa menggoreng)",
   masak_berminyak: "Menggoreng / masak berminyak",
-  minuman: "Minuman",
+  minuman: "Minuman / es",
+  jajanan: "Jajanan & kue",
   buah_sayur: "Buah & sayur",
   kelontong: "Kelontong / sembako",
-  laundry: "Laundry",
   cuci_motor: "Cuci motor",
-  pangkas: "Pangkas rambut",
-  bengkel: "Bengkel kecil / tambal ban",
-  jasa_lain: "Jasa lain",
+  bengkel: "Tambal ban / bengkel kecil",
 };
 
 export const LABEL_LISTRIK: Record<string, string> = {

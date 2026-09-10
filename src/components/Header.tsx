@@ -15,6 +15,14 @@ import LencanaHeader, { LencanaKosong } from "@/components/LencanaHeader";
 export default async function Header() {
   const sesi = await sesiSaya();
   const nama = sesi?.profil?.nama ?? sesi?.email ?? null;
+  /*
+    Dari profil yang SUDAH dimuat `sesiSaya()`, bukan satu RPC lagi.
+
+    Header dirender di setiap perpindahan halaman, dan tiap panggilan
+    Supabase dari `sin1` berbiaya sendiri — aturan region di CLAUDE.md
+    menghitungnya. Satu boolean tidak layak jadi panggilan kesembilan.
+  */
+  const admin = sesi?.profil?.admin === true;
 
 
   return (
@@ -60,6 +68,18 @@ export default async function Header() {
             <Suspense fallback={<LencanaKosong />}>
               <LencanaHeader />
             </Suspense>
+
+            {/* Tautan petugas, dan HANYA tautannya yang disembunyikan.
+                Gerbang sungguhannya ada di database — `antrean_verifikasi()`
+                menolak siapa pun yang bukan admin di baris pertama. */}
+            {admin && (
+              <Link
+                href="/admin/verifikasi"
+                className="hidden rounded-full px-3 py-2 text-sm font-semibold text-brand transition-colors hover:bg-brand-soft sm:block"
+              >
+                Verifikasi
+              </Link>
+            )}
 
             <Link
               href="/profil"

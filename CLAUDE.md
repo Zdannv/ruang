@@ -955,6 +955,122 @@ Kerjakan berurutan. Jangan lompat.
     Diukur dengan `setTimeout` yang dipasangi pencatat: 5,0 detik berulang
     saat belum disentuh, dan tepat 10,0 detik sesudah satu `pointerdown`.
 
+40. **Verifikasi lahan oleh petugas, dan formulir yang dipangkas**
+    (10 Sep 2026). Lihat `20_verifikasi.sql`. Semuanya berasal dari satu
+    kalimat pemiliknya setelah benar-benar mencoba mengisi formulirnya
+    sendiri: *"jujur saya mau ngisi aja males karena terlalu banyak"*.
+
+    **Verifikasi.** Pemilik mengajukan, petugas datang, mencocokkan
+    keterangan listing dengan keadaan di lokasi, lalu menyetujui atau
+    menolak. Yang lolos dapat lencana di kartu hasil dan di halaman detail.
+    Antreannya di `/admin/verifikasi`.
+
+    Yang dijamin lencana ini **sempit, dan layar wajib menyebutkannya**:
+    keterangannya cocok pada hari kunjungan. Bukan jaminan keamanan, bukan
+    asuransi. Halaman detail memasang kalimat batas itu tepat di bawah
+    lencananya, karena "terverifikasi" tanpa penjelasan akan dibaca sebagai
+    "dijamin aman" — kalimat yang dilarang di atas berkas ini, hanya saja
+    disimpulkan sendiri oleh pembacanya.
+
+    **Admin dinyalakan tangan lewat SQL, dan tidak ada layar yang bisa
+    mengangkatnya.** Layar yang bisa mengangkat admin bisa dipakai mengangkat
+    diri sendiri. Antreannya juga FUNGSI, bukan view: ia memuat alamat
+    lengkap dan nomor telepon pemilik, dan view tidak bisa membatasi diri ke
+    admin tanpa RLS di tabel dasarnya.
+
+    **Cacat yang ketemu saat mengujinya, dan ini yang paling berharga dari
+    seluruh migrasi ini:** versi pertama menjaga kolom verifikasi dengan
+    `revoke update (verifikasi, ...) on ruang from authenticated`. Itu
+    **tidak menahan apa pun** — `authenticated` sudah punya hak UPDATE
+    SE-TABEL atas `ruang`, dan di Postgres hak se-tabel meliputi semua kolom;
+    mencabut hak per kolom di atasnya tidak mempersempitnya sedikit pun.
+    Diuji langsung: host memanggil `update ruang set
+    verifikasi='terverifikasi'` dan Postgres menjawab `UPDATE 1`.
+
+    Aturan turunannya, dan berlaku untuk setiap kolom yang tidak boleh
+    ditulis klien: **`revoke update (kolom)` hanya bekerja kalau hak
+    se-tabelnya dicabut lebih dulu.** Karena mencabutnya berarti menyebut
+    ketiga puluhan kolom lain satu per satu — daftar yang akan terlupa saat
+    ada kolom baru — yang dipakai di sini TRIGGER, sama seperti
+    `ruang_pin_publik` menjaga `lat_publik`. Fungsi resminya menyalakan
+    penanda transaksi `app.verifikasi_sah`; tanpa penanda itu nilainya
+    dikembalikan diam-diam ke nilai lama, di INSERT maupun UPDATE.
+
+    **Formulirnya dipangkas, dan tiap pemangkasan punya alasan yang sama
+    bentuknya: jangan menanyakan yang bisa diturunkan atau tidak bisa
+    dijawab.**
+
+    - **"Lebar muka jalan" dibuang** — untuk lahan terbuka ia SISI YANG
+      MENGHADAP JALAN, yaitu `lebar_m` yang sudah ditanyakan. Yang berubah
+      cuma labelnya jadi "Lebar muka jalan" dan "Panjang ke dalam", dan
+      justru itu yang membuat angkanya berarti. Ini aturan lama nomor 17
+      diterapkan lagi: kalau bisa diturunkan, turunkan.
+    - **"Tinggi lahan dari jalan" dibuang** untuk lahan terbuka. Ia menuntut
+      pengukuran sentimeter untuk sesuatu yang hampir selalu nol, dan riwayat
+      banjir di sebelahnya sudah menjawab pertanyaan yang sama tanpa alat
+      ukur. Untuk ruang tertutup ia TETAP: di sana ia soal air yang masuk ke
+      barang orang.
+    - **"Tinggi" dibuang** untuk lahan terbuka (sudah sejak migrasi 19 tidak
+      berarti; sekarang isiannya benar-benar hilang).
+    - **Keterangan harga berhenti mengarang.** Dulu "yang sewa 3 bulan
+      membayar ...", dan tiga bulan itu tidak pernah diwajibkan apa pun di
+      aplikasi ini. Sekarang memakai sewa minimum yang pemiliknya sendiri
+      tetapkan sebaris di atas.
+    - **`laundry` dan `pangkas` dibuang dari jenis usaha.** Keduanya butuh
+      ruangan berdinding dan pelanggan yang duduk menunggu — bukan sepetak
+      halaman depan. Menawarkannya membuat daftarnya terbaca seolah disusun
+      tanpa melihat lahannya.
+    - **Keempat pilihan ganda menerima isian sendiri** (`+ Lainnya`). Daftar
+      tertutup selalu salah untuk sebagian orang, dan yang tidak menemukan
+      pilihannya akan mencentang yang paling mendekati — keterangannya jadi
+      SALAH, bukan kosong. Yang diketik masuk apa adanya ke kolom `text[]`,
+      dan `daftar_teks_wajar()` menjaga bentuknya (maksimal 20 isian, 40
+      karakter) supaya satu permintaan API tidak bisa menaruh berkas satu
+      megabita ke kolom yang dirender di kartu hasil.
+
+41. **Kolom angka akhirnya bisa dikosongkan** (10 Sep 2026). Lihat
+    `InputAngka` di `src/components/host/Kolom.tsx`.
+
+    Keluhannya: *"kalau saya hapus nomornya semua malah jadi 0 dan kalau saya
+    ganti tambahin nomornya malah 0nya masih tetep di awal"*. Sebabnya satu
+    baris — `v === "" ? 0 : Number(v)` — dan akibatnya menyebar ke SETIAP
+    kolom angka di aplikasi: karakter terakhir dihapus, induknya menerima ""
+    dan mengubahnya jadi 0, lalu mengirim 0 balik ke layar. Nol yang tidak
+    bisa dihapus, dan tiap angka baru mendarat di belakangnya jadi "0700000".
+
+    Sekarang teksnya disimpan di komponennya sendiri dan yang dikirim ke atas
+    `number | null`. Kosong berarti null, bukan nol — bedanya nyata: deposit
+    nol adalah pernyataan, deposit kosong adalah pertanyaan yang belum
+    dijawab. Kolom angka di `IsiRuang` ikut jadi `number | null`, dan yang
+    menjaganya terisi adalah pemeriksaan sebelum kirim, bukan tipe datanya.
+
+    **`type="text"` dengan `inputMode="decimal"`, bukan `type="number"`.**
+    `input[type=number].value` mengembalikan STRING KOSONG untuk isi yang
+    belum jadi angka sah, jadi orang yang mengetik "2," dalam perjalanan
+    menuju "2,5" membuat kolomnya melapor kosong — dan teks mentahnya tidak
+    bisa dibaca dari kode sama sekali, jadi tidak ada cara menjaganya.
+    Sekalian menyelesaikan yang lebih sering terjadi: orang Indonesia menulis
+    desimal dengan KOMA, dan `type=number` menolaknya tanpa penjelasan.
+    Konsekuensinya `min`/`step` tidak lagi diperiksa peramban — keduanya
+    sengaja tidak diteruskan ke DOM supaya tidak ada atribut yang terlihat
+    berlaku padahal tidak — dan batas bawahnya diperiksa sebelum kirim.
+
+    Satu jebakan lagi yang cuma ketahuan dari mengujinya: pengaman
+    "sesuaikan state saat prop berubah" membandingkan nilai dari induk dengan
+    teks yang sedang diketik, dan perbandingan itu HARUS memakai penerjemah
+    yang sama. Versi pertama memakai `Number(teks)` polos; `Number("2,")`
+    adalah NaN, jadi perbandingannya selalu meleset dan komanya terhapus
+    tepat saat diketik.
+
+    Diuji di peramban, delapan keadaan: hapus semua → kosong; ketik "7" →
+    "7"; "0700000" → "700000"; "2," bertahan; "2,5" → luas 7,5 m²; huruf
+    dibuang; "2.5.5" → "2.55"; "0,5" utuh.
+
+42. **Masuk mendarat di `/cari`, bukan halaman depan** (10 Sep 2026).
+    Halaman depan tugasnya meyakinkan orang yang belum kenal aplikasinya;
+    orang yang baru saja masuk sudah lewat tahap itu. `?lanjut=` tetap
+    menang. Berlaku juga untuk pendaftaran yang langsung bersesi.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris

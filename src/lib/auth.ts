@@ -9,6 +9,8 @@ export type ProfilSaya = {
   kota: string;
   foto_url: string | null;
   terverifikasi: boolean;
+  /** Petugas aplikasi. Migrasi 20; false di database yang belum menjalankannya. */
+  admin: boolean;
 };
 
 export type Sesi = {
@@ -41,15 +43,31 @@ export const sesiSaya = cache(async (): Promise<Sesi | null> => {
   const { data, error } = await db.auth.getUser();
   if (error || !data.user) return null;
 
-  const { data: profil } = await db
-    .from("profil")
-    .select("id, nama, telepon, kota, foto_url, terverifikasi")
-    .eq("user_id", data.user.id)
-    .maybeSingle();
+  const ambil = (kolom: string) =>
+    db.from("profil").select(kolom).eq("user_id", data.user.id).maybeSingle();
 
+  let { data: profil, error: galatProfil } = await ambil(
+    "id, nama, telepon, kota, foto_url, terverifikasi, admin"
+  );
+
+  /*
+    `admin` baru ada sejak 20_verifikasi.sql, dan database yang belum
+    menjalankannya menjawab 42703. Mundurnya WAJIB: tanpa ini profilnya
+    terbaca null, dan semua orang yang sudah masuk melihat header "Masuk /
+    Daftar" — seluruh aplikasi tampak keluar sendiri. Migrasi di proyek ini
+    dijalankan tangan, terpisah dari deploy, jadi keadaan "kode sudah tayang,
+    kolomnya belum ada" pasti terjadi.
+  */
+  if (galatProfil?.code === "42703") {
+    ({ data: profil, error: galatProfil } = await ambil(
+      "id, nama, telepon, kota, foto_url, terverifikasi"
+    ));
+  }
+
+  const baris = (profil as unknown as ProfilSaya | null) ?? null;
   return {
     userId: data.user.id,
     email: data.user.email ?? null,
-    profil: (profil as ProfilSaya | null) ?? null,
+    profil: baris && { ...baris, admin: baris.admin ?? false },
   };
 });
