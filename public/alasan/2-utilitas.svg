@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Listrik, air, dan atap tertulis">
+  <!-- Dihasilkan `skrip/buat-ilustrasi.py`. Jangan disunting langsung. -->
+  <defs><clipPath id="bingkai"><rect width="400" height="300" rx="20"/></clipPath></defs>
+  <g clip-path="url(#bingkai)">
+    <rect width="400" height="300" fill="#f6ead9"/>
+    
+  <rect x="0" y="240" width="400" height="60" fill="#e8e2dc"/>
+  <g fill="#e8e2dc">
+    <rect x="70" y="118" width="14" height="126" rx="7"/>
+    <rect x="316" y="118" width="14" height="126" rx="7"/>
+  </g>
+  <path d="M54 118 h292 v-16 a1 1 0 0 0 0 0 z" fill="none"/>
+  <path d="M54 102 h292 v22 a24 24 0 0 1 -48 0 a24 24 0 0 1 -48 0
+           a24 24 0 0 1 -48 0 a24 24 0 0 1 -48 0 a24 24 0 0 1 -48 0
+           a24 24 0 0 1 -52 0 z" fill="#a93b20"/>
+  <g>
+    <circle cx="152" cy="196" r="38" fill="#ffffff"/>
+    <path d="M158 172 l-22 30 h16 l-6 24 l24 -32 h-17 z" fill="#d99a2b"/>
+  </g>
+  <g>
+    <circle cx="248" cy="196" r="38" fill="#ffffff"/>
+    <path d="M248 168 c14 18 22 27 22 38 a22 22 0 0 1 -44 0 c0-11 8-20 22-38z"
+          fill="#a93b20"/>
+  </g>
+  </g>
+</svg>

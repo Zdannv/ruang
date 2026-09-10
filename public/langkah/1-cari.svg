@@ -1,7 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Cari dari titikmu">
-  <!-- Dihasilkan `skrip/buat-langkah.py`. Jangan disunting langsung. -->
-  <rect width="400" height="300" rx="20" fill="#f6ead9"/>
-  
+  <!-- Dihasilkan `skrip/buat-ilustrasi.py`. Jangan disunting langsung. -->
+  <defs><clipPath id="bingkai"><rect width="400" height="300" rx="20"/></clipPath></defs>
+  <g clip-path="url(#bingkai)">
+    <rect width="400" height="300" fill="#f6ead9"/>
+    
   <g stroke="#ffffff" stroke-width="16" stroke-linecap="round">
     <path d="M-10 118 H410"/><path d="M-10 210 H410"/>
     <path d="M104 -10 V310"/><path d="M280 -10 V310"/>
@@ -14,5 +16,6 @@
   </g>
   <g fill="#d99a2b">
     <circle cx="122" cy="196" r="13"/><circle cx="274" cy="104" r="13"/>
+  </g>
   </g>
 </svg>

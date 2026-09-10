@@ -708,8 +708,9 @@ Kerjakan berurutan. Jangan lompat.
     bagiannya sama sekali.
 
 34. **Ilustrasi per langkah** (9 Sep 2026). `public/langkah/`, dihasilkan
-    `skrip/buat-langkah.py`. Menggantikan ikon lucide di bagian "Cara
-    pakainya".
+    `skrip/buat-ilustrasi.py` (dulu `buat-langkah.py`; berganti nama
+    10 Sep 2026 saat ia ikut menghasilkan dua kelompok lain). Menggantikan
+    ikon lucide di bagian "Cara pakainya".
 
     **SVG, bukan raster seperti kartu sorotan — dan alasannya ukuran
     tampilnya.** Kartu langkah lebarnya sekitar 210px di laptop dan 142px di
@@ -722,9 +723,9 @@ Kerjakan berurutan. Jangan lompat.
     memenuhi lebar layar, ilustrasi raster boleh.** Bukan preferensi format,
     melainkan konsekuensi ukuran.
 
-    Langkah kelima digambar **abu-abu** sengaja: ia langkah "Bayar — belum
-    aktif", dan kartunya memang dirender pudar. Ilustrasi berwarna di kartu
-    pudar akan terbaca sebagai kesalahan render.
+    Langkah kelima dulu digambar **abu-abu** sengaja: ia langkah "Bayar —
+    belum aktif", dan kartunya dirender pudar. Sejak 10 Sep 2026 langkah itu
+    tampil seperti empat yang lain — lihat nomor 38.
 
     Kisinya **dua kolom di telepon**, bukan satu. Lima kartu berilustrasi satu
     kolom membuat bagian itu 1750px — orang berhenti menggulir sebelum sampai
@@ -863,6 +864,49 @@ Kerjakan berurutan. Jangan lompat.
     `permintaan` masih menanyakan **volume m³** — untuk pedagang yang benar
     adalah lebar muka jalan dan jenis usaha. Itu butuh migrasi sendiri dan
     `permintaan_kecamatan` ikut berubah bentuk, jadi dipisah.
+
+38. **Ilustrasi di tiga bagian, dan langkah bayar berhenti minta maaf**
+    (10 Sep 2026). `skrip/buat-ilustrasi.py` — bekas `buat-langkah.py` —
+    sekarang menghasilkan tiga kelompok: `public/langkah/` (5),
+    `public/alasan/` (4), dan `public/segmen/` (4).
+
+    **Satu skrip, bukan tiga.** Yang membuat ketiga belasnya terbaca sebagai
+    satu keluarga bukan kemiripan yang diusahakan per berkas melainkan satu
+    kerangka — kanvas, radius, warna, ketebalan garis. Tiga skrip berarti tiga
+    salinan paletnya, dan salinan ketiga akan tertinggal saat warnanya
+    diganti. Totalnya 13 KB untuk tiga belas berkas.
+
+    Petak segmen **bujur sangkar dan jauh lebih sederhana**: ia tampil 80px di
+    telepon dan 96px di laptop, jadi yang muat cuma satu benda utama plus satu
+    aksen. Bentuk yang bagus di 400px jadi bubur di 96px.
+
+    **Langkah "Bayar" tidak lagi ditandai belum aktif.** Diminta pemiliknya,
+    yang sedang menyiapkan payment gateway-nya. Kartunya tidak lagi dirender
+    pudar dan ilustrasinya ikut berwarna — kartu terang dengan ilustrasi
+    abu-abu terbaca sebagai gambar yang gagal dimuat, bukan sebagai langkah
+    yang tertunda.
+
+    Yang **tetap ada**: kalimat di `Footer` ("Pembayaran belum aktif; menunggu
+    payment gateway berlisensi") dan kotak penjelasan di `/pemesanan/[id]`.
+    Keduanya app-wide, dan yang kedua muncul persis di tempat orangnya
+    benar-benar mentok. Halaman depan boleh berhenti mengiklankan lubangnya;
+    layar tempat orang menunggu uangnya tidak boleh.
+
+    **Dua hal yang ketahuan cuma karena dilihat di layar:**
+
+    1. Bentuk yang menyentuh tepi — jalan di `1-ukuran`, tanah di
+       `2-utilitas` — menutup sudut membulat kartunya, jadi kartunya berujung
+       siku. Sekarang seluruh isi tiap SVG dipotong ke bingkai membulat yang
+       sama lewat `clipPath`, satu kali di fungsi pembuatnya.
+    2. Aspal/tanah itu semula **putih**, dan bagian "Yang kamu dapat"
+       berlatar putih — jadi sepertiga bawah kartunya melebur ke halaman dan
+       terbaca sebagai gambar yang termuat separuh. Diganti `PUDAR_MUDA`.
+
+    **Dan satu yang ketahuan karena diukur**: dengan ilustrasi satu kolom di
+    telepon, "Yang kamu dapat" jadi **1758px** — angka yang sama persis dengan
+    yang dulu membuat "Cara pakainya" dipecah dua kolom. Dua kolom di sini:
+    **767px**, diukur di 375×812. Aturannya sekarang berlaku umum: **begitu
+    sebuah daftar kartu dapat ilustrasi, ia dua kolom di telepon.**
 
 ### Berikutnya, selama pembayaran belum ada
 

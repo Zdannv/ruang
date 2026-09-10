@@ -1,7 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Tanya dulu, gratis">
-  <!-- Dihasilkan `skrip/buat-langkah.py`. Jangan disunting langsung. -->
-  <rect width="400" height="300" rx="20" fill="#f6ead9"/>
-  
+  <!-- Dihasilkan `skrip/buat-ilustrasi.py`. Jangan disunting langsung. -->
+  <defs><clipPath id="bingkai"><rect width="400" height="300" rx="20"/></clipPath></defs>
+  <g clip-path="url(#bingkai)">
+    <rect width="400" height="300" fill="#f6ead9"/>
+    
   <g>
     <path d="M52 66 h206 a20 20 0 0 1 20 20 v66 a20 20 0 0 1 -20 20 h-150 l-32 26 v-26 h-24
              a20 20 0 0 1 -20 -20 v-66 a20 20 0 0 1 20 -20z" fill="#ffffff"/>
@@ -17,5 +19,6 @@
       <rect x="192" y="180" width="132" height="13" rx="6.5"/>
       <rect x="192" y="206" width="86" height="13" rx="6.5"/>
     </g>
+  </g>
   </g>
 </svg>

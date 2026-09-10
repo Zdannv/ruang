@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Jasa harian">
+  <!-- Dihasilkan `skrip/buat-ilustrasi.py`. Jangan disunting langsung. -->
+  <defs><clipPath id="bingkai"><rect width="240" height="240" rx="20"/></clipPath></defs>
+  <g clip-path="url(#bingkai)">
+    <rect width="240" height="240" fill="#f6ead9"/>
+    
+  <path d="M64 108 h112 l-14 96 a12 12 0 0 1 -12 10 h-60 a12 12 0 0 1 -12 -10 z"
+        fill="#ffffff"/>
+  <rect x="54" y="94" width="132" height="22" rx="11" fill="#a93b20"/>
+  <path d="M78 116 h84 l-6 42 h-72 z" fill="#a93b20" fill-opacity="0.16"/>
+  <g fill="#d99a2b">
+    <path d="M196 52 c9 12 14 18 14 25a14 14 0 0 1 -28 0c0-7 5-13 14-25z"/>
+    <path d="M156 34 c6 8 10 12 10 17a10 10 0 0 1 -20 0c0-5 4-9 10-17z"/>
+  </g>
+  </g>
+</svg>

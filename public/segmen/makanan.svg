@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Makanan dan minuman">
+  <!-- Dihasilkan `skrip/buat-ilustrasi.py`. Jangan disunting langsung. -->
+  <defs><clipPath id="bingkai"><rect width="240" height="240" rx="20"/></clipPath></defs>
+  <g clip-path="url(#bingkai)">
+    <rect width="240" height="240" fill="#f6ead9"/>
+    
+  <path d="M36 92 h168 v18 a18 18 0 0 1 -36 0 a18 18 0 0 1 -36 0
+           a18 18 0 0 1 -36 0 a18 18 0 0 1 -36 0 a18 18 0 0 1 -24 0 z"
+        fill="#a93b20"/>
+  <rect x="34" y="74" width="172" height="20" rx="8" fill="#8a2e17"/>
+  <rect x="52" y="140" width="136" height="52" rx="10" fill="#ffffff"/>
+  <rect x="52" y="140" width="136" height="14" rx="7" fill="#e8e2dc"/>
+  <g fill="#1a1512" fill-opacity="0.75">
+    <circle cx="78" cy="200" r="14"/><circle cx="162" cy="200" r="14"/>
+  </g>
+  <path d="M138 100 v34" stroke="#e8e2dc" stroke-width="7" stroke-linecap="round"/>
+  <g transform="translate(96 120)">
+    <path d="M-16 -8 h32 l-5 30 h-22 z" fill="#d99a2b"/>
+  </g>
+  </g>
+</svg>

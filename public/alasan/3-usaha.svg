@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Jenis usaha yang diizinkan">
+  <!-- Dihasilkan `skrip/buat-ilustrasi.py`. Jangan disunting langsung. -->
+  <defs><clipPath id="bingkai"><rect width="400" height="300" rx="20"/></clipPath></defs>
+  <g clip-path="url(#bingkai)">
+    <rect width="400" height="300" fill="#f6ead9"/>
+    
+  <rect x="56" y="48" width="288" height="204" rx="18" fill="#ffffff"/>
+  <g>
+    <circle cx="106" cy="100" r="20" fill="#a93b20"/>
+    <path d="M97 100 l7 8 l13 -15" fill="none" stroke="#ffffff" stroke-width="6"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="142" y="92" width="152" height="16" rx="8" fill="#e8e2dc"/>
+  </g>
+  <g>
+    <circle cx="106" cy="150" r="20" fill="#a93b20"/>
+    <path d="M97 150 l7 8 l13 -15" fill="none" stroke="#ffffff" stroke-width="6"
+          stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="142" y="142" width="116" height="16" rx="8" fill="#e8e2dc"/>
+  </g>
+  <g>
+    <circle cx="106" cy="200" r="20" fill="#e8e2dc"/>
+    <path d="M99 193 l14 14 M113 193 l-14 14" fill="none" stroke="#8a807a"
+          stroke-width="6" stroke-linecap="round"/>
+    <rect x="142" y="192" width="134" height="16" rx="8" fill="#e8e2dc"
+          fill-opacity="0.55"/>
+  </g>
+  </g>
+</svg>

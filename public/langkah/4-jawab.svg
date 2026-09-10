@@ -1,7 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Pemilik terima atau tolak">
-  <!-- Dihasilkan `skrip/buat-langkah.py`. Jangan disunting langsung. -->
-  <rect width="400" height="300" rx="20" fill="#f6ead9"/>
-  
+  <!-- Dihasilkan `skrip/buat-ilustrasi.py`. Jangan disunting langsung. -->
+  <defs><clipPath id="bingkai"><rect width="400" height="300" rx="20"/></clipPath></defs>
+  <g clip-path="url(#bingkai)">
+    <rect width="400" height="300" fill="#f6ead9"/>
+    
   <circle cx="200" cy="150" r="86" fill="#a93b20"/>
   <path d="M160 152 l30 30 l56 -62" fill="none" stroke="#ffffff" stroke-width="20"
         stroke-linecap="round" stroke-linejoin="round"/>
@@ -10,5 +12,6 @@
   </g>
   <g stroke="#8a807a" stroke-width="7" stroke-linecap="round">
     <path d="M60 80 h20"/><path d="M320 212 l20 20 M340 212 l-20 20"/>
+  </g>
   </g>
 </svg>

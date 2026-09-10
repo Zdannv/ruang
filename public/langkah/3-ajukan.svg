@@ -1,7 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Ajukan sewa">
-  <!-- Dihasilkan `skrip/buat-langkah.py`. Jangan disunting langsung. -->
-  <rect width="400" height="300" rx="20" fill="#f6ead9"/>
-  
+  <!-- Dihasilkan `skrip/buat-ilustrasi.py`. Jangan disunting langsung. -->
+  <defs><clipPath id="bingkai"><rect width="400" height="300" rx="20"/></clipPath></defs>
+  <g clip-path="url(#bingkai)">
+    <rect width="400" height="300" fill="#f6ead9"/>
+    
   <rect x="72" y="48" width="256" height="204" rx="20" fill="#ffffff"/>
   <rect x="72" y="48" width="256" height="52" rx="20" fill="#a93b20"/>
   <rect x="72" y="80" width="256" height="20" fill="#a93b20"/>
@@ -17,5 +19,6 @@
   <g fill="#e8e2dc">
     <rect x="100" y="176" width="200" height="14" rx="7"/>
     <rect x="100" y="204" width="140" height="14" rx="7"/>
+  </g>
   </g>
 </svg>

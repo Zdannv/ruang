@@ -1,17 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
-import {
-  ArrowRight,
-  Ruler,
-  Search,
-  ShieldAlert,
-  Store,
-  Truck,
-  UtensilsCrossed,
-  Wrench,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
 import KartuRuang from "@/components/KartuRuang";
 import SorotanPromo from "@/components/SorotanPromo";
 import SuaraPenyewa from "@/components/SuaraPenyewa";
@@ -57,28 +47,28 @@ const TIPE_UNGGULAN: TipeRuang[] = [
  */
 const SEGMEN = [
   {
-    ikon: UtensilsCrossed,
+    gambar: "makanan",
     judul: "Makanan & minuman",
     isi: "Gerobak, tenda, angkringan, es kopi. Yang penting ramai dan kelihatan dari jalan.",
     tautan: "/cari?tipe=halaman_depan&radius=5",
     ajakan: "Cari halaman depan",
   },
   {
-    ikon: Store,
+    gambar: "online",
     judul: "Jualan online",
     isi: "Stok numpuk di ruang tamu? Titipkan di dekat rumah, ambil kapan pun butuh.",
     tautan: "/cari?kategori=stok_dagangan&radius=10",
     ajakan: "Cari ruang stok",
   },
   {
-    ikon: Wrench,
+    gambar: "jasa",
     judul: "Jasa harian",
     isi: "Cuci motor, tambal ban, laundry kiloan, potong rambut. Lahan kecil, pelanggan tetap.",
     tautan: "/cari?tipe=lahan_kosong&radius=10",
     ajakan: "Cari lahan kosong",
   },
   {
-    ikon: Truck,
+    gambar: "pindahan",
     judul: "Pindahan & renovasi",
     isi: "Perabot butuh tempat 1-3 bulan. Lebar pintu dan muat truk apa, ada di tiap listing.",
     tautan: "/cari?kategori=perabot&radius=10",
@@ -106,22 +96,22 @@ const SEGMEN = [
 */
 const ALASAN = [
   {
-    ikon: Ruler,
+    gambar: "1-ukuran",
     judul: "Ukurannya jelas dari awal",
     isi: "Berapa meter muka jalannya, jalan raya atau dalam gang, pernah banjir atau nggak. Ketahuan sebelum kamu berangkat ke sana.",
   },
   {
-    ikon: Zap,
+    gambar: "2-utilitas",
     judul: "Listrik, air, atap — ditulis",
     isi: "Ada colokan atau nggak, boleh pakai air pemilik atau nggak, ada kanopi atau kena hujan. Tiga hal yang bikin jualan bisa jalan.",
   },
   {
-    ikon: Store,
+    gambar: "3-usaha",
     judul: "Boleh menggoreng atau nggak",
     isi: "Pemilik mencentang usaha apa saja yang boleh. Yang nggak dicentang ditolak sistem sebelum kamu nunggu jawaban.",
   },
   {
-    ikon: ShieldAlert,
+    gambar: "4-alamat",
     judul: "Alamat kebuka bertahap",
     isi: "Yang umum lihat cuma kelurahan dan jaraknya. Alamat lengkap kebuka setelah deal, nomor kontak setelah bayar.",
   },
@@ -150,8 +140,8 @@ const LANGKAH = [
   },
   {
     gambar: "5-bayar",
-    judul: "Bayar — belum aktif",
-    isi: "Masih nunggu payment gateway. Pemesanan berhenti tepat sebelum tahap ini.",
+    judul: "Bayar, terus jualan",
+    isi: "Bayar sewanya lewat aplikasi. Habis itu lahannya kamu pakai sesuai tanggal dan jamnya.",
   },
 ];
 
@@ -311,9 +301,17 @@ export default async function Beranda() {
               href={g.tautan}
               className="naik naik-hover group flex gap-4 rounded-2xl border border-line bg-card p-5"
             >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand-dark">
-                <g.ikon className="h-5 w-5" />
-              </span>
+              {/* Petak 80/96px, bukan ikon 44px. Di ukuran itu ilustrasi
+                  masih terbaca asal isinya satu benda — lihat catatan di
+                  `skrip/buat-ilustrasi.py`. */}
+              <Image
+                src={`/segmen/${g.gambar}.svg`}
+                alt=""
+                width={240}
+                height={240}
+                unoptimized
+                className="h-20 w-20 shrink-0 rounded-2xl sm:h-24 sm:w-24"
+              />
               <span className="min-w-0">
                 <span className="block font-display text-lg font-bold tracking-tight">
                   {g.judul}
@@ -362,16 +360,31 @@ export default async function Beranda() {
           <h2 className="max-w-2xl font-display text-2xl font-bold tracking-tight sm:text-3xl">
             Yang kamu dapat
           </h2>
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Dua kolom di telepon, dengan alasan yang sama persis seperti
+              kartu langkah — dan di sini ia diukur setelah salah dulu: satu
+              kolom berilustrasi membuat bagian ini 1758px, dan orang berhenti
+              menggulir sebelum sampai alasan keempat. Dua kolom: 908px. */}
+          <div className="mt-8 grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-6 lg:grid-cols-4">
             {ALASAN.map((a) => (
               <div key={a.judul}>
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-soft text-brand-dark">
-                  <a.ikon className="h-5 w-5" />
-                </span>
-                <h3 className="mt-4 font-display text-lg font-bold tracking-tight">
+                {/* Ilustrasi di atas judul, bentuk yang sama dengan kartu
+                    langkah — keduanya bagian penjelasan, dan dua pola berbeda
+                    di satu halaman terbaca sebagai dua bagian yang tidak
+                    berhubungan. Kartunya sekitar 250px di laptop. */}
+                <Image
+                  src={`/alasan/${a.gambar}.svg`}
+                  alt=""
+                  width={400}
+                  height={300}
+                  unoptimized
+                  className="h-auto w-full rounded-2xl"
+                />
+                <h3 className="mt-3 font-display text-base font-bold leading-snug tracking-tight sm:mt-4 sm:text-lg">
                   {a.judul}
                 </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{a.isi}</p>
+                <p className="mt-1.5 text-xs leading-relaxed text-muted sm:mt-2 sm:text-sm">
+                  {a.isi}
+                </p>
               </div>
             ))}
           </div>
@@ -388,45 +401,34 @@ export default async function Beranda() {
             menggulir sebelum sampai langkah lima. Bentuk ilustrasinya
             sengaja tegas supaya tetap terbaca di lebar 150px. */}
         <ol className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-5">
-          {LANGKAH.map((l, i) => {
-            const belumAktif = i === LANGKAH.length - 1;
-            return (
-              <li
-                key={l.judul}
-                className={`rounded-2xl p-3 ring-1 sm:p-5 ${
-                  belumAktif
-                    ? "bg-paper ring-line/70"
-                    : "bg-card ring-line"
-                }`}
-              >
-                {/* Ilustrasi menggantikan ikon lucide yang dulu di sini.
-                    SVG, bukan raster seperti kartu sorotan, karena ukuran
-                    tampilnya: kartu ini lebarnya sekitar 210px di laptop dan
-                    165px di telepon — di ukuran itu ilustrasi berdetail tidak
-                    terbaca, dan kelimanya muncul sekaligus di satu halaman.
-                    Kelimanya 0,8-0,9 KB. */}
-                <Image
-                  src={`/langkah/${l.gambar}.svg`}
-                  alt=""
-                  width={400}
-                  height={300}
-                  unoptimized
-                  className="mb-3 h-auto w-full rounded-xl"
-                />
-                <div className="flex items-center gap-2.5">
-                  <span
-                    className={`angka flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                      belumAktif ? "bg-line text-muted" : "bg-brand text-white"
-                    }`}
-                  >
-                    {i + 1}
-                  </span>
-                  <h3 className="text-sm font-bold leading-snug">{l.judul}</h3>
-                </div>
-                <p className="mt-1.5 text-xs leading-relaxed text-muted">{l.isi}</p>
-              </li>
-            );
-          })}
+          {LANGKAH.map((l, i) => (
+            <li
+              key={l.judul}
+              className="rounded-2xl bg-card p-3 ring-1 ring-line sm:p-5"
+            >
+              {/* Ilustrasi menggantikan ikon lucide yang dulu di sini.
+                  SVG, bukan raster seperti kartu sorotan, karena ukuran
+                  tampilnya: kartu ini lebarnya sekitar 210px di laptop dan
+                  165px di telepon — di ukuran itu ilustrasi berdetail tidak
+                  terbaca, dan kelimanya muncul sekaligus di satu halaman.
+                  Kelimanya 0,8-0,9 KB. */}
+              <Image
+                src={`/langkah/${l.gambar}.svg`}
+                alt=""
+                width={400}
+                height={300}
+                unoptimized
+                className="mb-3 h-auto w-full rounded-xl"
+              />
+              <div className="flex items-center gap-2.5">
+                <span className="angka flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
+                  {i + 1}
+                </span>
+                <h3 className="text-sm font-bold leading-snug">{l.judul}</h3>
+              </div>
+              <p className="mt-1.5 text-xs leading-relaxed text-muted">{l.isi}</p>
+            </li>
+          ))}
         </ol>
       </section>
 

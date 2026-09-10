@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Stok jualan online">
+  <!-- Dihasilkan `skrip/buat-ilustrasi.py`. Jangan disunting langsung. -->
+  <defs><clipPath id="bingkai"><rect width="240" height="240" rx="20"/></clipPath></defs>
+  <g clip-path="url(#bingkai)">
+    <rect width="240" height="240" fill="#f6ead9"/>
+    
+  <rect x="46" y="122" width="88" height="76" rx="10" fill="#d99a2b"/>
+  <rect x="82" y="122" width="16" height="76" fill="#8a2e17" fill-opacity="0.3"/>
+  <rect x="118" y="146" width="80" height="52" rx="10" fill="#e8e2dc"/>
+  <rect x="150" y="146" width="16" height="52" fill="#8a807a" fill-opacity="0.35"/>
+  <rect x="76" y="46" width="92" height="64" rx="10" fill="#a93b20"/>
+  <rect x="114" y="46" width="16" height="64" fill="#8a2e17"/>
+  <path d="M76 74 h92" stroke="#ffffff" stroke-width="6" stroke-opacity="0.55"/>
+  </g>
+</svg>
