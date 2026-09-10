@@ -253,13 +253,13 @@ export function dimensi(p: number | string, l: number | string, t: number | stri
   return `${n(p)} x ${n(l)} x ${n(t)} m`;
 }
 
-/** "40,0 m2" — luas datang sebagai numeric, jadi bisa berupa string. */
+/** "40,0 m2", luas datang sebagai numeric, jadi bisa berupa string. */
 export function luas(m2: number | string): string {
   const n = typeof m2 === "string" ? Number(m2) : m2;
   return `${n.toFixed(1).replace(".", ",")} m²`;
 }
 
-/** "15 Juli 2026" — tanggal ditampilkan waktu Jakarta, sesuai aturan di CLAUDE.md. */
+/** "15 Juli 2026", tanggal ditampilkan waktu Jakarta, sesuai aturan di CLAUDE.md. */
 export function tanggal(iso: string): string {
   return new Intl.DateTimeFormat("id-ID", {
     day: "numeric",
@@ -269,7 +269,7 @@ export function tanggal(iso: string): string {
   }).format(new Date(iso));
 }
 
-/** "Juli 2026" — untuk "bergabung sejak". */
+/** "Juli 2026", untuk "bergabung sejak". */
 export function bulanTahun(iso: string): string {
   return new Intl.DateTimeFormat("id-ID", {
     month: "long",
@@ -291,7 +291,7 @@ export const LABEL_STATUS_AKSES: Record<string, string> = {
 };
 
 export const LABEL_FREKUENSI: Record<string, string> = {
-  jarang: "Jarang — beberapa bulan sekali",
+  jarang: "Jarang, beberapa bulan sekali",
   bulanan: "Bulanan",
   mingguan: "Mingguan",
   harian: "Hampir setiap hari",
@@ -318,7 +318,7 @@ export function nadaStatus(status: string): "netral" | "proses" | "baik" | "wasp
   return "netral";
 }
 
-/** "11 Sep 2026" — lebih pendek dari `tanggal()`, untuk baris rapat. */
+/** "11 Sep 2026", lebih pendek dari `tanggal()`, untuk baris rapat. */
 export function tanggalPendek(iso: string): string {
   return new Intl.DateTimeFormat("id-ID", {
     day: "numeric",
@@ -328,7 +328,7 @@ export function tanggalPendek(iso: string): string {
   }).format(new Date(iso));
 }
 
-/** "11 Sep 2026, 14.05" — untuk jejak transisi, yang butuh jamnya. */
+/** "11 Sep 2026, 14.05", untuk jejak transisi, yang butuh jamnya. */
 export function tanggalJam(iso: string): string {
   return new Intl.DateTimeFormat("id-ID", {
     day: "numeric",
@@ -340,7 +340,7 @@ export function tanggalJam(iso: string): string {
   }).format(new Date(iso));
 }
 
-/** "Rp450.000". Rupiah penuh, tanpa desimal — uang disimpan bigint. */
+/** "Rp450.000". Rupiah penuh, tanpa desimal, uang disimpan bigint. */
 export function rupiah(nilai: number): string {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",

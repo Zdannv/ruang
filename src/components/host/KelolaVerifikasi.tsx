@@ -103,7 +103,7 @@ export default function KelolaVerifikasi({
             Petugas kami datang ke lokasi dan mencocokkan keterangan di listing ini
             dengan keadaan sebenarnya. Yang lolos dapat lencana{" "}
             <strong className="text-ink">Terverifikasi</strong> di kartu hasil
-            pencarian — dan pedagang lebih dulu membuka yang berlencana.
+            pencarian, dan pedagang lebih dulu membuka yang berlencana.
           </p>
           <p className="mt-1.5 text-xs leading-relaxed text-muted">
             Gratis, dan tidak wajib. Yang dinyatakan lencananya cuma kecocokan

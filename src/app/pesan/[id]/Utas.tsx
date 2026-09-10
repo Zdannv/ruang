@@ -37,7 +37,7 @@ export default function Utas({
   sayaId: string;
   sayaHost: boolean;
   alamatSudahDibuka: boolean;
-  /** Disusun dari data ruangnya, bukan disimpan — lihat lib/balasan.ts. */
+  /** Disusun dari data ruangnya, bukan disimpan, lihat lib/balasan.ts. */
   balasanRuang: BalasanSiap[];
   balasanTersimpan: BalasanTersimpan[];
 }) {
@@ -117,7 +117,7 @@ export default function Utas({
           </p>
           <p className="mt-1 text-xs leading-relaxed text-muted">
             Supaya ia bisa datang melihat sebelum memesan. Hanya berlaku untuk orang
-            ini, dan <strong className="text-ink">tidak bisa ditutup lagi</strong> —
+            ini, dan <strong className="text-ink">tidak bisa ditutup lagi</strong> 
             alamat yang sudah dilihat tidak bisa ditarik kembali.
           </p>
           <button
@@ -165,7 +165,7 @@ export default function Utas({
       {/* ── Balasan cepat ────────────────────────────────────────────────
           Untuk host: jawaban yang disusun dari data ruangnya sendiri, plus yang
           ia tulis sendiri. Untuk penyewa: pertanyaan pembuka, tapi hanya
-          selama utasnya masih kosong — setelah percakapannya jalan, saran
+          selama utasnya masih kosong, setelah percakapannya jalan, saran
           pembuka cuma jadi gangguan. */}
       {(sayaHost || pesanAwal.length === 0) && (
         <div className="geser-x -mx-4 mt-5 overflow-x-auto px-4 sm:mx-0 sm:px-0">

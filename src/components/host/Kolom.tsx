@@ -208,7 +208,7 @@ export function Pilihan({
   id: string;
   label: string;
   bantuan?: string;
-  /** [nilai, label] — biasanya `Object.entries(LABEL_*)`. */
+  /** [nilai, label], biasanya `Object.entries(LABEL_*)`. */
   opsi: [string, string][];
 }) {
   return (
@@ -306,7 +306,7 @@ export function KotakCentangGanda({
         })}
 
         {/* Isian sendiri tampil sebagai chip yang bisa dibuang, bukan sebagai
-            teks di kolom terpisah — supaya ia terbaca setara dengan pilihan
+            teks di kolom terpisah, supaya ia terbaca setara dengan pilihan
             yang lain, dan supaya jelas ia sudah tersimpan. */}
         {tambahan.map((v) => (
           <span

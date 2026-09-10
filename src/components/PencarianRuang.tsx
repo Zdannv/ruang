@@ -405,7 +405,7 @@ export default function PencarianRuang() {
           Ringkas, bukan hero.
 
           Versi sebelumnya memakai bidang gradien biru setinggi hampir separuh
-          layar di sini — sama seperti halaman depan. Setelah dilihat di layar
+          layar di sini, sama seperti halaman depan. Setelah dilihat di layar
           sungguhan, akibatnya jelas: hasil pencarian, satu-satunya alasan orang
           membuka halaman ini, terdorong ke bawah lipatan oleh bidang yang tidak
           membawa informasi apa pun. Sekarang kendalinya muat dalam satu baris
@@ -416,7 +416,7 @@ export default function PencarianRuang() {
 
           {/* Titik mengambil satu baris penuh di layar telepon. Bertiga dalam
               satu baris di lebar 375px membuat namanya terpangkas jadi satu
-              huruf — "Waru / Aloha" terbaca "W…". */}
+              huruf, "Waru / Aloha" terbaca "W…". */}
           <label className="flex w-full min-w-0 cursor-pointer items-center gap-2 rounded-full border border-line bg-card px-3.5 py-2 sm:w-auto sm:min-w-56 sm:flex-none">
             <MapPin className="h-4 w-4 shrink-0 text-brand" />
             <span className="sr-only">Titik pencarian</span>
@@ -483,11 +483,11 @@ export default function PencarianRuang() {
           {/* "Hapus filter" dulu di sini juga. Dibuang: bilah ringkas di bawah
               sudah punya tombol yang memanggil `bersihkan()` yang sama, dan
               sejak titik mengambil baris penuh di HP, yang di sini terlempar
-              ke barisnya sendiri — satu baris terbuang untuk tombol kembar. */}
+              ke barisnya sendiri, satu baris terbuang untuk tombol kembar. */}
         </div>
 
         {/* Peramban tidak boleh dimintai izin lokasi tanpa orangnya menekan
-            apa pun — dialog yang muncul sendiri diredam Chrome, dan
+            apa pun, dialog yang muncul sendiri diredam Chrome, dan
             penolakannya melekat sehingga tombol "Lokasiku" pun tidak bisa lagi
             bertanya. Jadi kunjungan pertama tetap butuh satu ketukan; yang
             bisa diperbaiki adalah membuat ketukan itu terlihat, bukan
@@ -498,7 +498,7 @@ export default function PencarianRuang() {
             <Crosshair className="h-4 w-4 shrink-0 text-brand-dark" />
             <p className="min-w-0 flex-1 text-xs leading-relaxed text-brand-dark">
               Hasil di bawah dihitung dari <strong>{TITIK_BAWAAN.nama}</strong>. Pakai
-              lokasimu sendiri supaya jaraknya benar — cukup sekali, kunjungan
+              lokasimu sendiri supaya jaraknya benar, cukup sekali, kunjungan
               berikutnya otomatis.
             </p>
             <button
@@ -530,10 +530,10 @@ export default function PencarianRuang() {
 
             Sebelumnya ia disembunyikan selama memuat, lalu muncul dan mendorong
             seluruh hasil ke bawah tepat saat orang mulai membacanya. Pergeseran
-            seperti itu paling terasa justru di koneksi lambat — persis keadaan
+            seperti itu paling terasa justru di koneksi lambat, persis keadaan
             saat orang paling tidak sabar. */}
         {/* Bilah ringkas. Marketplace besar menaruh penyaring rinci di balik
-            satu tombol dan menyisakan barisan pilihan yang sedang aktif —
+            satu tombol dan menyisakan barisan pilihan yang sedang aktif 
             karena yang dibutuhkan orang di layar hasil adalah HASILNYA, dan
             penyaring cuma sesekali. */}
         <div className="geser-x -mx-4 flex items-center gap-2 overflow-x-auto px-4 pt-5 pb-1 sm:mx-0 sm:px-0">
@@ -585,7 +585,7 @@ export default function PencarianRuang() {
               bawah, keduanya bertabrakan: dua judul menanyakan hal yang sama dan
               cuma satu yang benar-benar menyaring barang. Sekarang ia menanyakan
               BENTUK tempatnya, dan pertanyaan "mau jualan apa" ada di panel
-              filter — di sana ia menyaring `usaha_diizinkan`, bukan bentuk. */}
+              filter, di sana ia menyaring `usaha_diizinkan`, bukan bentuk. */}
           <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
             Tempat seperti apa?
           </h2>
@@ -657,7 +657,7 @@ export default function PencarianRuang() {
               <p className="mt-1 text-xs text-muted">
                 Pemilik lahan menuliskan usaha apa saja yang boleh jalan di tempatnya.
                 Menyaringnya di sini berarti kamu tidak membuka lahan yang sudah pasti
-                menolak daganganmu — termasuk yang tidak mengizinkan menggoreng.
+                menolak daganganmu, termasuk yang tidak mengizinkan menggoreng.
               </p>
               <div className="geser-x -mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
                 <div className="flex w-max gap-2 pb-1 sm:w-auto sm:flex-wrap">
@@ -859,7 +859,7 @@ export default function PencarianRuang() {
             <p className="text-sm font-semibold">Belum ada yang cocok di sini</p>
             <p className="max-w-md text-xs leading-relaxed text-muted">
               Coba perlebar radiusnya, atau longgarkan jenis usaha, lebar muka, dan
-              harganya. Bisa juga menitipkan kriteriamu di halaman permintaan — pemilik
+              harganya. Bisa juga menitipkan kriteriamu di halaman permintaan, pemilik
               lahan di kecamatanmu bisa melihat hitungannya.
             </p>
             <div className="mt-1 flex flex-wrap justify-center gap-2">
@@ -898,7 +898,7 @@ export default function PencarianRuang() {
             supaya tidak ada yang datang ke sini mengira barangnya diasuransikan. */}
         <p className="mt-12 border-t border-line pt-6 text-xs leading-relaxed text-muted">
           Alamat lengkap dibuka setelah jadwal survei disetujui pemiliknya. Lahan dan
-          ruang di sini disewakan langsung oleh pemiliknya — platform menengahi kalau
+          ruang di sini disewakan langsung oleh pemiliknya, platform menengahi kalau
           ada sengketa, tapi tidak memberi ganti rugi.
         </p>
       </div>

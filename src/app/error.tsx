@@ -30,7 +30,7 @@ export default function Galat({
           Halamannya gagal dimuat
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-muted">
-          Ada yang salah di sisi kami, bukan di perangkatmu. Coba muat ulang — kalau
+          Ada yang salah di sisi kami, bukan di perangkatmu. Coba muat ulang, kalau
           masih sama, tunggu sebentar lalu coba lagi.
         </p>
 

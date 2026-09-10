@@ -66,7 +66,7 @@ export async function getPercakapan(
   };
 }
 
-/** Jumlah pesan belum dibaca di seluruh percakapan — untuk lencana di header. */
+/** Jumlah pesan belum dibaca di seluruh percakapan, untuk lencana di header. */
 export async function pesanBelumDibaca(db: SupabaseClient): Promise<number> {
   const { data, error } = await db.from("percakapan_saya").select("belum_dibaca");
   if (error) return 0;

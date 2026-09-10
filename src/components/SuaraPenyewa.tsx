@@ -69,12 +69,12 @@ function Kosong() {
         Ulasan penyewa
       </p>
       <h2 className="mt-3 font-display text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl">
-        Belum ada ulasan — dan memang belum bisa ada
+        Belum ada ulasan, dan memang belum bisa ada
       </h2>
       <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/85 sm:text-base">
         Ulasan di sini cuma bisa ditulis penyewa yang sewanya sudah{" "}
         <strong className="text-white">selesai</strong>, dan yang dinilai bukan
-        cuma bintang — ia menilai seberapa tepat keterangan yang ditulis pemilik
+        cuma bintang, ia menilai seberapa tepat keterangan yang ditulis pemilik
         dibanding kenyataannya. Tidak ada cara menambahnya dari luar, jadi
         jumlahnya akan bertambah lambat. Itu memang maksudnya.
       </p>
@@ -96,7 +96,7 @@ function Kosong() {
         Yang <strong className="text-white/90">tidak</strong> kami janjikan: ganti
         rugi. Lahan disewakan langsung oleh pemiliknya, dan tidak ada asuransi
         barang. Kalau ada sengketa, kami memutuskan siapa yang benar berdasarkan
-        catatan di atas — bukan membayar kerugiannya.
+        catatan di atas, bukan membayar kerugiannya.
       </p>
 
       <Link

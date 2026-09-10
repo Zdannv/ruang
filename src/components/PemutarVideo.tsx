@@ -34,7 +34,7 @@ export default function PemutarVideo({
     <section className="mt-8">
       <h2 className="font-display text-xl font-bold tracking-tight">Video lahan</h2>
       <p className="mt-1 text-sm text-muted">
-        Direkam pemiliknya. Ketuk untuk memutar — videonya baru diunduh saat itu.
+        Direkam pemiliknya. Ketuk untuk memutar, videonya baru diunduh saat itu.
       </p>
 
       <ul className="geser-x -mx-4 mt-4 flex gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">

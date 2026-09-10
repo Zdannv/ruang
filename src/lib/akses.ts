@@ -90,7 +90,7 @@ export async function mintaKunjungan(
   if (error) throw error;
 }
 
-/** "yyyy-MM-ddTHH:mm" waktu Jakarta — bentuk yang diminta `datetime-local`. */
+/** "yyyy-MM-ddTHH:mm" waktu Jakarta, bentuk yang diminta `datetime-local`. */
 export function waktuJakarta(d: Date): string {
   const bagian = new Intl.DateTimeFormat("sv-SE", {
     timeZone: "Asia/Jakarta",

@@ -51,7 +51,7 @@ export default function FormLupaSandi() {
               yang ada dan yang tidak membuat halaman ini jadi alat memeriksa
               siapa saja yang punya akun di sini. */}
           <p className="text-xs leading-relaxed text-muted">
-            Kami tidak memberi tahu apakah sebuah email terdaftar atau tidak — kalau
+            Kami tidak memberi tahu apakah sebuah email terdaftar atau tidak, kalau
             dibedakan, halaman ini bisa dipakai orang untuk mendata siapa saja yang
             punya akun di sini.
           </p>

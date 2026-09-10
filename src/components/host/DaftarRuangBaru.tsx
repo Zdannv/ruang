@@ -72,8 +72,8 @@ export default function DaftarRuangBaru({ hostId }: { hostId: string }) {
           <div className="rounded-2xl bg-card p-5 ring-1 ring-line">
             <p className="text-sm font-semibold">Sudah cukup fotonya?</p>
             <p className="mt-1.5 text-xs leading-relaxed text-muted">
-              Langkah berikutnya — {terbuka ? "jam boleh jualan" : "jendela akses"} dan
-              menayangkannya — ada di halaman kelola. Kamu bisa ke sana sekarang atau
+              Langkah berikutnya, {terbuka ? "jam boleh jualan" : "jendela akses"} dan
+              menayangkannya, ada di halaman kelola. Kamu bisa ke sana sekarang atau
               nanti; semua yang di atas sudah tersimpan.
             </p>
             <Link

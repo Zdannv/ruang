@@ -39,7 +39,7 @@ export type VideoMilikSaya = {
   keterangan: string | null;
 };
 
-/** Keterangan yang disarankan — sengaja spesifik, bukan "video 1". */
+/** Keterangan yang disarankan, sengaja spesifik, bukan "video 1". */
 export const KETERANGAN_VIDEO = [
   "jalan masuk dari jalan raya",
   "keliling lahan",

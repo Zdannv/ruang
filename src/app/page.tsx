@@ -13,7 +13,7 @@ import { supabaseSiap } from "@/lib/supabase/env";
 import type { TipeRuang } from "@/lib/ruang";
 
 export const metadata: Metadata = {
-  title: "Cari Ruang — lahan nganggur jadi cuan",
+  title: "Cari Ruang · lahan nganggur jadi cuan",
   description:
     "Halaman depan nganggur? Sewakan bulanan ke pedagang di sekitarmu. Mau jualan di pinggir jalan? Sewa lahannya, tanpa beli tanah. Sidoarjo dan Surabaya.",
 };
@@ -102,7 +102,7 @@ const ALASAN = [
   },
   {
     gambar: "2-utilitas",
-    judul: "Listrik, air, atap — ditulis",
+    judul: "Listrik, air, dan atap ditulis",
     isi: "Ada colokan atau nggak, boleh pakai air pemilik atau nggak, ada kanopi atau kena hujan. Tiga hal yang bikin jualan bisa jalan.",
   },
   {
@@ -172,8 +172,8 @@ export default async function Beranda() {
       {/* ── Hero ───────────────────────────────────────────────────────────
           Latar terang, bukan bidang biru penuh seperti versi sebelumnya.
           Bidang warna sebesar itu tidak membawa informasi apa pun, dan justru
-          membuat foto ruang serta harganya — hal yang benar-benar ingin dilihat
-          orang — kalah menonjol. Warnanya sekarang cuma tersisa sebagai kilau
+          membuat foto ruang serta harganya, hal yang benar-benar ingin dilihat
+          orang, kalah menonjol. Warnanya sekarang cuma tersisa sebagai kilau
           tipis di sudut. */}
       <section className="relative -mt-[var(--tinggi-header)] overflow-hidden border-b border-line bg-card pt-[var(--tinggi-header)]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(110%_75%_at_88%_-10%,#f7e3d9_0%,transparent_58%)]" />
@@ -190,7 +190,7 @@ export default async function Beranda() {
 
             <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-muted">
               Sewakan bulanan ke pedagang di sekitarmu. Atau kalau kamu yang mau
-              jualan — sewa lahan di pinggir jalan, tanpa beli tanah.
+              jualan, sewa lahan di pinggir jalan, tanpa beli tanah.
             </p>
 
             {/* Kotak pencarian dulu di sini. Dipindah ke `/cari` saja: di
@@ -218,7 +218,7 @@ export default async function Beranda() {
                 membaca sebagai aplikasi yang kosong, dan bahkan dengan lima
                 belas ia tidak menjawab pertanyaan yang sedang dipikirkan
                 pengunjung. Yang menggantikannya contoh listing sungguhan di
-                bawah — itu yang benar-benar memberi tahu isinya seperti apa. */}
+                bawah, itu yang benar-benar memberi tahu isinya seperti apa. */}
           </div>
 
           <div className="lg:pl-2">
@@ -229,7 +229,7 @@ export default async function Beranda() {
 
       {/* ── Contoh listing ─────────────────────────────────────────────────
           Kartu listing sungguhan dari database, bukan gambar contoh. Ini yang
-          paling cepat menjawab "aplikasinya isinya apa" — jauh lebih cepat
+          paling cepat menjawab "aplikasinya isinya apa", jauh lebih cepat
           daripada deret angka yang dulu ada di hero.
 
           Disembunyikan seluruhnya kalau belum ada isinya: bagian berjudul
@@ -264,7 +264,7 @@ export default async function Beranda() {
                 Mau sewa salah satunya?
               </p>
               <p className="mt-1 text-sm leading-relaxed text-muted">
-                Bikin akun dulu — gratis, dan sekalian dipakai buat chat pemiliknya.
+                Bikin akun dulu, gratis, dan sekalian dipakai buat chat pemiliknya.
               </p>
             </div>
             <div className="mt-4 flex flex-wrap gap-2 sm:mt-0 sm:shrink-0">
@@ -302,7 +302,7 @@ export default async function Beranda() {
               className="naik naik-hover group flex gap-4 rounded-2xl border border-line bg-card p-5"
             >
               {/* Petak 80/96px, bukan ikon 44px. Di ukuran itu ilustrasi
-                  masih terbaca asal isinya satu benda — lihat catatan di
+                  masih terbaca asal isinya satu benda, lihat catatan di
                   `skrip/buat-ilustrasi.py`. */}
               <Image
                 src={`/segmen/${g.gambar}.svg`}
@@ -361,14 +361,14 @@ export default async function Beranda() {
             Yang kamu dapat
           </h2>
           {/* Dua kolom di telepon, dengan alasan yang sama persis seperti
-              kartu langkah — dan di sini ia diukur setelah salah dulu: satu
+              kartu langkah, dan di sini ia diukur setelah salah dulu: satu
               kolom berilustrasi membuat bagian ini 1758px, dan orang berhenti
               menggulir sebelum sampai alasan keempat. Dua kolom: 908px. */}
           <div className="mt-8 grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-6 lg:grid-cols-4">
             {ALASAN.map((a) => (
               <div key={a.judul}>
                 {/* Ilustrasi di atas judul, bentuk yang sama dengan kartu
-                    langkah — keduanya bagian penjelasan, dan dua pola berbeda
+                    langkah, keduanya bagian penjelasan, dan dua pola berbeda
                     di satu halaman terbaca sebagai dua bagian yang tidak
                     berhubungan. Kartunya sekitar 250px di laptop. */}
                 <Image
@@ -397,7 +397,7 @@ export default async function Beranda() {
           Cara pakainya
         </h2>
         {/* Dua kolom di telepon, bukan satu. Lima kartu berilustrasi satu
-            kolom membuat bagian ini sekitar 1750px — orang berhenti
+            kolom membuat bagian ini sekitar 1750px, orang berhenti
             menggulir sebelum sampai langkah lima. Bentuk ilustrasinya
             sengaja tegas supaya tetap terbaca di lebar 150px. */}
         <ol className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-5">
@@ -409,7 +409,7 @@ export default async function Beranda() {
               {/* Ilustrasi menggantikan ikon lucide yang dulu di sini.
                   SVG, bukan raster seperti kartu sorotan, karena ukuran
                   tampilnya: kartu ini lebarnya sekitar 210px di laptop dan
-                  165px di telepon — di ukuran itu ilustrasi berdetail tidak
+                  165px di telepon, di ukuran itu ilustrasi berdetail tidak
                   terbaca, dan kelimanya muncul sekaligus di satu halaman.
                   Kelimanya 0,8-0,9 KB. */}
               <Image
@@ -445,16 +445,16 @@ export default async function Beranda() {
               dibangun apa-apa.
             </p>
             <p className="mt-2.5 text-sm leading-relaxed text-white/80">
-              Kamu yang tentukan harganya, jam bukanya, dan jenis usaha apa yang boleh
-              — mau yang nggak menggoreng saja, boleh. Setiap permintaan tetap harus
-              lewat kamu dulu.
+              Kamu yang tentukan harganya, jam bukanya, dan jenis usaha apa yang
+              boleh. Mau yang nggak menggoreng saja, boleh. Setiap permintaan tetap
+              harus lewat kamu dulu.
             </p>
 
             {ringkas.jumlahPencari > 0 && (
               <p className="angka mt-5 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold text-white">
                 {ringkas.jumlahPencari} orang sedang mencari lahan
                 {ringkas.kecamatanTeratas[0] &&
-                  ` — terbanyak di ${ringkas.kecamatanTeratas[0].kecamatan}`}
+                  `, terbanyak di ${ringkas.kecamatanTeratas[0].kecamatan}`}
               </p>
             )}
 

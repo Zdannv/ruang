@@ -29,11 +29,11 @@ import Image from "next/image";
 const KARTU = [
   {
     berkas: "sorotan-1",
-    alt: "Halaman depan nganggur? Jadikan cuan — disewakan bulanan ke pedagang di sekitarmu, Rp 600 ribu per bulan",
+    alt: "Halaman depan nganggur? Jadikan cuan, disewakan bulanan ke pedagang di sekitarmu, Rp 600 ribu per bulan",
   },
   {
     berkas: "sorotan-2",
-    alt: "Sewa, bukan beli — punya lahan sendiri ratusan juta, sewa 2 × 3 meter di depan rumah orang ratusan ribu per bulan",
+    alt: "Sewa, bukan beli, punya lahan sendiri ratusan juta, sewa 2 × 3 meter di depan rumah orang ratusan ribu per bulan",
   },
 ];
 
@@ -188,7 +188,7 @@ export default function SorotanPromo() {
   return (
     <div>
       {/* Geseran mendatar dengan snap. Kartu di sebelahnya sengaja mengintip
-          sedikit di layar telepon — itu isyarat pertama bahwa ia bisa
+          sedikit di layar telepon, itu isyarat pertama bahwa ia bisa
           digeser. Di laptop kartunya selebar penuh dan tidak ada yang
           mengintip, dan di sanalah titik penunjuk di bawah menjadi
           satu-satunya yang memberi tahu bahwa masih ada kartu berikutnya. */}

@@ -19,7 +19,7 @@ export type Jendela = {
 
 export type JendelaPublik = Pick<Jendela, "hari" | "mulai" | "selesai">;
 
-/** Urutan tampilan mulai Senin — itu cara orang di sini menyebut minggu kerja. */
+/** Urutan tampilan mulai Senin, itu cara orang di sini menyebut minggu kerja. */
 export const HARI_URUT = [1, 2, 3, 4, 5, 6, 0];
 
 export const NAMA_HARI: Record<number, string> = {

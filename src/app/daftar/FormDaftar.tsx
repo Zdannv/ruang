@@ -184,7 +184,7 @@ export default function FormDaftar() {
           {tautanLokal && (
             <p className="rounded-xl bg-warn-soft px-3.5 py-2.5 text-left text-xs leading-relaxed text-warn">
               Tautan konfirmasinya menunjuk ke{" "}
-              <code className="font-mono">{tujuanKonfirmasi}</code> — komputer ini. Buka
+              <code className="font-mono">{tujuanKonfirmasi}</code>, komputer ini. Buka
               emailnya di komputer yang sama, dan pastikan{" "}
               <code className="font-mono">npm run dev</code> masih jalan saat kamu
               mengkliknya. Kalau servernya mati, peramban akan menjawab

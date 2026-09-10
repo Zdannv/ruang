@@ -169,12 +169,12 @@ export default function FormProfil({
         <dl className="mt-3 space-y-2 text-sm">
           <div className="flex flex-wrap justify-between gap-3">
             <dt className="text-muted">Email</dt>
-            <dd className="font-medium">{email ?? "—"}</dd>
+            <dd className="font-medium">{email ?? ""}</dd>
           </div>
           <div className="flex flex-wrap justify-between gap-3">
             <dt className="text-muted">Bergabung</dt>
             <dd className="angka font-medium">
-              {bergabung ? bulanTahun(bergabung) : "—"}
+              {bergabung ? bulanTahun(bergabung) : ""}
             </dd>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -192,7 +192,7 @@ export default function FormProfil({
           </div>
         </dl>
         <p className="mt-3 border-t border-line pt-3 text-xs leading-relaxed text-muted">
-          Email tidak bisa diganti dari sini — menggantinya berarti memverifikasi ulang
+          Email tidak bisa diganti dari sini, menggantinya berarti memverifikasi ulang
           alamat yang baru, dan alurnya belum dibangun. Verifikasi identitas menunggu
           vendor e-KYC; kami tidak menyimpan foto KTP di database sendiri.
         </p>

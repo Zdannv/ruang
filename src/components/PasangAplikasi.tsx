@@ -130,7 +130,7 @@ export default function PasangAplikasi() {
       {keadaan === "ios" && (
         <>
           <p className="mt-2 text-sm leading-relaxed text-muted">
-            Di iPhone dan iPad, pemasangan hanya bisa lewat menu Safari — tidak ada
+            Di iPhone dan iPad, pemasangan hanya bisa lewat menu Safari, tidak ada
             tombol yang bisa disediakan halaman ini.
           </p>
           <ol className="mt-3 space-y-2 text-sm text-ink">

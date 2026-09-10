@@ -14,7 +14,7 @@ import type { MetadataRoute } from "next";
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Cari Ruang — lahan nganggur jadi cuan",
+    name: "Cari Ruang · lahan nganggur jadi cuan",
     short_name: "Cari Ruang",
     description:
       "Sewa halaman depan atau lahan kosong di pinggir jalan buat jualan. Bulanan, langsung dari pemiliknya.",

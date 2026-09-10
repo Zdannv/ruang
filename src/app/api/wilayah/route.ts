@@ -106,7 +106,7 @@ export async function GET(permintaan: Request) {
   }
 }
 
-/** Salinan dalam repo — hanya dua tingkat teratas. Lihat komentar di atas. */
+/** Salinan dalam repo, hanya dua tingkat teratas. Lihat komentar di atas. */
 function dariSalinan(
   tingkat: Tingkat,
   kode: string

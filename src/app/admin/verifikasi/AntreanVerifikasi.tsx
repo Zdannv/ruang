@@ -96,7 +96,7 @@ export default function AntreanVerifikasi({ awal }: { awal: BarisVerifikasi[] })
                   </dt>
                   <dd className="min-w-0">
                     {a.alamat}
-                    {a.patokan ? ` (${a.patokan})` : ""} — {a.kelurahan}, {a.kecamatan},{" "}
+                    {a.patokan ? ` (${a.patokan})` : ""}, {a.kelurahan}, {a.kecamatan},{" "}
                     {a.kota}
                     <a
                       href={`https://www.google.com/maps/search/?api=1&query=${a.lat},${a.lng}`}
@@ -153,7 +153,7 @@ export default function AntreanVerifikasi({ awal }: { awal: BarisVerifikasi[] })
                   <label htmlFor={`catatan-${a.id}`} className="text-xs font-medium">
                     Catatan {""}
                     <span className="font-normal text-muted">
-                      (wajib kalau menolak — ini yang dibaca pemiliknya)
+                      (wajib kalau menolak, ini yang dibaca pemiliknya)
                     </span>
                   </label>
                   <textarea
@@ -178,7 +178,7 @@ export default function AntreanVerifikasi({ awal }: { awal: BarisVerifikasi[] })
                       ) : (
                         <Check className="h-3.5 w-3.5" />
                       )}
-                      Sesuai — verifikasi
+                      Sesuai, verifikasi
                     </button>
                     <button
                       type="button"

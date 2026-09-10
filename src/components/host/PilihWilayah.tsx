@@ -134,7 +134,7 @@ export default function PilihWilayah({
       <div className={bungkus}>
         <p className="rounded-xl bg-warn-soft px-3.5 py-2.5 text-xs leading-relaxed text-warn">
           Daftar wilayah sedang tidak bisa diambil, jadi pilihannya belum muncul.
-          Wilayah hanya boleh dipilih dari daftar resmi — mengetiknya sendiri
+          Wilayah hanya boleh dipilih dari daftar resmi, mengetiknya sendiri
           membuat ruangmu terhitung di wilayah yang berbeda dari tetanggamu.
         </p>
         <button
@@ -217,9 +217,9 @@ export default function PilihWilayah({
             . Memilih ulang di atas akan menggantinya.
           </>
         ) : sampaiKelurahan ? (
-          "Pilih sampai kelurahan. Yang terlihat publik cuma kelurahan dan kecamatan — alamat lengkapnya tidak."
+          "Pilih sampai kelurahan. Yang terlihat publik cuma kelurahan dan kecamatan, alamat lengkapnya tidak."
         ) : sampaiKecamatan ? (
-          "Pilih sampai kecamatan — itu satuan yang dilihat host saat menghitung permintaan."
+          "Pilih sampai kecamatan, itu satuan yang dilihat host saat menghitung permintaan."
         ) : (
           "Dipakai sebagai titik awal pencarian, dan bisa diubah kapan pun dari halaman akun."
         )}

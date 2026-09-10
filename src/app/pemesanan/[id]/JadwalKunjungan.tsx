@@ -103,7 +103,7 @@ export default function JadwalKunjungan({
       <p className="mt-1 text-xs leading-relaxed text-muted">
         Jendela akses yang ditetapkan host: <strong className="text-ink">{jendelaAkses}</strong>.
         Permintaan di luar jadwal itu ditolak sistem, bukan diteruskan ke host. Setiap
-        kunjungan tercatat di sini — itu yang menggantikan segel pada penitipan biasa.
+        kunjungan tercatat di sini, itu yang menggantikan segel pada penitipan biasa.
       </p>
 
       {/* Jadwalnya dijabarkan per hari, bukan cuma sebagai label. Label

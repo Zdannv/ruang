@@ -23,7 +23,7 @@ export const LABEL_VERIFIKASI: Record<StatusVerifikasi, string> = {
   ditolak: "Perlu diperbaiki",
 };
 
-/** Satu baris antrean petugas. Memuat alamat lengkap — jangan bocor ke layar publik. */
+/** Satu baris antrean petugas. Memuat alamat lengkap, jangan bocor ke layar publik. */
 export type BarisVerifikasi = {
   id: string;
   judul: string;

@@ -18,7 +18,7 @@ const serif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "Cari Ruang — lahan nganggur jadi cuan",
+  title: "Cari Ruang · lahan nganggur jadi cuan",
   description:
     "Sewa halaman depan atau lahan kosong di pinggir jalan buat jualan. Bulanan, langsung dari pemiliknya. Punya lahan nganggur? Sewakan.",
   applicationName: "Cari Ruang",

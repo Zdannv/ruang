@@ -31,7 +31,7 @@ export default function GaleriFoto({ foto, judul }: { foto: FotoRuang[]; judul: 
       <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-line">
         <Image
           src={utama.url}
-          alt={`${judul} — ${utama.keterangan}`}
+          alt={`${judul}, ${utama.keterangan}`}
           fill
           sizes="(min-width: 1024px) 720px, 100vw"
           className="object-cover"

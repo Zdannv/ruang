@@ -119,7 +119,7 @@ export default function KartuRuang({
 
             Ditaruh di BAWAH, bukan di kanan atas. Versi pertama memakai
             `right-2 top-2` dan di lebar 166px ia menimpa lencana tipe sampai
-            "Halaman depan" terbaca "Hala…" — ketahuan saat kartunya dilihat
+            "Halaman depan" terbaca "Hala…", ketahuan saat kartunya dilihat
             di layar 375px, bukan dari membaca kodenya. */}
         {banjirWaspada && (
           <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-warn px-2 py-0.5 text-[11px] font-semibold text-white shadow-sm sm:bottom-3 sm:left-3 sm:px-2.5 sm:py-1">

@@ -3,7 +3,7 @@ import { supabaseSiap } from "@/lib/supabase/env";
 import PencarianRuang from "@/components/PencarianRuang";
 
 export const metadata = {
-  title: "Cari lahan usaha — Cari Ruang",
+  title: "Cari lahan usaha, Cari Ruang",
   description:
     "Cari lahan pinggir jalan buat jualan: halaman depan rumah, teras, lahan " +
     "kosong, dan kios. Saring per jenis usaha, lebar muka jalan, dan harga.",

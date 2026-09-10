@@ -30,7 +30,7 @@ import {
 } from "@/lib/label";
 import type { TipeRuang } from "@/lib/ruang";
 
-export const metadata: Metadata = { title: "Detail pemesanan — Cari Ruang" };
+export const metadata: Metadata = { title: "Detail pemesanan, Cari Ruang" };
 
 /**
  * Satu pemesanan, dilihat dari sisi mana pun.
@@ -126,7 +126,7 @@ export default async function HalamanDetailPemesanan({
             </p>
             <p className="mt-1 text-xs leading-relaxed text-brand-dark/80">
               Jalur pembayaran menunggu payment gateway berlisensi. Sampai itu ada,
-              pemesanan berhenti di tahap ini — tidak ada tombol yang menandainya
+              pemesanan berhenti di tahap ini, tidak ada tombol yang menandainya
               lunas, karena itu berarti mencatat uang yang belum pernah masuk.
             </p>
           </div>
@@ -164,7 +164,7 @@ export default async function HalamanDetailPemesanan({
               </h2>
               <p className="mt-1 text-xs leading-relaxed text-muted">
                 Ini yang dicocokkan dengan kebijakan pemilik sebelum permintaannya
-                diteruskan. Mau ganti jenis dagangan? Ajukan pemesanan baru — bukan
+                diteruskan. Mau ganti jenis dagangan? Ajukan pemesanan baru, bukan
                 karena sistemnya kaku, tapi karena persetujuan pemiliknya berlaku untuk
                 usaha yang ini.
               </p>
@@ -174,7 +174,7 @@ export default async function HalamanDetailPemesanan({
                   : "Belum dicatat"}
               </p>
               <p className="mt-4 text-xs leading-relaxed text-muted">
-                Tidak ada manifes barang untuk lahan usaha — gerobak dan alat dagang
+                Tidak ada manifes barang untuk lahan usaha, gerobak dan alat dagang
                 dibawa pulang penyewa sendiri. Kalau ada sengketa, platform menengahi
                 tapi tidak memberi ganti rugi.
               </p>
@@ -206,7 +206,7 @@ export default async function HalamanDetailPemesanan({
                         </p>
                       </div>
                       <p className="angka shrink-0 text-sm text-muted">
-                        {m.taksiran_nilai > 0 ? rupiah(m.taksiran_nilai) : "—"}
+                        {m.taksiran_nilai > 0 ? rupiah(m.taksiran_nilai) : ""}
                       </p>
                     </li>
                   ))}
@@ -220,7 +220,7 @@ export default async function HalamanDetailPemesanan({
               )}
               <p className="mt-2 text-xs leading-relaxed text-muted">
                 Taksiran nilai dipakai kalau ada sengketa. Platform menengahi, tapi tidak
-                memberi ganti rugi — tidak ada asuransi barang.
+                memberi ganti rugi, tidak ada asuransi barang.
               </p>
             </section>
           )}
@@ -270,7 +270,7 @@ export default async function HalamanDetailPemesanan({
                       {t.dari && (
                         <span className="font-normal text-muted">
                           {" "}
-                          — dari {(LABEL_STATUS[t.dari] ?? t.dari).toLowerCase()}
+                          dari {(LABEL_STATUS[t.dari] ?? t.dari).toLowerCase()}
                         </span>
                       )}
                     </p>
@@ -306,7 +306,7 @@ export default async function HalamanDetailPemesanan({
               </div>
             </dl>
             <p className="mt-3 border-t border-line pt-3 text-xs text-muted">
-              {sayaHost ? "Penyewa" : "Host"}: {sayaHost ? "—" : p.host_nama}
+              {sayaHost ? "Penyewa" : "Host"}: {sayaHost ? "" : p.host_nama}
             </p>
             <p className="angka mt-1 flex items-center gap-1.5 text-xs text-muted">
               <Package className="h-3.5 w-3.5" />

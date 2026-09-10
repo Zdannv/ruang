@@ -23,7 +23,7 @@ export type StatusPemesanan =
   | "tunggakan"
   | "sengketa";
 
-/** Satu baris `pemesanan_saya` — pemesanan plus ringkasan ruangnya. */
+/** Satu baris `pemesanan_saya`, pemesanan plus ringkasan ruangnya. */
 export type PemesananRingkas = {
   id: string;
   ruang_id: string;
@@ -40,7 +40,7 @@ export type PemesananRingkas = {
   kota: string;
   deposit: number;
   jendela_akses: string;
-  /** NULL berarti tanpa batas — yang biasa dipakai lahan usaha. */
+  /** NULL berarti tanpa batas, yang biasa dipakai lahan usaha. */
   kuota_akses_bulanan: number | null;
   host_id: string;
   host_nama: string;
@@ -89,7 +89,7 @@ export type RuangUntukPesan = {
   deposit: number;
   durasi_min_hari: number;
   kategori_diterima: string[];
-  /** Migrasi 19. Kosong untuk ruang tertutup — di sana yang berlaku manifes. */
+  /** Migrasi 19. Kosong untuk ruang tertutup, di sana yang berlaku manifes. */
   usaha_diizinkan: string[];
   jendela_akses: string;
   /** NULL berarti tanpa batas. */
@@ -256,12 +256,12 @@ export async function batalkanPemesanan(
   if (error) throw error;
 }
 
-/** Jumlah bulan yang ditagih untuk sekian hari — dibulatkan ke atas. */
+/** Jumlah bulan yang ditagih untuk sekian hari, dibulatkan ke atas. */
 export function bulanDari(hari: number): number {
   return hari > 0 ? Math.ceil(hari / 30) : 0;
 }
 
-/** Jumlah bulan yang ditagih — dibulatkan ke atas, sama seperti di database. */
+/** Jumlah bulan yang ditagih, dibulatkan ke atas, sama seperti di database. */
 export function bulanSewa(mulai: string, selesai: string): number {
   return bulanDari(
     Math.round((new Date(selesai).getTime() - new Date(mulai).getTime()) / 86_400_000)

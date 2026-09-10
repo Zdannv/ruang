@@ -8,7 +8,7 @@ import { daftarPermintaanSaya, getPermintaanKecamatan } from "@/lib/permintaan";
 import { rupiah, volume } from "@/lib/label";
 
 export const metadata: Metadata = {
-  title: "Titipkan permintaan — Cari Ruang",
+  title: "Titipkan permintaan, Cari Ruang",
   description:
     "Belum ada lahan yang cocok? Titipkan kriterianya, dan pemilik lahan di " +
     "kecamatanmu akan melihat ada yang mencari.",
@@ -37,7 +37,7 @@ export default async function HalamanPermintaan() {
       </h1>
       <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
         Titipkan kriterianya. Permintaan yang menumpuk di satu kecamatan itulah yang
-        meyakinkan orang di sana untuk menyewakan halaman depannya yang nganggur —
+        meyakinkan orang di sana untuk menyewakan halaman depannya yang nganggur 
         pemilik lahan bisa melihat hitungannya per kecamatan, tanpa nama.
       </p>
 
@@ -66,7 +66,7 @@ export default async function HalamanPermintaan() {
           </ul>
           <p className="mt-3 text-xs leading-relaxed text-muted">
             Rata-rata sengaja disembunyikan di kecamatan yang permintaannya kurang dari
-            tiga — di sana &ldquo;rata-rata&rdquo; berarti anggaran satu orang tertentu.
+            tiga, di sana &ldquo;rata-rata&rdquo; berarti anggaran satu orang tertentu.
           </p>
         </section>
       )}

@@ -10,7 +10,7 @@ import { tabelBelumAda } from "@/lib/galat";
 import MigrasiKurang from "@/components/MigrasiKurang";
 import { tanggalPendek } from "@/lib/label";
 
-export const metadata: Metadata = { title: "Pesan — Cari Ruang" };
+export const metadata: Metadata = { title: "Pesan, Cari Ruang" };
 
 export default async function HalamanPesan() {
   const sesi = await sesiSaya();
@@ -42,7 +42,7 @@ export default async function HalamanPesan() {
     <div className="mx-auto w-full max-w-2xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
       <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">Pesan</h1>
       <p className="mt-1.5 text-sm text-muted">
-        Tanya-jawab dengan host sebelum memesan, dan lanjutannya setelah memesan —
+        Tanya-jawab dengan host sebelum memesan, dan lanjutannya setelah memesan 
         satu utas per ruang.
       </p>
 

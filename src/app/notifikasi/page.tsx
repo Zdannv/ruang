@@ -6,7 +6,7 @@ import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { daftarNotifikasi } from "@/lib/notifikasi";
 
-export const metadata: Metadata = { title: "Notifikasi — Cari Ruang" };
+export const metadata: Metadata = { title: "Notifikasi, Cari Ruang" };
 
 export default async function HalamanNotifikasi() {
   const sesi = await sesiSaya();
@@ -21,7 +21,7 @@ export default async function HalamanNotifikasi() {
         Notifikasi
       </h1>
       <p className="mt-1.5 text-sm text-muted">
-        Email dan WhatsApp menyusul — keduanya menunggu penyedia di luar.
+        Email dan WhatsApp menyusul, keduanya menunggu penyedia di luar.
       </p>
 
       {sesi.profil && <TombolPush profilId={sesi.profil.id} />}

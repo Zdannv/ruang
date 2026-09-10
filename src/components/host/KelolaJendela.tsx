@@ -72,15 +72,15 @@ export default function KelolaJendela({
       </h2>
       <p className="mt-1 text-xs leading-relaxed text-muted">
         {terbuka
-          ? "Jam saat pedagang boleh buka di lahanmu. Ini ditegakkan sistem, jadi jangan diisi lebih sempit dari yang kamu benar-benar izinkan — di luar jam ini ia tidak bisa jualan."
+          ? "Jam saat pedagang boleh buka di lahanmu. Ini ditegakkan sistem, jadi jangan diisi lebih sempit dari yang kamu benar-benar izinkan, di luar jam ini ia tidak bisa jualan."
           : "Jam saat penyewa boleh datang. Ini ditegakkan sistem: permintaan kunjungan di luar jadwal ini ditolak otomatis, jadi penyewa tidak perlu menebak dan kamu tidak perlu menolak satu-satu."}
       </p>
 
       {jendela.length === 0 && (
         <p className="mt-3 rounded-xl bg-warn-soft px-3.5 py-2.5 text-sm text-warn">
           {terbuka
-            ? "Belum ada jadwal. Selama kosong, pedagang boleh jualan kapan saja. Isi jadwalnya kalau kamu mau membatasi — misalnya cuma sore sampai malam."
-            : "Belum ada jadwal. Selama kosong, kunjungan boleh diminta kapan saja — supaya penyewa tidak terkurung dari barangnya. Isi jadwalnya supaya batasnya jelas."}
+            ? "Belum ada jadwal. Selama kosong, pedagang boleh jualan kapan saja. Isi jadwalnya kalau kamu mau membatasi, misalnya cuma sore sampai malam."
+            : "Belum ada jadwal. Selama kosong, kunjungan boleh diminta kapan saja, supaya penyewa tidak terkurung dari barangnya. Isi jadwalnya supaya batasnya jelas."}
         </p>
       )}
 
@@ -195,7 +195,7 @@ export default function KelolaJendela({
         </div>
         <p className="mt-2 text-xs text-muted">
           Jam ditulis waktu Jakarta. Satu hari boleh punya dua rentang, misalnya pagi
-          dan sore — tambahkan dua kali.
+          dan sore, tambahkan dua kali.
         </p>
       </div>
 

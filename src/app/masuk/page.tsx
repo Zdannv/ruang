@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import FormMasuk from "./FormMasuk";
 
-export const metadata: Metadata = { title: "Masuk — Cari Ruang" };
+export const metadata: Metadata = { title: "Masuk, Cari Ruang" };
 
 /** `useSearchParams` di dalam form memaksa batas Suspense di atasnya. */
 export default function HalamanMasuk() {

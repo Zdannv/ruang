@@ -6,7 +6,7 @@ import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { antreanVerifikasi, sayaAdmin } from "@/lib/verifikasi";
 
-export const metadata: Metadata = { title: "Verifikasi lahan — Cari Ruang" };
+export const metadata: Metadata = { title: "Verifikasi lahan, Cari Ruang" };
 
 /**
  * Antrean petugas.
@@ -50,13 +50,13 @@ export default async function HalamanVerifikasi() {
           : "Tidak ada yang menunggu kunjungan."}{" "}
         Yang dicek cuma satu hal: apakah keterangan di listing cocok dengan
         keadaan di lokasi. Kalau ada yang tidak cocok, tolak dan tulis apa yang
-        harus diperbaiki — itu yang dibaca pemiliknya.
+        harus diperbaiki, itu yang dibaca pemiliknya.
       </p>
 
       <div className="mt-4 rounded-2xl bg-warn-soft px-4 py-3 text-xs leading-relaxed text-warn">
         Alamat lengkap dan nomor pemilik di halaman ini cuma untuk keperluan
         kunjungan. Lencana &ldquo;terverifikasi&rdquo; menyatakan keterangannya cocok pada
-        hari kunjungan — bukan jaminan keamanan, dan bukan asuransi.
+        hari kunjungan, bukan jaminan keamanan, dan bukan asuransi.
       </div>
 
       <AntreanVerifikasi awal={antrean} />

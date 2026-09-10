@@ -181,7 +181,7 @@ export default function FormPesan({ ruang }: { ruang: RuangUntukPesan }) {
             <h2 className="font-display text-lg font-bold tracking-tight">Jenis usaha</h2>
             <p className="mt-1 text-xs leading-relaxed text-muted">
               Pilih yang paling mendekati daganganmu. Yang tampil di bawah cuma yang
-              memang diizinkan pemilik lahan — jadi kamu tidak perlu menunggu jawaban
+              memang diizinkan pemilik lahan, jadi kamu tidak perlu menunggu jawaban
               untuk sesuatu yang sudah pasti ditolak.
             </p>
 
@@ -218,7 +218,7 @@ export default function FormPesan({ ruang }: { ruang: RuangUntukPesan }) {
 
             <p className="mt-4 text-xs leading-relaxed text-muted">
               Gerobak, meja, dan alat daganganmu tetap milikmu dan dibawa pulang
-              sendiri — tidak ada manifes barang untuk lahan usaha. Kalau ada
+              sendiri, tidak ada manifes barang untuk lahan usaha. Kalau ada
               sengketa, platform menengahi tapi tidak memberi ganti rugi.
             </p>
           </section>
@@ -227,7 +227,7 @@ export default function FormPesan({ ruang }: { ruang: RuangUntukPesan }) {
             <h2 className="font-display text-lg font-bold tracking-tight">Manifes barang</h2>
             <p className="mt-1 text-xs leading-relaxed text-muted">
               Wajib diisi. Kategorinya dicocokkan dengan kebijakan host sebelum
-              permintaanmu diteruskan — host berhak menolak barang yang tidak sesuai.
+              permintaanmu diteruskan, host berhak menolak barang yang tidak sesuai.
               Daftar ini juga jadi acuan saat serah terima.
             </p>
 
@@ -334,7 +334,7 @@ export default function FormPesan({ ruang }: { ruang: RuangUntukPesan }) {
 
             <p className="mt-4 text-xs leading-relaxed text-muted">
               Taksiran nilai dipakai kalau ada sengketa. Platform menengahi, tapi tidak
-              memberi ganti rugi — tidak ada asuransi barang.
+              memberi ganti rugi, tidak ada asuransi barang.
             </p>
           </section>
         )}

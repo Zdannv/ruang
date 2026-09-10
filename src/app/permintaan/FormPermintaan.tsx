@@ -128,7 +128,7 @@ export default function FormPermintaan({
           Titipkan kriteriamu
         </h2>
         <p className="mt-1 text-xs leading-relaxed text-muted">
-          Host di kecamatan itu melihat ada berapa orang yang mencari — tanpa nama,
+          Host di kecamatan itu melihat ada berapa orang yang mencari, tanpa nama,
           tanpa kontak. Yang terlihat cuma hitungannya, dan rata-rata anggaran baru
           muncul kalau ada minimal tiga permintaan di kecamatan yang sama.
         </p>

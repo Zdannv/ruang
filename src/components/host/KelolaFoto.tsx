@@ -105,7 +105,7 @@ export default function KelolaFoto({
       )}
       <p className="mt-1.5 text-xs leading-relaxed text-muted">
         Foto diperkecil dan disimpan ulang di peramban sebelum diunggah, sehingga
-        metadata aslinya ikut terbuang — termasuk koordinat GPS yang biasanya
+        metadata aslinya ikut terbuang, termasuk koordinat GPS yang biasanya
         menempel di foto HP. Tanpa itu, alamat persis lahanmu terbaca dari berkas
         gambar yang publik.
       </p>

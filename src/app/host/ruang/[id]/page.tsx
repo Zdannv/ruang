@@ -15,7 +15,7 @@ import { daftarVideo } from "@/lib/video";
 import { daftarJendela } from "@/lib/jendela";
 import { pakaiLuas } from "@/lib/label";
 
-export const metadata: Metadata = { title: "Kelola lahan — Cari Ruang" };
+export const metadata: Metadata = { title: "Kelola lahan, Cari Ruang" };
 
 export default async function KelolaRuang({ params }: PageProps<"/host/ruang/[id]">) {
   const { id } = await params;
@@ -127,7 +127,7 @@ export default async function KelolaRuang({ params }: PageProps<"/host/ruang/[id
           terbuka={pakaiLuas(ruang.tipe)}
         />
         {/* `?? "belum"` menjaga halaman ini tetap terbuka di database yang
-            belum menjalankan migrasi 20 — kolomnya belum ada di view, dan
+            belum menjalankan migrasi 20, kolomnya belum ada di view, dan
             halaman kelola tidak boleh mati karena penyempurnaan yang belum
             dipasang. Pengajuannya sendiri tetap ditolak RPC di sana. */}
         <KelolaVerifikasi

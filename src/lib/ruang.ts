@@ -63,7 +63,7 @@ export type HasilRuang = {
   kota: string;
   lat_publik: number;
   lng_publik: number;
-  /** Untuk lahan terbuka, ini ukuran yang berarti — bukan volume. */
+  /** Untuk lahan terbuka, ini ukuran yang berarti, bukan volume. */
   luas_m2: number;
   /** Untuk lahan terbuka, ini SISI YANG MENGHADAP JALAN. Lihat `FormRuang`. */
   lebar_m: number;
@@ -242,7 +242,7 @@ export type UlasanRuang = {
   penulis_foto_url: string | null;
 };
 
-/** Satu baris `ruang_publik` — kolom publik, plus data host yang sudah ikut. */
+/** Satu baris `ruang_publik`, kolom publik, plus data host yang sudah ikut. */
 export type RuangPublik = {
   id: string;
   judul: string;
@@ -280,7 +280,7 @@ export type RuangPublik = {
   tempat_terverifikasi: boolean;
   verifikasi_pada: string | null;
   jendela_akses: string;
-  /** NULL berarti tanpa batas — lihat migrasi 19. */
+  /** NULL berarti tanpa batas, lihat migrasi 19. */
   kuota_akses_bulanan: number | null;
   durasi_min_hari: number;
   harga_bulanan: number;

@@ -8,7 +8,7 @@ import { klienServer } from "@/lib/supabase/server";
 import { daftarRuangSaya } from "@/lib/host";
 import { LABEL_TIPE, luas, pakaiLuas, rupiah, volume } from "@/lib/label";
 
-export const metadata: Metadata = { title: "Dasbor host — Cari Ruang" };
+export const metadata: Metadata = { title: "Dasbor host, Cari Ruang" };
 
 /**
  * Dasbor host.
@@ -105,7 +105,7 @@ export default async function DasborHost() {
                 </span>
                 <span className="mt-0.5 block text-xs text-warn/80">
                   Selama daftarnya kosong, tidak ada pedagang yang bisa mengirim
-                  permintaan — sistem menolaknya lebih dulu. Centang minimal satu.
+                  permintaan, sistem menolaknya lebih dulu. Centang minimal satu.
                 </span>
               </span>
             </Link>
@@ -150,13 +150,13 @@ export default async function DasborHost() {
           <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted">
             Halaman depan rumah yang cuma jadi tempat parkir sepeda, teras samping,
             pojok lahan kosong yang menghadap jalan. Kamu yang menentukan harga, jam
-            boleh jualan, dan jenis usaha apa saja yang boleh — termasuk boleh
-            menggoreng atau tidak — dan tetap berhak menolak permintaan.
+            boleh jualan, dan jenis usaha apa saja yang boleh, termasuk boleh
+            menggoreng atau tidak, dan tetap berhak menolak permintaan.
           </p>
           <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted">
             Yang menyewa biasanya pedagang makanan dan minuman, kopi keliling yang
             capek pindah-pindah, jualan buah, atau tukang tambal ban. Ruang
-            tertutup — garasi, gudang, lantai ruko — juga tetap bisa didaftarkan di
+            tertutup, garasi, gudang, lantai ruko, juga tetap bisa didaftarkan di
             sini.
           </p>
           <Link

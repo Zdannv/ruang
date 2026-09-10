@@ -70,7 +70,7 @@ export default async function Header() {
             </Suspense>
 
             {/* Tautan petugas, dan HANYA tautannya yang disembunyikan.
-                Gerbang sungguhannya ada di database — `antrean_verifikasi()`
+                Gerbang sungguhannya ada di database, `antrean_verifikasi()`
                 menolak siapa pun yang bukan admin di baris pertama. */}
             {admin && (
               <Link

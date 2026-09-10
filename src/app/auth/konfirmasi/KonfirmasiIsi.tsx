@@ -93,7 +93,7 @@ export default function KonfirmasiIsi() {
         <CircleX className="h-10 w-10 text-warn" />
         <p className="text-xs leading-relaxed text-muted">
           Tautan konfirmasi hanya bisa dipakai sekali. Kalau akunmu sudah aktif, tautan
-          yang sama akan gagal — dan itu wajar. Coba masuk lebih dulu sebelum meminta
+          yang sama akan gagal, dan itu wajar. Coba masuk lebih dulu sebelum meminta
           email baru.
         </p>
         <Link

@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import DaftarRuangBaru from "@/components/host/DaftarRuangBaru";
 import { sesiSaya } from "@/lib/auth";
 
-export const metadata: Metadata = { title: "Sewakan lahan — Cari Ruang" };
+export const metadata: Metadata = { title: "Sewakan lahan, Cari Ruang" };
 
 export default async function RuangBaru() {
   const sesi = await sesiSaya();
@@ -26,13 +26,7 @@ export default async function RuangBaru() {
         Sewakan lahanmu
       </h1>
       <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
-        Dua langkah: keterangan lahannya dulu, lalu fotonya. Simpan sebagai draf
-        kalau belum yakin — draf tidak terlihat siapa pun sampai kamu menayangkannya.
-      </p>
-      <p className="mt-2 max-w-xl text-xs leading-relaxed text-muted">
-        Bawaannya halaman depan rumah. Kalau yang kamu sewakan ruang tertutup —
-        garasi, gudang, lantai ruko — ganti tipenya di isian pertama, dan
-        pertanyaannya ikut berubah.
+        Keterangan lahannya dulu, lalu fotonya.
       </p>
 
       <DaftarRuangBaru hostId={sesi.profil.id} />

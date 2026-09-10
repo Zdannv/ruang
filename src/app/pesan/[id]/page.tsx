@@ -15,7 +15,7 @@ import {
   type RuangUntukBalasan,
 } from "@/lib/balasan";
 
-export const metadata: Metadata = { title: "Percakapan — Cari Ruang" };
+export const metadata: Metadata = { title: "Percakapan, Cari Ruang" };
 
 export default async function HalamanUtas({ params }: PageProps<"/pesan/[id]">) {
   const { id } = await params;

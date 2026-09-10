@@ -350,11 +350,6 @@ export default function FormRuang({
                 ? "mis. Halaman depan pinggir jalan raya, muka 4 m"
                 : "mis. Garasi kering, mobil sudah dijual"
             }
-            bantuan={
-              terbuka
-                ? "Sebutkan yang paling menentukan: pinggir jalan raya, muka lebar, ada colokan."
-                : "Sebutkan yang paling menentukan: kering, muat truk, dekat kampus."
-            }
           />
         </div>
         <Pilihan
@@ -363,11 +358,6 @@ export default function FormRuang({
           value={isi.tipe}
           onChange={(e) => gantiTipe(e.target.value as IsiRuang["tipe"])}
           opsi={opsi(LABEL_TIPE)}
-          bantuan={
-            terbuka
-              ? "Lahan terbuka: yang ditanyakan lebar muka jalan dan jenis usaha."
-              : "Ruang tertutup: yang ditanyakan volume dan kategori barang."
-          }
         />
         <Pilihan
           id="kepemilikan"
@@ -375,13 +365,13 @@ export default function FormRuang({
           value={isi.kepemilikan}
           onChange={(e) => ubah("kepemilikan", e.target.value as IsiRuang["kepemilikan"])}
           opsi={opsi(LABEL_KEPEMILIKAN)}
-          bantuan="Kalau kamu menyewa tempatnya, pastikan pemiliknya mengizinkan disewakan lagi."
+          bantuan="Kalau kamu menyewa, pastikan pemiliknya mengizinkan disewakan lagi."
         />
       </Bagian>
 
       <Bagian
         judul="Lokasi"
-        keterangan="Alamat lengkap tidak pernah ditampilkan ke publik — yang terlihat cuma kelurahan, kecamatan, dan jarak. Titik di peta digeser sekitar 200 m otomatis, dan pergeserannya tidak bisa dimatikan."
+        keterangan="Alamat lengkap tidak pernah tampil ke publik. Yang terlihat cuma kelurahan, kecamatan, dan jarak."
       >
         <div className="sm:col-span-2">
           <Kolom
@@ -458,12 +448,12 @@ export default function FormRuang({
       </Bagian>
 
       {/*
-        Untuk lahan terbuka, LEBAR adalah lebar muka jalan — dan itu sebabnya
+        Untuk lahan terbuka, LEBAR adalah lebar muka jalan, dan itu sebabnya
         tidak ada isian "lebar muka jalan" tersendiri.
 
         Sempat ada, dan dibuang 10 September 2026 karena formulirnya terlalu
         panjang: pemiliknya harus mengukur satu angka lagi untuk sesuatu yang
-        sudah ia sebutkan. Aturan di CLAUDE.md sudah menyebutnya — kalau
+        sudah ia sebutkan. Aturan di CLAUDE.md sudah menyebutnya, kalau
         sebuah keterangan bisa diturunkan dari kolom yang ada, turunkan,
         jangan simpan salinannya. Yang berubah cuma labelnya, dan justru itu
         yang membuat angkanya berarti: "lebar 3 m" jadi jawaban atas
@@ -473,12 +463,10 @@ export default function FormRuang({
         judul="Ukuran"
         keterangan={
           terbuka
-            ? `Kira-kira saja, tidak perlu diukur pita. Luasnya dihitung otomatis: ${luas(
-                (isi.panjang_m ?? 0) * (isi.lebar_m ?? 0)
-              )}.`
-            : `Luas dan volume dihitung otomatis: ${luas(
-                (isi.panjang_m ?? 0) * (isi.lebar_m ?? 0)
-              )} · ${volume((isi.panjang_m ?? 0) * (isi.lebar_m ?? 0) * (isi.tinggi_m ?? 0))}`
+            ? `Kira-kira saja. Luas: ${luas((isi.panjang_m ?? 0) * (isi.lebar_m ?? 0))}`
+            : `Luas ${luas((isi.panjang_m ?? 0) * (isi.lebar_m ?? 0))} · volume ${volume(
+                (isi.panjang_m ?? 0) * (isi.lebar_m ?? 0) * (isi.tinggi_m ?? 0)
+              )}`
         }
       >
         <KolomAngka
@@ -519,11 +507,7 @@ export default function FormRuang({
 
       <Bagian
         judul={terbuka ? "Akses dan parkir" : "Akses masuk"}
-        keterangan={
-          terbuka
-            ? "Pembeli pedagang datang naik motor dan berhenti sebentar. Jarak parkir di sini soal pelanggannya, bukan soal mengangkut barang."
-            : "Ini yang paling sering membatalkan sewa setelah orang datang melihat. Isi apa adanya."
-        }
+        keterangan={terbuka ? undefined : "Isi apa adanya. Ini yang paling sering membatalkan sewa."}
       >
         <Pilihan
           id="akses"
@@ -551,7 +535,7 @@ export default function FormRuang({
               satuan="cm"
               nilai={isi.lebar_pintu_cm}
               onNilai={(n) => ubah("lebar_pintu_cm", n)}
-              bantuan="Ukur bagian tersempit yang harus dilewati barang."
+              bantuan="Bagian tersempit yang harus dilewati barang."
             />
           </>
         )}
@@ -591,15 +575,15 @@ export default function FormRuang({
           value={isi.riwayat_banjir}
           onChange={(e) => ubah("riwayat_banjir", e.target.value as IsiRuang["riwayat_banjir"])}
           opsi={opsi(LABEL_BANJIR)}
-          bantuan="Ini ditampilkan menonjol di kartu hasil. Menyembunyikannya cuma menunda pembatalan."
+          bantuan="Tampil menonjol di kartu hasil."
         />
         {/*
           "Tinggi lahan dari jalan" dibuang untuk lahan terbuka, 10 September
           2026. Ia menuntut pengukuran dalam sentimeter untuk sesuatu yang
           hampir selalu nol atau satu anak tangga, dan pemiliknya berhenti
           mengisi formulir di situ. Riwayat banjir di sebelahnya sudah
-          menjawab pertanyaan yang sama — apakah lahannya aman saat jalan
-          tergenang — dan itu bisa dijawab tanpa alat ukur.
+          menjawab pertanyaan yang sama, apakah lahannya aman saat jalan
+          tergenang, dan itu bisa dijawab tanpa alat ukur.
 
           Untuk ruang tertutup ia TETAP: di sana ia soal air yang masuk ke
           barang orang lain, dan lantai 20 cm di atas tanah adalah keterangan
@@ -634,11 +618,7 @@ export default function FormRuang({
           value={isi.berbagi}
           onChange={(e) => ubah("berbagi", e.target.value as IsiRuang["berbagi"])}
           opsi={opsi(LABEL_BERBAGI)}
-          bantuan={
-            terbuka
-              ? "Satu lahan boleh dibagi ke beberapa pedagang — pilih yang sesuai."
-              : undefined
-          }
+          bantuan={terbuka ? "Boleh dibagi ke beberapa pedagang." : undefined}
         />
         <div className="sm:col-span-2">
           <KotakCentangGanda
@@ -665,7 +645,7 @@ export default function FormRuang({
       {terbuka && (
         <Bagian
           judul="Lahan usaha"
-          keterangan="Jenis usaha yang tidak kamu centang otomatis ditolak sistem sebelum permintaannya sampai ke kamu — termasuk yang menggoreng. Lebar muka jalannya sudah diisi di bagian Ukuran."
+          keterangan="Yang tidak kamu centang otomatis ditolak sistem, termasuk yang menggoreng."
         >
           <div className="sm:col-span-2">
             <KotakCentangGanda
@@ -712,8 +692,8 @@ export default function FormRuang({
         judul="Aturan"
         keterangan={
           terbuka
-            ? "Sewa minimum dan kuota kunjungan. Untuk lahan usaha, kuota biasanya dibiarkan kosong — pedagang ada di sana setiap hari."
-            : "Manifes penyewa dicocokkan dengan kategori di bawah sebelum permintaannya sampai ke kamu. Kategori yang tidak dicentang otomatis ditolak sistem."
+            ? undefined
+            : "Kategori yang tidak dicentang otomatis ditolak sistem."
         }
       >
         {!terbuka && (
@@ -735,11 +715,7 @@ export default function FormRuang({
           satuan="x"
           nilai={isi.kuota_akses_bulanan}
           onNilai={(n) => ubah("kuota_akses_bulanan", n)}
-          bantuan={
-            terbuka
-              ? "Biarkan kosong — pedagang jualan setiap hari, bukan datang beberapa kali sebulan."
-              : "Kosongkan untuk tanpa batas."
-          }
+          bantuan="Kosongkan untuk tanpa batas."
         />
         <KolomAngka
           id="durasi"
@@ -754,7 +730,7 @@ export default function FormRuang({
 
       {/*
         Keterangannya dulu berbunyi "yang sewa 3 bulan membayar ...", dan tiga
-        bulan itu angka karangan — tidak ada apa pun di aplikasi ini yang
+        bulan itu angka karangan, tidak ada apa pun di aplikasi ini yang
         mewajibkannya. Sekarang yang dipakai sewa MINIMUM yang pemiliknya
         sendiri tetapkan sebaris di atas, jadi angkanya benar-benar berlaku.
       */}
@@ -765,7 +741,7 @@ export default function FormRuang({
             ? `Sewa minimum ${isi.durasi_min_hari} hari berarti ${rupiah(
                 isi.harga_bulanan * bulanDari(isi.durasi_min_hari)
               )}${isi.deposit ? `, plus deposit ${rupiah(isi.deposit)}` : ""}.`
-            : "Bulan dibulatkan ke atas: sewa 45 hari dihitung dua bulan."
+            : "Bulan dibulatkan ke atas."
         }
       >
         <KolomAngka
@@ -794,15 +770,11 @@ export default function FormRuang({
           value={isi.status}
           onChange={(e) => ubah("status", e.target.value as IsiRuang["status"])}
           opsi={[
-            ["draf", "Draf — belum terlihat siapa pun"],
-            ["tayang", "Tayang — muncul di pencarian"],
-            ["ditangguhkan", "Ditangguhkan — sementara tidak menerima penyewa"],
+            ["draf", "Draf, belum terlihat siapa pun"],
+            ["tayang", "Tayang, muncul di pencarian"],
+            ["ditangguhkan", "Ditangguhkan, sementara tidak menerima penyewa"],
           ]}
-          bantuan={
-            terbuka
-              ? "Tayangkan setelah fotonya ada. Pedagang mau lihat mukanya ke jalan dulu."
-              : "Tayangkan setelah fotonya ada. Ruang tanpa foto hampir tidak pernah diklik."
-          }
+          bantuan="Tayangkan setelah fotonya ada."
         />
       </Bagian>
 

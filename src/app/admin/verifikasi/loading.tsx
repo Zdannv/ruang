@@ -1,4 +1,4 @@
-/** Kerangka; setiap rute punya satu — lihat aturan region di CLAUDE.md. */
+/** Kerangka; setiap rute punya satu, lihat aturan region di CLAUDE.md. */
 export default function Memuat() {
   return (
     <div className="mx-auto w-full max-w-4xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">

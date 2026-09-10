@@ -9,7 +9,7 @@ import { klienServer } from "@/lib/supabase/server";
 import { jumlahBelumDibaca } from "@/lib/notifikasi";
 import { pesanBelumDibaca } from "@/lib/percakapan";
 
-export const metadata: Metadata = { title: "Profil — Cari Ruang" };
+export const metadata: Metadata = { title: "Profil, Cari Ruang" };
 
 type UsahaProfil = { nama_usaha: string | null; npwp: string | null };
 type WilayahProfil = { kelurahan: string | null; kecamatan: string | null };
@@ -93,7 +93,7 @@ export default async function HalamanProfil() {
       </p>
 
       {/* Notifikasi dijangkau dari sini juga, bukan cuma dari lonceng di
-          header — lonceng itu disembunyikan di layar kecil. */}
+          header, lonceng itu disembunyikan di layar kecil. */}
       <Link
         href="/notifikasi"
         className="naik naik-hover mt-6 flex items-center gap-3 rounded-2xl border border-line bg-card p-4"

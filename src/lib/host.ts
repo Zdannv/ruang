@@ -71,7 +71,7 @@ export type IsiRuang = {
   air: string | null;
   atap: string | null;
   kelas_jalan: string | null;
-  /** NULL berarti tanpa batas — yang benar untuk lahan usaha. */
+  /** NULL berarti tanpa batas, yang benar untuk lahan usaha. */
   kuota_akses_bulanan: number | null;
   durasi_min_hari: number | null;
   harga_bulanan: number | null;
@@ -214,7 +214,7 @@ export function keteranganFoto(terbuka: boolean): string[] {
   return terbuka ? KETERANGAN_FOTO_LAHAN : KETERANGAN_FOTO_RUANG;
 }
 
-/** Sisi terpanjang versi penuh — dipakai galeri di halaman detail. */
+/** Sisi terpanjang versi penuh, dipakai galeri di halaman detail. */
 const LEBAR_MAKS = 1600;
 
 /**

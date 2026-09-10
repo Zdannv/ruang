@@ -67,7 +67,7 @@ export async function hapusPermintaan(db: SupabaseClient, id: string): Promise<v
   if (error) throw error;
 }
 
-/** Hitungan permintaan per kecamatan — boleh dibaca siapa pun. */
+/** Hitungan permintaan per kecamatan, boleh dibaca siapa pun. */
 export async function getPermintaanKecamatan(
   db: SupabaseClient
 ): Promise<PermintaanKecamatan[]> {

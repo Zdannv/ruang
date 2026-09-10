@@ -67,7 +67,7 @@ export default function Footer() {
           </p>
           <p>
             Lahan disewakan langsung oleh pemiliknya. Kalau ada sengketa, platform
-            menengahi dan memutuskan siapa yang benar — tapi tidak membayar ganti
+            menengahi dan memutuskan siapa yang benar, tapi tidak membayar ganti
             rugi. Tidak ada asuransi barang.
           </p>
           <p className="pt-2">Pembayaran belum aktif; menunggu payment gateway berlisensi.</p>

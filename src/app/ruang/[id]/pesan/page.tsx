@@ -9,7 +9,7 @@ import { getRuangUntukPesan } from "@/lib/pemesanan";
 import { pakaiLuas } from "@/lib/label";
 import type { TipeRuang } from "@/lib/ruang";
 
-export const metadata: Metadata = { title: "Ajukan sewa — Cari Ruang" };
+export const metadata: Metadata = { title: "Ajukan sewa, Cari Ruang" };
 
 /**
  * Formulir pengajuan sewa.

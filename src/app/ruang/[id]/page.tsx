@@ -77,11 +77,11 @@ export async function generateMetadata({ params }: PageProps<"/ruang/[id]">) {
   if (!supabaseSiap) return { title: "Cari Ruang" };
   const { id } = await params;
   const data = await ambilDetail(id).catch(() => null);
-  if (!data) return { title: "Lahan tidak ditemukan — Cari Ruang" };
+  if (!data) return { title: "Lahan tidak ditemukan, Cari Ruang" };
 
   const { ruang } = data;
   return {
-    title: `${ruang.judul} — ${ruang.kecamatan}, ${ruang.kota} · Cari Ruang`,
+    title: `${ruang.judul}, ${ruang.kecamatan}, ${ruang.kota} · Cari Ruang`,
     // Satuannya ikut tipenya, sama seperti di layar: "18 m³" untuk halaman
     // depan rumah adalah angka yang benar dan tidak berarti apa-apa — dan di
     // sini ia masuk ke cuplikan hasil pencarian Google.
@@ -197,7 +197,7 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
               </h2>
               <p className="mt-1 text-sm text-muted">
                 Lima hal yang menentukan lahannya cocok atau tidak buat daganganmu.
-                Yang belum diisi pemilik ditandai — tanya lewat chat sebelum memesan.
+                Yang belum diisi pemilik ditandai, tanya lewat chat sebelum memesan.
               </p>
 
               <div className="mt-4 grid gap-x-8 rounded-2xl bg-card p-5 ring-1 ring-line sm:grid-cols-2">
@@ -276,7 +276,7 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
                   ikon={Store}
                   judul="Usaha yang diizinkan pemilik"
                   isi={labelDaftar(ruang.usaha_diizinkan, LABEL_USAHA)}
-                  kosong="Pemilik belum menuliskannya — tanya dulu lewat chat"
+                  kosong="Pemilik belum menuliskannya, tanya dulu lewat chat"
                   rapat
                 />
                 <p className="mt-3 text-xs leading-relaxed text-muted">
@@ -452,7 +452,7 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
               <p className="text-xs leading-relaxed text-muted">
                 {terbuka
                   ? "Jam di atas yang disepakati; di luar itu lahannya kembali ke pemilik. Kuota \"tanpa batas\" berarti kamu boleh datang setiap hari selama masa sewa."
-                  : "Kunjungan dijanjikan lewat aplikasi, di dalam jendela akses di atas. Setiap kunjungan tercatat di log akses — itu yang menggantikan segel pada penitipan biasa."}
+                  : "Kunjungan dijanjikan lewat aplikasi, di dalam jendela akses di atas. Setiap kunjungan tercatat di log akses, itu yang menggantikan segel pada penitipan biasa."}
               </p>
             </div>
           </section>
@@ -461,7 +461,7 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
             Lencana verifikasi WAJIB disertai batasnya, dan batasnya sempit.
             Yang diperiksa cuma kecocokan keterangan dengan kenyataan pada
             satu hari. Tanpa kalimat ini, "terverifikasi" akan dibaca sebagai
-            "dijamin aman" — persis kalimat yang dilarang di CLAUDE.md, hanya
+            "dijamin aman", persis kalimat yang dilarang di CLAUDE.md, hanya
             saja disimpulkan sendiri oleh pembacanya.
           */}
           {ruang.tempat_terverifikasi && (
@@ -475,7 +475,7 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
                   </p>
                   <p className="mt-1 text-xs leading-relaxed text-good/85">
                     Yang dicek: keterangan di halaman ini cocok dengan keadaan di
-                    lokasi — ukuran, foto, dan akses jalannya. Itu saja. Lencana
+                    lokasi, ukuran, foto, dan akses jalannya. Itu saja. Lencana
                     ini bukan jaminan keamanan dan bukan asuransi; kalau ada
                     sengketa, platform menengahi tapi tidak memberi ganti rugi.
                   </p>
@@ -505,7 +505,7 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
                 <p className="mt-2 flex items-start gap-2 text-xs leading-relaxed text-muted">
                   <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
                   {ruang.terbuka_alamat
-                    ? "Ruang komersial — alamat lengkap dan patokannya dibuka begitu kamu mengajukan sewa."
+                    ? "Ruang komersial, alamat lengkap dan patokannya dibuka begitu kamu mengajukan sewa."
                     : "Ruang di rumah tinggal. Titik di peta digeser sekitar 200 m. Alamat lengkapnya bisa dibuka host lewat percakapan, atau terbuka sendiri setelah pembayaran."}
                 </p>
               )}
@@ -647,7 +647,7 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
   );
 }
 
-/** Kelompok chip untuk kolom `text[]` — pengawasan, fasilitas, kategori. */
+/** Kelompok chip untuk kolom `text[]`, pengawasan, fasilitas, kategori. */
 function DaftarChip({
   ikon: Ikon,
   judul,
