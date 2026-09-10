@@ -7,7 +7,7 @@ import LencanaStatus from "@/components/LencanaStatus";
 import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { daftarPemesanan, type PemesananRingkas } from "@/lib/pemesanan";
-import { LABEL_TIPE, rupiah, tanggalPendek } from "@/lib/label";
+import { LABEL_TIPE, LABEL_USAHA, rupiah, tanggalPendek } from "@/lib/label";
 
 export const metadata: Metadata = { title: "Pemesanan — Cari Ruang" };
 
@@ -62,7 +62,7 @@ export default async function HalamanPemesanan() {
         <section className="mt-10">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-display text-lg font-bold tracking-tight">
-              Permintaan ke ruang saya
+              Permintaan ke lahan saya
             </h2>
             {perluDitindak > 0 && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-soft px-2.5 py-1 text-xs font-semibold text-brand-dark">
@@ -106,6 +106,16 @@ function Kartu({ p, peran }: { p: PemesananRingkas; peran: "penyewa" | "host" })
           <MapPin className="h-3.5 w-3.5 shrink-0" />
           {LABEL_TIPE[p.tipe as keyof typeof LABEL_TIPE] ?? p.tipe} · {p.kecamatan}
         </p>
+
+        {/* Jenis usaha ditampilkan di kartu, bukan cuma di halaman detailnya:
+            host yang punya beberapa lahan menjawab permintaan dari daftar ini,
+            dan "boleh menggoreng atau tidak" adalah hal pertama yang ia
+            timbang. */}
+        {p.usaha && (
+          <p className="mt-1.5 inline-flex rounded-full bg-brand-soft px-2.5 py-0.5 text-[11px] font-semibold text-brand-dark">
+            {LABEL_USAHA[p.usaha] ?? p.usaha.replace(/_/g, " ")}
+          </p>
+        )}
 
         <p className="angka mt-2 text-xs text-muted">
           {tanggalPendek(p.mulai)} – {tanggalPendek(p.selesai)}

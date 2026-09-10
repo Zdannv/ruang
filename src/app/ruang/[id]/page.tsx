@@ -16,12 +16,16 @@ import {
   Layers,
   MapPin,
   Package,
+  Route,
   Ruler,
   ShieldAlert,
   Star,
+  Store,
   Truck,
+  Umbrella,
   Users,
   Waves,
+  Zap,
 } from "lucide-react";
 import GaleriFoto from "@/components/GaleriFoto";
 import PemutarVideo from "@/components/PemutarVideo";
@@ -44,11 +48,19 @@ import {
   LABEL_PENGAWASAN,
   LABEL_PENGUNCIAN,
   LABEL_POSISI,
+  LABEL_AIR,
+  LABEL_ATAP,
+  LABEL_KELAS_JALAN,
+  LABEL_LISTRIK,
   LABEL_TIPE,
+  LABEL_USAHA,
   bulanTahun,
   dimensi,
+  kuotaAkses,
   labelDaftar,
+  lebarMuka,
   luas,
+  pakaiLuas,
   rupiah,
   tanggal,
   volume,
@@ -69,8 +81,13 @@ export async function generateMetadata({ params }: PageProps<"/ruang/[id]">) {
 
   const { ruang } = data;
   return {
-    title: `${ruang.judul} — ${ruang.kecamatan}, ${ruang.kota} · Ruang`,
-    description: `${LABEL_TIPE[ruang.tipe]} ${volume(ruang.volume_m3)} di ${ruang.kelurahan}, ${ruang.kecamatan}. ${rupiah(ruang.harga_bulanan)} per bulan.`,
+    title: `${ruang.judul} — ${ruang.kecamatan}, ${ruang.kota} · Cari Ruang`,
+    // Satuannya ikut tipenya, sama seperti di layar: "18 m³" untuk halaman
+    // depan rumah adalah angka yang benar dan tidak berarti apa-apa — dan di
+    // sini ia masuk ke cuplikan hasil pencarian Google.
+    description: `${LABEL_TIPE[ruang.tipe]} ${
+      pakaiLuas(ruang.tipe) ? luas(ruang.luas_m2) : volume(ruang.volume_m3)
+    } di ${ruang.kelurahan}, ${ruang.kecamatan}. ${rupiah(ruang.harga_bulanan)} per bulan.`,
   };
 }
 
@@ -92,6 +109,16 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
 
   const { ruang, host, foto, video, ulasan, tersewaSampai, alamatLengkap } = data;
   const IkonTipe = IKON_TIPE[ruang.tipe];
+
+  /*
+    Lahan terbuka dan ruang tertutup dibaca dengan pertanyaan yang berbeda, dan
+    halaman ini mengikuti pertanyaannya — bukan menampilkan semua kolom yang
+    ada. "Kelembapan: kering & berventilasi" pada halaman depan rumah bukan
+    keterangan yang kurang berguna, ia keterangan yang MENYESATKAN: ia membaca
+    seolah lahannya berdinding.
+  */
+  const terbuka = pakaiLuas(ruang.tipe);
+  const muka = lebarMuka(ruang.lebar_muka_m);
 
   const skorRata =
     ulasan.length > 0
@@ -144,20 +171,127 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
               <MapPin className="h-4 w-4" />
               {ruang.kelurahan}, {ruang.kecamatan}, {ruang.kota}
               <span aria-hidden>·</span>
-              {dimensi(ruang.panjang_m, ruang.lebar_m, ruang.tinggi_m)}
+              {terbuka ? luas(ruang.luas_m2) : dimensi(ruang.panjang_m, ruang.lebar_m, ruang.tinggi_m)}
               <span aria-hidden>·</span>
-              {luas(ruang.luas_m2)}
-              <span aria-hidden>·</span>
-              {volume(ruang.volume_m3)}
+              {terbuka ? (muka ?? `${ruang.lebar_m} m lebar`) : luas(ruang.luas_m2)}
+              {!terbuka && (
+                <>
+                  <span aria-hidden>·</span>
+                  {volume(ruang.volume_m3)}
+                </>
+              )}
             </p>
           </header>
 
+          {/* ── Buat jualan ────────────────────────────────────────────────── */}
+          {terbuka && (
+            <section className="mt-8">
+              <h2 className="font-display text-xl font-bold tracking-tight">
+                Buat jualan
+              </h2>
+              <p className="mt-1 text-sm text-muted">
+                Lima hal yang menentukan lahannya cocok atau tidak buat daganganmu.
+                Yang belum diisi pemilik ditandai — tanya lewat chat sebelum memesan.
+              </p>
+
+              <div className="mt-4 grid gap-x-8 rounded-2xl bg-card p-5 ring-1 ring-line sm:grid-cols-2">
+                <dl className="divide-y divide-line">
+                  <BarisRubrik
+                    ikon={Ruler}
+                    label="Lebar muka jalan"
+                    nilai={muka ?? "Belum diisi pemilik"}
+                    nada={muka ? "netral" : "waspada"}
+                  />
+                  <BarisRubrik
+                    ikon={Route}
+                    label="Kelas jalan"
+                    nilai={
+                      ruang.kelas_jalan
+                        ? (LABEL_KELAS_JALAN[ruang.kelas_jalan] ?? ruang.kelas_jalan)
+                        : "Belum diisi pemilik"
+                    }
+                    nada={
+                      ruang.kelas_jalan === "jalan_raya"
+                        ? "baik"
+                        : ruang.kelas_jalan === "dalam_gang"
+                          ? "waspada"
+                          : "netral"
+                    }
+                  />
+                  <BarisRubrik
+                    ikon={Umbrella}
+                    label="Atap"
+                    nilai={
+                      ruang.atap
+                        ? (LABEL_ATAP[ruang.atap] ?? ruang.atap)
+                        : "Belum diisi pemilik"
+                    }
+                    nada={ruang.atap === "tidak_ada" ? "waspada" : "netral"}
+                  />
+                </dl>
+
+                <dl className="divide-y divide-line">
+                  <BarisRubrik
+                    ikon={Zap}
+                    label="Listrik"
+                    nilai={
+                      ruang.listrik
+                        ? (LABEL_LISTRIK[ruang.listrik] ?? ruang.listrik)
+                        : "Belum diisi pemilik"
+                    }
+                    nada={
+                      ruang.listrik === "tidak_ada"
+                        ? "waspada"
+                        : ruang.listrik
+                          ? "baik"
+                          : "waspada"
+                    }
+                  />
+                  <BarisRubrik
+                    ikon={Droplets}
+                    label="Air"
+                    nilai={
+                      ruang.air
+                        ? (LABEL_AIR[ruang.air] ?? ruang.air)
+                        : "Belum diisi pemilik"
+                    }
+                    nada={ruang.air === "tidak_ada" ? "waspada" : "netral"}
+                  />
+                  <BarisRubrik
+                    ikon={Users}
+                    label="Pemakaian lahan"
+                    nilai={LABEL_BERBAGI[ruang.berbagi]}
+                  />
+                </dl>
+              </div>
+
+              <div className="mt-4 rounded-2xl bg-card p-5 ring-1 ring-line">
+                <DaftarChip
+                  ikon={Store}
+                  judul="Usaha yang diizinkan pemilik"
+                  isi={labelDaftar(ruang.usaha_diizinkan, LABEL_USAHA)}
+                  kosong="Pemilik belum menuliskannya — tanya dulu lewat chat"
+                  rapat
+                />
+                <p className="mt-3 text-xs leading-relaxed text-muted">
+                  Jenis usaha yang tidak ada di daftar itu ditolak sistem sebelum
+                  permintaanmu sampai ke pemilik. Menggoreng dipisah dari makanan
+                  biasa, karena asap dan minyak yang menempel di rumah orang adalah
+                  alasan penolakan paling sering.
+                </p>
+              </div>
+            </section>
+          )}
+
           {/* ── Rubrik kondisi ─────────────────────────────────────────────── */}
           <section className="mt-8">
-            <h2 className="font-display text-xl font-bold tracking-tight">Kondisi ruang</h2>
+            <h2 className="font-display text-xl font-bold tracking-tight">
+              {terbuka ? "Kondisi lahan" : "Kondisi ruang"}
+            </h2>
             <p className="mt-1 text-sm text-muted">
-              Semua diisi host saat mendaftarkan ruangnya. Penyewa menilai
-              ketepatannya setelah sewa berakhir.
+              {terbuka
+                ? "Semua diisi pemilik saat mendaftarkan lahannya. Penyewa menilai ketepatannya setelah sewa berakhir."
+                : "Semua diisi host saat mendaftarkan ruangnya. Penyewa menilai ketepatannya setelah sewa berakhir."}
             </p>
 
             <div className="mt-4 grid gap-x-8 rounded-2xl bg-card p-5 ring-1 ring-line sm:grid-cols-2">
@@ -167,35 +301,43 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
                   label="Kendaraan terbesar yang bisa masuk"
                   nilai={LABEL_AKSES[ruang.akses_masuk]}
                 />
-                <BarisRubrik
-                  ikon={Layers}
-                  label="Posisi lantai"
-                  nilai={LABEL_POSISI[ruang.posisi_lantai]}
-                />
-                <BarisRubrik
-                  ikon={DoorOpen}
-                  label="Lebar pintu"
-                  nilai={`${ruang.lebar_pintu_cm} cm`}
-                />
+                {!terbuka && (
+                  <>
+                    <BarisRubrik
+                      ikon={Layers}
+                      label="Posisi lantai"
+                      nilai={LABEL_POSISI[ruang.posisi_lantai]}
+                    />
+                    <BarisRubrik
+                      ikon={DoorOpen}
+                      label="Lebar pintu"
+                      nilai={`${ruang.lebar_pintu_cm} cm`}
+                    />
+                  </>
+                )}
                 <BarisRubrik
                   ikon={CircleParking}
                   label="Jarak dari parkir"
                   nilai={LABEL_PARKIR[ruang.jarak_parkir]}
                 />
-                <BarisRubrik
-                  ikon={Home}
-                  label="Kondisi bangunan"
-                  nilai={LABEL_BANGUNAN[ruang.kondisi_bangunan]}
-                />
+                {!terbuka && (
+                  <BarisRubrik
+                    ikon={Home}
+                    label="Kondisi bangunan"
+                    nilai={LABEL_BANGUNAN[ruang.kondisi_bangunan]}
+                  />
+                )}
               </dl>
 
               <dl className="divide-y divide-line">
-                <BarisRubrik
-                  ikon={Droplets}
-                  label="Kelembapan"
-                  nilai={LABEL_KELEMBAPAN[ruang.kelembapan]}
-                  nada={ruang.kelembapan === "cenderung_lembap" ? "waspada" : "baik"}
-                />
+                {!terbuka && (
+                  <BarisRubrik
+                    ikon={Droplets}
+                    label="Kelembapan"
+                    nilai={LABEL_KELEMBAPAN[ruang.kelembapan]}
+                    nada={ruang.kelembapan === "cenderung_lembap" ? "waspada" : "baik"}
+                  />
+                )}
                 <BarisRubrik
                   ikon={Waves}
                   label="Riwayat banjir"
@@ -208,22 +350,26 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
                         : "netral"
                   }
                 />
-                <BarisRubrik
-                  ikon={Ruler}
-                  label="Tinggi lantai dari tanah"
-                  nilai={`${ruang.tinggi_lantai_cm} cm`}
-                />
-                <BarisRubrik
-                  ikon={KeyRound}
-                  label="Penguncian"
-                  nilai={LABEL_PENGUNCIAN[ruang.penguncian]}
-                  nada={ruang.penguncian === "kunci_penyewa" ? "baik" : "waspada"}
-                />
-                <BarisRubrik
-                  ikon={Users}
-                  label="Pemakaian ruang"
-                  nilai={LABEL_BERBAGI[ruang.berbagi]}
-                />
+                {!terbuka && (
+                  <>
+                    <BarisRubrik
+                      ikon={Ruler}
+                      label="Tinggi lantai dari tanah"
+                      nilai={`${ruang.tinggi_lantai_cm} cm`}
+                    />
+                    <BarisRubrik
+                      ikon={KeyRound}
+                      label="Penguncian"
+                      nilai={LABEL_PENGUNCIAN[ruang.penguncian]}
+                      nada={ruang.penguncian === "kunci_penyewa" ? "baik" : "waspada"}
+                    />
+                    <BarisRubrik
+                      ikon={Users}
+                      label="Pemakaian ruang"
+                      nilai={LABEL_BERBAGI[ruang.berbagi]}
+                    />
+                  </>
+                )}
               </dl>
             </div>
 
@@ -246,33 +392,44 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
           {/* ── Kebijakan ──────────────────────────────────────────────────── */}
           <section className="mt-8">
             <h2 className="font-display text-xl font-bold tracking-tight">
-              Aturan dari host
+              {terbuka ? "Aturan dari pemilik" : "Aturan dari host"}
             </h2>
 
             <div className="mt-4 space-y-4 rounded-2xl bg-card p-5 ring-1 ring-line">
-              <DaftarChip
-                ikon={Package}
-                judul="Barang yang diterima"
-                isi={labelDaftar(ruang.kategori_diterima, LABEL_KATEGORI)}
-                kosong="Host belum menentukan kategori"
-                rapat
-              />
-              <p className="text-xs leading-relaxed text-muted">
-                Manifes barang wajib diisi saat memesan, dan dicocokkan dengan daftar
-                ini sebelum permintaanmu diteruskan ke host. Host berhak menolak barang
-                yang tidak sesuai.
-              </p>
+              {terbuka ? (
+                <p className="text-xs leading-relaxed text-muted">
+                  Saat memesan kamu memilih satu jenis usaha dari daftar di atas.
+                  Pilihannya dicocokkan sistem sebelum permintaanmu sampai ke pemilik,
+                  jadi kamu tidak menunggu jawaban untuk sesuatu yang sudah pasti
+                  ditolak.
+                </p>
+              ) : (
+                <>
+                  <DaftarChip
+                    ikon={Package}
+                    judul="Barang yang diterima"
+                    isi={labelDaftar(ruang.kategori_diterima, LABEL_KATEGORI)}
+                    kosong="Host belum menentukan kategori"
+                    rapat
+                  />
+                  <p className="text-xs leading-relaxed text-muted">
+                    Manifes barang wajib diisi saat memesan, dan dicocokkan dengan
+                    daftar ini sebelum permintaanmu diteruskan ke host. Host berhak
+                    menolak barang yang tidak sesuai.
+                  </p>
+                </>
+              )}
 
               <dl className="grid divide-y divide-line border-t border-line pt-1 sm:grid-cols-2 sm:gap-x-8 sm:divide-y-0">
                 <BarisRubrik
                   ikon={CalendarClock}
-                  label="Jendela akses"
+                  label={terbuka ? "Jam boleh jualan" : "Jendela akses"}
                   nilai={ruang.jendela_akses}
                 />
                 <BarisRubrik
                   ikon={DoorOpen}
-                  label="Kuota kunjungan"
-                  nilai={`${ruang.kuota_akses_bulanan}x per bulan`}
+                  label={terbuka ? "Kuota kedatangan" : "Kuota kunjungan"}
+                  nilai={kuotaAkses(ruang.kuota_akses_bulanan)}
                 />
                 <BarisRubrik
                   ikon={CalendarClock}
@@ -287,9 +444,9 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
               </dl>
 
               <p className="text-xs leading-relaxed text-muted">
-                Kunjungan dijanjikan lewat aplikasi, di dalam jendela akses di atas.
-                Setiap kunjungan tercatat di log akses — itu yang menggantikan segel
-                pada penitipan biasa.
+                {terbuka
+                  ? "Jam di atas yang disepakati; di luar itu lahannya kembali ke pemilik. Kuota \"tanpa batas\" berarti kamu boleh datang setiap hari selama masa sewa."
+                  : "Kunjungan dijanjikan lewat aplikasi, di dalam jendela akses di atas. Setiap kunjungan tercatat di log akses — itu yang menggantikan segel pada penitipan biasa."}
               </p>
             </div>
           </section>
@@ -389,8 +546,8 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
                 <dd className="font-medium">{ruang.durasi_min_hari} hari</dd>
               </div>
               <div className="flex justify-between gap-3">
-                <dt className="text-muted">Kuota kunjungan</dt>
-                <dd className="font-medium">{ruang.kuota_akses_bulanan}x / bulan</dd>
+                <dt className="text-muted">{terbuka ? "Kuota kedatangan" : "Kuota kunjungan"}</dt>
+                <dd className="font-medium">{kuotaAkses(ruang.kuota_akses_bulanan, true)}</dd>
               </div>
             </dl>
 

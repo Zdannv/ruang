@@ -3,9 +3,10 @@ import { supabaseSiap } from "@/lib/supabase/env";
 import PencarianRuang from "@/components/PencarianRuang";
 
 export const metadata = {
-  title: "Cari ruang — Cari Ruang",
+  title: "Cari lahan usaha — Cari Ruang",
   description:
-    "Telusuri ruang kosong terdekat: titik, radius, tipe, ukuran, dan harga.",
+    "Cari lahan pinggir jalan buat jualan: halaman depan rumah, teras, lahan " +
+    "kosong, dan kios. Saring per jenis usaha, lebar muka jalan, dan harga.",
 };
 
 /** Halaman pencarian. Beranda (`/`) adalah landing page yang menaut ke sini. */
@@ -38,8 +39,8 @@ function PetunjukPemasangan() {
           Project Settings di Supabase. Wajib anon key, bukan service role.
         </li>
         <li>
-          Pastikan <code className="font-mono text-ink">01_schema.sql</code> dan{" "}
-          <code className="font-mono text-ink">02_seed.sql</code> sudah dijalankan.
+          Pastikan seluruh migrasi di <code className="font-mono text-ink">supabase/migrations/</code>{" "}
+          sudah dijalankan berurutan. Lihat SETUP.md.
         </li>
         <li>Jalankan ulang server pengembangan.</li>
       </ol>

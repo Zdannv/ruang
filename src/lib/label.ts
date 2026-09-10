@@ -147,6 +147,90 @@ export const LABEL_KATEGORI: Record<string, string> = {
   ban_perkakas: "Ban & perkakas",
 };
 
+/*
+  Rubrik lahan usaha, ditambahkan migrasi 19. Kelimanya hanya berarti untuk
+  tipe lahan terbuka — lihat `pakaiLuas()` dan `TIPE_LAHAN` di atas.
+*/
+
+/**
+ * Jenis usaha yang pemilik izinkan.
+ *
+ * `masak_berminyak` sengaja dipisah dari `makanan`, dan itu bukan
+ * kerapian: "boleh menggoreng atau tidak" adalah pertanyaan yang jawabannya
+ * membatalkan sewa. Asap dan minyak yang menempel di dinding rumah orang
+ * adalah alasan penolakan paling sering di lahan pinggir jalan.
+ */
+export const LABEL_USAHA: Record<string, string> = {
+  makanan: "Makanan (tanpa menggoreng)",
+  masak_berminyak: "Menggoreng / masak berminyak",
+  minuman: "Minuman",
+  buah_sayur: "Buah & sayur",
+  kelontong: "Kelontong / sembako",
+  laundry: "Laundry",
+  cuci_motor: "Cuci motor",
+  pangkas: "Pangkas rambut",
+  bengkel: "Bengkel kecil / tambal ban",
+  jasa_lain: "Jasa lain",
+};
+
+export const LABEL_LISTRIK: Record<string, string> = {
+  tidak_ada: "Tidak ada listrik",
+  berbagi: "Nyambung dari rumah pemilik",
+  meteran_sendiri: "Meteran sendiri",
+};
+
+export const LABEL_AIR: Record<string, string> = {
+  tidak_ada: "Tidak ada air",
+  boleh_pakai: "Boleh pakai air pemilik",
+};
+
+export const LABEL_ATAP: Record<string, string> = {
+  tidak_ada: "Tanpa atap",
+  kanopi: "Kanopi / tenda",
+  permanen: "Atap permanen",
+};
+
+export const LABEL_KELAS_JALAN: Record<string, string> = {
+  jalan_raya: "Jalan raya",
+  jalan_kolektor: "Jalan kolektor",
+  perumahan: "Jalan perumahan",
+  dalam_gang: "Dalam gang",
+};
+
+/**
+ * Versi pendek `LABEL_LISTRIK`, untuk lencana di kartu hasil.
+ *
+ * "Nyambung dari rumah pemilik" benar dan tidak muat: lencananya sekitar 80px
+ * di kartu dua kolom. Yang perlu dijawab di daftar hasil cuma ada atau tidak.
+ */
+export const LABEL_LISTRIK_PENDEK: Record<string, string> = {
+  tidak_ada: "Tanpa listrik",
+  berbagi: "Ada listrik",
+  meteran_sendiri: "Meteran sendiri",
+};
+
+/** "3,0 m muka jalan", atau "muka 3,0 m" kalau `pendek`. */
+export function lebarMuka(m: number | string | null, pendek = false): string | null {
+  if (m == null) return null;
+  const n = typeof m === "string" ? Number(m) : m;
+  if (!Number.isFinite(n) || n <= 0) return null;
+  const angka = n.toFixed(1).replace(".", ",");
+  return pendek ? `muka ${angka} m` : `${angka} m muka jalan`;
+}
+
+/**
+ * "4x per bulan", atau "Tanpa batas" kalau kuotanya NULL.
+ *
+ * NULL bukan data yang hilang — sejak migrasi 19 ia berarti tanpa batas, dan
+ * itu keadaan yang WAJAR untuk lahan usaha: pedagang ada di lahannya setiap
+ * hari, bukan datang beberapa kali sebulan. Tanpa fungsi ini layar menulis
+ * "nullx / bulan".
+ */
+export function kuotaAkses(n: number | null, pendek = false): string {
+  if (n == null) return "Tanpa batas";
+  return pendek ? `${n}x / bulan` : `${n}x per bulan`;
+}
+
 /** Terjemahkan isi kolom array; yang tidak dikenal dirapikan, bukan dibuang. */
 export function labelDaftar(nilai: string[], peta: Record<string, string>): string[] {
   return nilai.map((v) => peta[v] ?? v.replace(/_/g, " "));

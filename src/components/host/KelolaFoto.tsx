@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { ImagePlus, Loader2, Trash2 } from "lucide-react";
 import { klienBrowser } from "@/lib/supabase/browser";
 import {
-  KETERANGAN_FOTO,
   daftarFoto,
   hapusFoto,
+  keteranganFoto,
   unggahFoto,
   type FotoMilikSaya,
 } from "@/lib/host";
@@ -25,6 +25,7 @@ export default function KelolaFoto({
   hostId,
   ruangId,
   awal,
+  terbuka = false,
 }: {
   hostId: string;
   ruangId: string;
@@ -37,10 +38,13 @@ export default function KelolaFoto({
    * host akan mengunggah foto lalu melihat kotak kosong.
    */
   awal: FotoMilikSaya[];
+  /** Lahan terbuka. Menentukan daftar keterangan yang ditawarkan. */
+  terbuka?: boolean;
 }) {
   const router = useRouter();
+  const pilihanKeterangan = keteranganFoto(terbuka);
   const [foto, setFoto] = useState(awal);
-  const [keterangan, setKeterangan] = useState(KETERANGAN_FOTO[0]);
+  const [keterangan, setKeterangan] = useState(pilihanKeterangan[0]);
   const [proses, setProses] = useState(false);
   const [galat, setGalat] = useState<string | null>(null);
 
@@ -92,10 +96,17 @@ export default function KelolaFoto({
       <p className="mt-1 text-xs font-medium text-good">
         Foto tersimpan begitu dipilih. Tidak perlu menekan tombol simpan mana pun.
       </p>
+      {terbuka && (
+        <p className="mt-1.5 text-xs leading-relaxed text-muted">
+          Satu foto yang wajib ada: <strong className="text-ink">tampak dari jalan</strong>.
+          Itu yang dilihat pedagang pertama kali, dan itu yang menentukan ia
+          menghubungimu atau menggeser ke lahan berikutnya.
+        </p>
+      )}
       <p className="mt-1.5 text-xs leading-relaxed text-muted">
         Foto diperkecil dan disimpan ulang di peramban sebelum diunggah, sehingga
         metadata aslinya ikut terbuang — termasuk koordinat GPS yang biasanya
-        menempel di foto HP. Tanpa itu, alamat persis ruangmu terbaca dari berkas
+        menempel di foto HP. Tanpa itu, alamat persis lahanmu terbaca dari berkas
         gambar yang publik.
       </p>
 
@@ -139,7 +150,7 @@ export default function KelolaFoto({
             onChange={(e) => setKeterangan(e.target.value)}
             className="mt-1.5 w-full cursor-pointer rounded-xl bg-card px-3.5 py-2.5 text-sm ring-1 ring-line focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           >
-            {KETERANGAN_FOTO.map((k) => (
+            {pilihanKeterangan.map((k) => (
               <option key={k} value={k}>
                 {k}
               </option>

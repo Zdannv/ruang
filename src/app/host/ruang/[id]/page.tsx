@@ -12,8 +12,9 @@ import { klienServer } from "@/lib/supabase/server";
 import { daftarFoto, getRuangSaya, type IsiRuang } from "@/lib/host";
 import { daftarVideo } from "@/lib/video";
 import { daftarJendela } from "@/lib/jendela";
+import { pakaiLuas } from "@/lib/label";
 
-export const metadata: Metadata = { title: "Kelola ruang — Cari Ruang" };
+export const metadata: Metadata = { title: "Kelola lahan — Cari Ruang" };
 
 export default async function KelolaRuang({ params }: PageProps<"/host/ruang/[id]">) {
   const { id } = await params;
@@ -65,6 +66,12 @@ export default async function KelolaRuang({ params }: PageProps<"/host/ruang/[id
     pengawasan: ruang.pengawasan,
     fasilitas: ruang.fasilitas,
     kategori_diterima: ruang.kategori_diterima,
+    usaha_diizinkan: ruang.usaha_diizinkan ?? [],
+    lebar_muka_m: ruang.lebar_muka_m ?? null,
+    listrik: ruang.listrik ?? null,
+    air: ruang.air ?? null,
+    atap: ruang.atap ?? null,
+    kelas_jalan: ruang.kelas_jalan ?? null,
     kuota_akses_bulanan: ruang.kuota_akses_bulanan,
     durasi_min_hari: ruang.durasi_min_hari,
     harga_bulanan: ruang.harga_bulanan,
@@ -99,16 +106,25 @@ export default async function KelolaRuang({ params }: PageProps<"/host/ruang/[id
             href={`/ruang/${ruang.id}`}
             className="inline-flex items-center gap-1.5 rounded-full bg-card px-4 py-2 text-sm font-semibold text-ink ring-1 ring-line transition-colors hover:bg-paper"
           >
-            Lihat sebagai penyewa
+            Lihat sebagai pedagang
             <ExternalLink className="h-3.5 w-3.5" />
           </Link>
         )}
       </div>
 
       <div className="mt-6 space-y-5">
-        <KelolaFoto hostId={sesi.profil.id} ruangId={ruang.id} awal={foto} />
+        <KelolaFoto
+          hostId={sesi.profil.id}
+          ruangId={ruang.id}
+          awal={foto}
+          terbuka={pakaiLuas(ruang.tipe)}
+        />
         <KelolaVideo hostId={sesi.profil.id} ruangId={ruang.id} awal={video} />
-        <KelolaJendela ruangId={ruang.id} jendela={jendela} />
+        <KelolaJendela
+          ruangId={ruang.id}
+          jendela={jendela}
+          terbuka={pakaiLuas(ruang.tipe)}
+        />
         <FormRuang hostId={sesi.profil.id} ruangId={ruang.id} awal={isi} />
       </div>
     </div>

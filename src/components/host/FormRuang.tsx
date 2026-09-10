@@ -24,6 +24,12 @@ import {
   luas,
   rupiah,
   volume,
+  LABEL_AIR,
+  LABEL_ATAP,
+  LABEL_KELAS_JALAN,
+  LABEL_LISTRIK,
+  LABEL_USAHA,
+  pakaiLuas,
 } from "@/lib/label";
 
 const opsi = (peta: Record<string, string>): [string, string][] => Object.entries(peta);
@@ -36,7 +42,7 @@ const opsi = (peta: Record<string, string>): [string, string][] => Object.entrie
  */
 const AWAL: IsiRuang = {
   judul: "",
-  tipe: "garasi",
+  tipe: "halaman_depan",
   kepemilikan: "milik_sendiri",
   alamat: "",
   patokan: "",
@@ -53,16 +59,27 @@ const AWAL: IsiRuang = {
   posisi_lantai: "dasar_rata",
   lebar_pintu_cm: 90,
   jarak_parkir: "lt10m",
-  kondisi_bangunan: "dinding_atap",
+  // Bawaannya lahan terbuka, jadi ketiga jawaban ini yang benar untuk halaman
+  // depan rumah — bukan warisan dari masa ruang tertutup. `gantiTipe()` di
+  // bawah menukarnya begitu host memilih tipe dari kelompok yang lain.
+  kondisi_bangunan: "terbuka",
   kelembapan: "kering_ventilasi",
   riwayat_banjir: "tidak_pernah",
-  tinggi_lantai_cm: 20,
-  penguncian: "kunci_penyewa",
+  tinggi_lantai_cm: 0,
+  penguncian: "tanpa_kunci",
   berbagi: "eksklusif",
   pengawasan: [],
   fasilitas: [],
   kategori_diterima: ["kardus"],
-  kuota_akses_bulanan: 4,
+  usaha_diizinkan: [],
+  lebar_muka_m: null,
+  listrik: null,
+  air: null,
+  atap: null,
+  kelas_jalan: null,
+  // Lahan usaha hampir selalu tanpa batas kunjungan — pedagang ada di sana
+  // setiap hari. Host ruang tertutup mengisinya sendiri.
+  kuota_akses_bulanan: null,
   durasi_min_hari: 30,
   harga_bulanan: 300000,
   deposit: 0,
@@ -95,7 +112,7 @@ export default function FormRuang({
    * bisa dibalik — tapi itu alasan teknis dan tidak ada gunanya diketahui
    * host, jadi ia tidak perlu ikut berpindah halaman untuk melewatinya.
    */
-  onDibuat?: (id: string) => void;
+  onDibuat?: (id: string, tipe: IsiRuang["tipe"]) => void;
 }) {
   const router = useRouter();
   const [isi, setIsi] = useState<IsiRuang>(awal ?? AWAL);
@@ -105,8 +122,55 @@ export default function FormRuang({
   const [konfirmasiHapus, setKonfirmasiHapus] = useState(false);
   const [tersimpan, setTersimpan] = useState(false);
 
+  /*
+    Dua kelompok tipe punya pertanyaan yang berbeda, dan menanyakan semuanya ke
+    semua orang adalah cara tercepat membuat host berhenti mengisi.
+
+    Lahan terbuka: jenis usaha yang diizinkan, lebar muka jalan, listrik, air,
+    atap, kelas jalan. Ruang tertutup: kategori barang dan kuota kunjungan.
+
+    "Kelas jalan" untuk sebuah loteng tidak ada artinya, dan "kategori barang"
+    untuk halaman depan yang disewa pedagang juga tidak.
+  */
+  const terbuka = pakaiLuas(isi.tipe);
+
   const ubah = <K extends keyof IsiRuang>(kunci: K, nilai: IsiRuang[K]) =>
     setIsi((v) => ({ ...v, [kunci]: nilai }));
+
+  /*
+    Berpindah kelompok tipe ikut menukar jawaban yang tidak berlaku lagi.
+
+    Kolomnya NOT NULL dan tetap tersimpan meski isiannya disembunyikan, jadi
+    tanpa ini sebuah halaman depan rumah menyimpan "berdinding dan beratap"
+    dan "kunci dipegang penyewa" — dua keterangan yang tidak pernah tampil di
+    layar untuk tipe itu, tapi tetap ada di database dan tetap salah. Arah
+    sebaliknya juga: rubrik lahan usaha dikosongkan supaya sebuah gudang tidak
+    membawa "boleh menggoreng" yang tidak pernah dijawab pemiliknya.
+  */
+  const gantiTipe = (tipe: IsiRuang["tipe"]) =>
+    setIsi((v) =>
+      pakaiLuas(tipe)
+        ? {
+            ...v,
+            tipe,
+            kondisi_bangunan: "terbuka",
+            penguncian: "tanpa_kunci",
+            kuota_akses_bulanan: null,
+          }
+        : {
+            ...v,
+            tipe,
+            kondisi_bangunan:
+              v.kondisi_bangunan === "terbuka" ? "dinding_atap" : v.kondisi_bangunan,
+            penguncian: v.penguncian === "tanpa_kunci" ? "kunci_penyewa" : v.penguncian,
+            usaha_diizinkan: [],
+            lebar_muka_m: null,
+            listrik: null,
+            air: null,
+            atap: null,
+            kelas_jalan: null,
+          }
+    );
 
   const angka = (v: string) => (v === "" ? 0 : Number(v));
 
@@ -131,7 +195,15 @@ export default function FormRuang({
 
   const simpan = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isi.kategori_diterima.length === 0) {
+    // Syaratnya berbeda per kelompok tipe. Lahan terbuka dengan
+    // `usaha_diizinkan` kosong akan menolak SETIAP pemesanan di database
+    // (lihat migrasi 19), jadi menyimpannya begitu berarti memasang lahan yang
+    // tidak mungkin disewa — dan pemiliknya tidak akan pernah tahu kenapa.
+    if (terbuka && isi.usaha_diizinkan.length === 0) {
+      setGalat("Pilih minimal satu jenis usaha yang boleh jalan di lahan ini.");
+      return;
+    }
+    if (!terbuka && isi.kategori_diterima.length === 0) {
       setGalat("Pilih minimal satu kategori barang yang kamu terima.");
       return;
     }
@@ -163,7 +235,7 @@ export default function FormRuang({
           // dimatikan sendiri — persis jenis kelalaian yang dulu membuat
           // tombol simpan berputar selamanya.
           setKirim(false);
-          onDibuat(id);
+          onDibuat(id, isi.tipe);
         } else {
           // Di sini `kirim` sengaja dibiarkan menyala: halamannya benar-benar
           // berpindah, dan pemintalnya adalah satu-satunya tanda bahwa
@@ -202,16 +274,29 @@ export default function FormRuang({
             maxLength={120}
             value={isi.judul}
             onChange={(e) => ubah("judul", e.target.value)}
-            placeholder="mis. Garasi kering, mobil sudah dijual"
-            bantuan="Sebutkan yang paling menentukan: kering, muat truk, dekat kampus."
+            placeholder={
+              terbuka
+                ? "mis. Halaman depan pinggir jalan raya, muka 4 m"
+                : "mis. Garasi kering, mobil sudah dijual"
+            }
+            bantuan={
+              terbuka
+                ? "Sebutkan yang paling menentukan: pinggir jalan raya, muka lebar, ada colokan."
+                : "Sebutkan yang paling menentukan: kering, muat truk, dekat kampus."
+            }
           />
         </div>
         <Pilihan
           id="tipe"
-          label="Tipe ruang"
+          label="Tipe tempat"
           value={isi.tipe}
-          onChange={(e) => ubah("tipe", e.target.value as IsiRuang["tipe"])}
+          onChange={(e) => gantiTipe(e.target.value as IsiRuang["tipe"])}
           opsi={opsi(LABEL_TIPE)}
+          bantuan={
+            terbuka
+              ? "Lahan terbuka: yang ditanyakan lebar muka jalan dan jenis usaha."
+              : "Ruang tertutup: yang ditanyakan volume dan kategori barang."
+          }
         />
         <Pilihan
           id="kepemilikan"
@@ -303,9 +388,13 @@ export default function FormRuang({
 
       <Bagian
         judul="Ukuran"
-        keterangan={`Luas dan volume dihitung otomatis: ${luas(
-          isi.panjang_m * isi.lebar_m
-        )} · ${volume(isi.panjang_m * isi.lebar_m * isi.tinggi_m)}`}
+        keterangan={
+          terbuka
+            ? `Luasnya dihitung otomatis: ${luas(isi.panjang_m * isi.lebar_m)}. Tingginya tidak ditanyakan — untuk lahan terbuka yang berarti luas, bukan volume.`
+            : `Luas dan volume dihitung otomatis: ${luas(
+                isi.panjang_m * isi.lebar_m
+              )} · ${volume(isi.panjang_m * isi.lebar_m * isi.tinggi_m)}`
+        }
       >
         <Kolom
           id="panjang"
@@ -329,22 +418,28 @@ export default function FormRuang({
           value={isi.lebar_m}
           onChange={(e) => ubah("lebar_m", angka(e.target.value))}
         />
-        <Kolom
-          id="tinggi"
-          label="Tinggi"
-          type="number"
-          step="0.1"
-          min="0.5"
-          required
-          satuan="m"
-          value={isi.tinggi_m}
-          onChange={(e) => ubah("tinggi_m", angka(e.target.value))}
-        />
+        {!terbuka && (
+          <Kolom
+            id="tinggi"
+            label="Tinggi"
+            type="number"
+            step="0.1"
+            min="0.5"
+            required
+            satuan="m"
+            value={isi.tinggi_m}
+            onChange={(e) => ubah("tinggi_m", angka(e.target.value))}
+          />
+        )}
       </Bagian>
 
       <Bagian
-        judul="Akses masuk"
-        keterangan="Ini yang paling sering membatalkan sewa setelah orang datang melihat. Isi apa adanya."
+        judul={terbuka ? "Akses dan parkir" : "Akses masuk"}
+        keterangan={
+          terbuka
+            ? "Pembeli pedagang datang naik motor dan berhenti sebentar. Jarak parkir di sini soal pelanggannya, bukan soal mengangkut barang."
+            : "Ini yang paling sering membatalkan sewa setelah orang datang melihat. Isi apa adanya."
+        }
       >
         <Pilihan
           id="akses"
@@ -353,24 +448,30 @@ export default function FormRuang({
           onChange={(e) => ubah("akses_masuk", e.target.value as IsiRuang["akses_masuk"])}
           opsi={opsi(LABEL_AKSES)}
         />
-        <Pilihan
-          id="posisi"
-          label="Posisi lantai"
-          value={isi.posisi_lantai}
-          onChange={(e) => ubah("posisi_lantai", e.target.value as IsiRuang["posisi_lantai"])}
-          opsi={opsi(LABEL_POSISI)}
-        />
-        <Kolom
-          id="pintu"
-          label="Lebar pintu"
-          type="number"
-          min="30"
-          required
-          satuan="cm"
-          value={isi.lebar_pintu_cm}
-          onChange={(e) => ubah("lebar_pintu_cm", angka(e.target.value))}
-          bantuan="Ukur bagian tersempit yang harus dilewati barang."
-        />
+        {!terbuka && (
+          <>
+            <Pilihan
+              id="posisi"
+              label="Posisi lantai"
+              value={isi.posisi_lantai}
+              onChange={(e) =>
+                ubah("posisi_lantai", e.target.value as IsiRuang["posisi_lantai"])
+              }
+              opsi={opsi(LABEL_POSISI)}
+            />
+            <Kolom
+              id="pintu"
+              label="Lebar pintu"
+              type="number"
+              min="30"
+              required
+              satuan="cm"
+              value={isi.lebar_pintu_cm}
+              onChange={(e) => ubah("lebar_pintu_cm", angka(e.target.value))}
+              bantuan="Ukur bagian tersempit yang harus dilewati barang."
+            />
+          </>
+        )}
         <Pilihan
           id="parkir"
           label="Jarak dari parkir"
@@ -381,22 +482,26 @@ export default function FormRuang({
       </Bagian>
 
       <Bagian judul="Kondisi">
-        <Pilihan
-          id="bangunan"
-          label="Kondisi bangunan"
-          value={isi.kondisi_bangunan}
-          onChange={(e) =>
-            ubah("kondisi_bangunan", e.target.value as IsiRuang["kondisi_bangunan"])
-          }
-          opsi={opsi(LABEL_BANGUNAN)}
-        />
-        <Pilihan
-          id="lembap"
-          label="Kelembapan"
-          value={isi.kelembapan}
-          onChange={(e) => ubah("kelembapan", e.target.value as IsiRuang["kelembapan"])}
-          opsi={opsi(LABEL_KELEMBAPAN)}
-        />
+        {!terbuka && (
+          <>
+            <Pilihan
+              id="bangunan"
+              label="Kondisi bangunan"
+              value={isi.kondisi_bangunan}
+              onChange={(e) =>
+                ubah("kondisi_bangunan", e.target.value as IsiRuang["kondisi_bangunan"])
+              }
+              opsi={opsi(LABEL_BANGUNAN)}
+            />
+            <Pilihan
+              id="lembap"
+              label="Kelembapan"
+              value={isi.kelembapan}
+              onChange={(e) => ubah("kelembapan", e.target.value as IsiRuang["kelembapan"])}
+              opsi={opsi(LABEL_KELEMBAPAN)}
+            />
+          </>
+        )}
         <Pilihan
           id="banjir"
           label="Riwayat banjir"
@@ -407,30 +512,42 @@ export default function FormRuang({
         />
         <Kolom
           id="tinggilantai"
-          label="Tinggi lantai dari tanah"
+          label={terbuka ? "Tinggi lahan dari jalan" : "Tinggi lantai dari tanah"}
           type="number"
           min="0"
           required
           satuan="cm"
           value={isi.tinggi_lantai_cm}
           onChange={(e) => ubah("tinggi_lantai_cm", angka(e.target.value))}
+          bantuan={
+            terbuka
+              ? "0 kalau rata dengan jalan. Lahan yang lebih tinggi lebih aman saat jalan tergenang."
+              : undefined
+          }
         />
       </Bagian>
 
       <Bagian judul="Keamanan dan pemakaian">
-        <Pilihan
-          id="kunci"
-          label="Penguncian"
-          value={isi.penguncian}
-          onChange={(e) => ubah("penguncian", e.target.value as IsiRuang["penguncian"])}
-          opsi={opsi(LABEL_PENGUNCIAN)}
-        />
+        {!terbuka && (
+          <Pilihan
+            id="kunci"
+            label="Penguncian"
+            value={isi.penguncian}
+            onChange={(e) => ubah("penguncian", e.target.value as IsiRuang["penguncian"])}
+            opsi={opsi(LABEL_PENGUNCIAN)}
+          />
+        )}
         <Pilihan
           id="berbagi"
-          label="Pemakaian ruang"
+          label={terbuka ? "Pemakaian lahan" : "Pemakaian ruang"}
           value={isi.berbagi}
           onChange={(e) => ubah("berbagi", e.target.value as IsiRuang["berbagi"])}
           opsi={opsi(LABEL_BERBAGI)}
+          bantuan={
+            terbuka
+              ? "Satu lahan boleh dibagi ke beberapa pedagang — pilih yang sesuai."
+              : undefined
+          }
         />
         <div className="sm:col-span-2">
           <KotakCentangGanda
@@ -450,27 +567,96 @@ export default function FormRuang({
         </div>
       </Bagian>
 
+      {terbuka && (
+        <Bagian
+          judul="Lahan usaha"
+          keterangan="Enam hal yang paling menentukan bagi pedagang. Jenis usaha yang tidak kamu centang otomatis ditolak sistem sebelum permintaannya sampai ke kamu — termasuk yang menggoreng."
+        >
+          <div className="sm:col-span-2">
+            <KotakCentangGanda
+              label="Jenis usaha yang boleh"
+              opsi={opsi(LABEL_USAHA)}
+              nilai={isi.usaha_diizinkan}
+              onChange={(v) => ubah("usaha_diizinkan", v)}
+            />
+          </div>
+          <Kolom
+            id="lebar_muka"
+            label="Lebar muka jalan"
+            type="number"
+            min="0.5"
+            step="0.5"
+            satuan="m"
+            value={isi.lebar_muka_m ?? ""}
+            onChange={(e) =>
+              ubah("lebar_muka_m", e.target.value === "" ? null : angka(e.target.value))
+            }
+            bantuan="Yang menghadap jalan, bukan luasnya. Ini ukuran yang dipikirkan pedagang."
+          />
+          <Pilihan
+            id="kelas_jalan"
+            label="Kelas jalan"
+            value={isi.kelas_jalan ?? ""}
+            onChange={(e) => ubah("kelas_jalan", e.target.value || null)}
+            opsi={[["", "Pilih kelas jalan"], ...opsi(LABEL_KELAS_JALAN)]}
+          />
+          <Pilihan
+            id="listrik"
+            label="Listrik"
+            value={isi.listrik ?? ""}
+            onChange={(e) => ubah("listrik", e.target.value || null)}
+            opsi={[["", "Pilih"], ...opsi(LABEL_LISTRIK)]}
+          />
+          <Pilihan
+            id="air"
+            label="Air"
+            value={isi.air ?? ""}
+            onChange={(e) => ubah("air", e.target.value || null)}
+            opsi={[["", "Pilih"], ...opsi(LABEL_AIR)]}
+          />
+          <Pilihan
+            id="atap"
+            label="Atap"
+            value={isi.atap ?? ""}
+            onChange={(e) => ubah("atap", e.target.value || null)}
+            opsi={[["", "Pilih"], ...opsi(LABEL_ATAP)]}
+          />
+        </Bagian>
+      )}
+
       <Bagian
         judul="Aturan"
-        keterangan="Manifes penyewa dicocokkan dengan kategori di bawah sebelum permintaannya sampai ke kamu. Kategori yang tidak dicentang otomatis ditolak sistem. Jam aksesnya diatur terpisah di bagian Jendela akses."
+        keterangan={
+          terbuka
+            ? "Sewa minimum dan kuota kunjungan. Untuk lahan usaha, kuota biasanya dibiarkan kosong — pedagang ada di sana setiap hari."
+            : "Manifes penyewa dicocokkan dengan kategori di bawah sebelum permintaannya sampai ke kamu. Kategori yang tidak dicentang otomatis ditolak sistem."
+        }
       >
-        <div className="sm:col-span-2">
-          <KotakCentangGanda
-            label="Barang yang diterima"
-            opsi={opsi(LABEL_KATEGORI)}
-            nilai={isi.kategori_diterima}
-            onChange={(v) => ubah("kategori_diterima", v)}
-          />
-        </div>
+        {!terbuka && (
+          <div className="sm:col-span-2">
+            <KotakCentangGanda
+              label="Barang yang diterima"
+              opsi={opsi(LABEL_KATEGORI)}
+              nilai={isi.kategori_diterima}
+              onChange={(v) => ubah("kategori_diterima", v)}
+            />
+          </div>
+        )}
         <Kolom
           id="kuota"
-          label="Kuota kunjungan per bulan"
+          label={terbuka ? "Kuota kedatangan per bulan" : "Kuota kunjungan per bulan"}
           type="number"
           min="1"
-          required
           satuan="x"
-          value={isi.kuota_akses_bulanan}
-          onChange={(e) => ubah("kuota_akses_bulanan", angka(e.target.value))}
+          value={isi.kuota_akses_bulanan ?? ""}
+          onChange={(e) =>
+            ubah("kuota_akses_bulanan", e.target.value === "" ? null : angka(e.target.value))
+          }
+          bantuan={
+            terbuka
+              ? "Biarkan kosong — pedagang jualan setiap hari, bukan datang beberapa kali sebulan."
+              : "Kosongkan untuk tanpa batas."
+          }
         />
         <Kolom
           id="durasi"
@@ -486,9 +672,9 @@ export default function FormRuang({
 
       <Bagian
         judul="Harga"
-        keterangan={`Penyewa 3 bulan membayar ${rupiah(isi.harga_bulanan * 3)} sewa${
-          isi.deposit > 0 ? `, plus deposit ${rupiah(isi.deposit)}` : ""
-        }.`}
+        keterangan={`${terbuka ? "Pedagang" : "Penyewa"} yang sewa 3 bulan membayar ${rupiah(
+          isi.harga_bulanan * 3
+        )} sewa${isi.deposit > 0 ? `, plus deposit ${rupiah(isi.deposit)}` : ""}.`}
       >
         <Kolom
           id="harga"
@@ -522,7 +708,11 @@ export default function FormRuang({
             ["tayang", "Tayang — muncul di pencarian"],
             ["ditangguhkan", "Ditangguhkan — sementara tidak menerima penyewa"],
           ]}
-          bantuan="Tayangkan setelah fotonya ada. Ruang tanpa foto hampir tidak pernah diklik."
+          bantuan={
+            terbuka
+              ? "Tayangkan setelah fotonya ada. Pedagang mau lihat mukanya ke jalan dulu."
+              : "Tayangkan setelah fotonya ada. Ruang tanpa foto hampir tidak pernah diklik."
+          }
         />
       </Bagian>
 
@@ -542,14 +732,22 @@ export default function FormRuang({
           className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
         >
           {kirim && <Loader2 className="h-4 w-4 animate-spin" />}
-          {ruangId ? "Simpan perubahan" : onDibuat ? "Lanjut ke foto" : "Simpan ruang"}
+          {ruangId
+            ? "Simpan perubahan"
+            : onDibuat
+              ? "Lanjut ke foto"
+              : terbuka
+                ? "Simpan lahan"
+                : "Simpan ruang"}
         </button>
 
         {ruangId && (
           <>
             {konfirmasiHapus ? (
               <span className="flex flex-wrap items-center gap-2 text-sm">
-                <span className="text-muted">Hapus ruang ini permanen?</span>
+                <span className="text-muted">
+                  Hapus {terbuka ? "lahan" : "ruang"} ini permanen?
+                </span>
                 <button
                   type="button"
                   onClick={hapus}
@@ -573,7 +771,7 @@ export default function FormRuang({
                 className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-semibold text-muted hover:text-warn"
               >
                 <Trash2 className="h-4 w-4" />
-                Hapus ruang
+                Hapus {terbuka ? "lahan" : "ruang"}
               </button>
             )}
           </>

@@ -13,11 +13,20 @@ pihak luar, bukan karena sengaja dipalsukan.
 2. SQL Editor → jalankan berurutan: `01_schema.sql`, `03_auth_rls.sql`,
    `04_pesan.sql`, `05_host.sql`, `06_akses.sql`, `07_advisor.sql`,
    `08_jendela.sql`, `09_notifikasi.sql`, `10_push.sql`, `11_pesan_chat.sql`,
-   `12_balasan_cepat.sql`, `13_umkm.sql`, `14_foto_kecil.sql`, `16_wilayah_profil.sql`, `17_lahan_usaha.sql`, `18_video.sql`.
+   `12_balasan_cepat.sql`, `13_umkm.sql`, `14_foto_kecil.sql`, `16_wilayah_profil.sql`, `17_lahan_usaha.sql`, `18_video.sql`,
+   `19_rubrik_usaha.sql`.
    **Semuanya wajib.** Aplikasi membaca lewat view yang dibuat di `03`–`05`
    dan menulis lewat fungsi di `04`; tanpa itu layarnya menjawab "relation
    does not exist". `05` juga membuat bucket Storage `ruang-foto` beserta
-   policy-nya.
+   policy-nya, dan `18` membuat bucket `ruang-video` (batas 20 MB per berkas).
+   Periksa keduanya ada di Storage setelah migrasinya jalan.
+
+   `19` yang paling berdampak ke layar: ia menambah rubrik lahan usaha
+   (jenis usaha yang diizinkan, lebar muka jalan, listrik, air, atap, kelas
+   jalan) dan membuat `buat_pemesanan` menerima lahan **tanpa manifes
+   barang**. Sebelum ia dijalankan, pedagang secara harfiah tidak bisa
+   memesan halaman depan rumah — formulirnya menampilkan pilihan jenis usaha
+   yang kosong dan tombol kirimnya mati.
 3. **`02_seed.sql` sengaja tidak ada di daftar itu.** Ia berisi data contoh
    Malang — 6 host, 4 penyewa, 14 ruang, 84 foto berpenunjuk picsum.photos,
    6 pemesanan, manifes, log akses, ulasan, 5 permintaan — dan gunanya cuma

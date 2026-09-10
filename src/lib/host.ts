@@ -54,7 +54,16 @@ export type IsiRuang = {
   pengawasan: string[];
   fasilitas: string[];
   kategori_diterima: string[];
-  kuota_akses_bulanan: number;
+  /* Rubrik lahan usaha (migrasi 19). Hanya diisi untuk tipe lahan terbuka;
+     untuk ruang tertutup keempatnya null dan formulir tidak menampilkannya. */
+  usaha_diizinkan: string[];
+  lebar_muka_m: number | null;
+  listrik: string | null;
+  air: string | null;
+  atap: string | null;
+  kelas_jalan: string | null;
+  /** NULL berarti tanpa batas — yang benar untuk lahan usaha. */
+  kuota_akses_bulanan: number | null;
   durasi_min_hari: number;
   harga_bulanan: number;
   deposit: number;
@@ -130,8 +139,27 @@ export async function hapusRuang(db: SupabaseClient, id: string): Promise<void> 
 
 export const BUCKET_FOTO = "ruang-foto";
 
-/** Keterangan foto yang disarankan — sengaja spesifik, bukan "foto 1". */
-export const KETERANGAN_FOTO = [
+/**
+ * Keterangan foto yang disarankan — sengaja spesifik, bukan "foto 1".
+ *
+ * Dua daftar, karena yang perlu dibuktikan foto berbeda per kelompok tipe.
+ * Pedagang menilai lahan dari MUKA JALANNYA dan dari seramai apa jalan itu;
+ * "kondisi kunci" dan "lantai" tidak menjawab satu pun pertanyaannya, dan
+ * daftar pilihan yang isinya tidak relevan membuat host memilih yang pertama
+ * saja untuk semua foto — yang sama saja dengan tanpa keterangan.
+ */
+export const KETERANGAN_FOTO_LAHAN = [
+  "tampak dari jalan",
+  "lebar muka jalan",
+  "seluruh lahan",
+  "titik colokan listrik",
+  "atap / kanopi",
+  "arah datang pembeli",
+  "jalan saat jam ramai",
+  "patokan terdekat",
+];
+
+export const KETERANGAN_FOTO_RUANG = [
   "mulut gang",
   "tampak depan",
   "jalur akses",
@@ -141,6 +169,10 @@ export const KETERANGAN_FOTO = [
   "atap",
   "lantai",
 ];
+
+export function keteranganFoto(terbuka: boolean): string[] {
+  return terbuka ? KETERANGAN_FOTO_LAHAN : KETERANGAN_FOTO_RUANG;
+}
 
 /** Sisi terpanjang versi penuh — dipakai galeri di halaman detail. */
 const LEBAR_MAKS = 1600;

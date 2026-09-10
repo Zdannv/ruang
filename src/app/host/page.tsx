@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { Camera, Inbox, Plus, TrendingUp } from "lucide-react";
+import { Camera, Inbox, Plus, Store, TrendingUp } from "lucide-react";
 import LencanaStatus from "@/components/LencanaStatus";
 import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { daftarRuangSaya } from "@/lib/host";
-import { LABEL_TIPE, rupiah, volume } from "@/lib/label";
+import { LABEL_TIPE, luas, pakaiLuas, rupiah, volume } from "@/lib/label";
 
 export const metadata: Metadata = { title: "Dasbor host — Cari Ruang" };
 
@@ -33,6 +33,21 @@ export default async function DasborHost() {
 
   const totalPermintaan = ruang.reduce((t, r) => t + r.permintaan_baru, 0);
   const tanpaFoto = ruang.filter((r) => r.jumlah_foto === 0);
+  /*
+    Lahan terbuka yang tayang tapi belum menuliskan jenis usaha yang boleh.
+
+    Ini bukan kelengkapan yang kurang, ia jalan yang tertutup: `buat_pemesanan`
+    menolak setiap pemesanan lahan terbuka yang jenis usahanya tidak ada di
+    daftar pemiliknya, dan daftar kosong berarti TIDAK ADA jenis usaha yang
+    lolos. Jadi lahannya tayang, dilihat orang, dan tidak satu pun pedagang
+    bisa mengirim permintaan — tanpa pemiliknya pernah tahu kenapa.
+  */
+  const tanpaUsaha = ruang.filter(
+    (r) =>
+      pakaiLuas(r.tipe) &&
+      r.status === "tayang" &&
+      (r.usaha_diizinkan ?? []).length === 0
+  );
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
@@ -56,7 +71,10 @@ export default async function DasborHost() {
         </Link>
       </div>
 
-      {(totalPermintaan > 0 || tanpaFoto.length > 0 || wilayah.length > 0) && (
+      {(totalPermintaan > 0 ||
+        tanpaUsaha.length > 0 ||
+        tanpaFoto.length > 0 ||
+        wilayah.length > 0) && (
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           {totalPermintaan > 0 && (
             <Link
@@ -75,16 +93,34 @@ export default async function DasborHost() {
             </Link>
           )}
 
+          {tanpaUsaha.length > 0 && (
+            <Link
+              href={`/host/ruang/${tanpaUsaha[0].id}`}
+              className="flex items-start gap-3 rounded-2xl bg-warn-soft p-4 transition-transform hover:-translate-y-0.5"
+            >
+              <Store className="mt-0.5 h-5 w-5 shrink-0 text-warn" />
+              <span>
+                <span className="angka block text-sm font-semibold text-warn">
+                  {tanpaUsaha.length} lahan belum menyebut usaha yang boleh
+                </span>
+                <span className="mt-0.5 block text-xs text-warn/80">
+                  Selama daftarnya kosong, tidak ada pedagang yang bisa mengirim
+                  permintaan — sistem menolaknya lebih dulu. Centang minimal satu.
+                </span>
+              </span>
+            </Link>
+          )}
+
           {tanpaFoto.length > 0 && (
             <div className="flex items-start gap-3 rounded-2xl bg-warn-soft p-4">
               <Camera className="mt-0.5 h-5 w-5 shrink-0 text-warn" />
               <span>
                 <span className="angka block text-sm font-semibold text-warn">
-                  {tanpaFoto.length} ruang belum ada fotonya
+                  {tanpaFoto.length} lahan belum ada fotonya
                 </span>
                 <span className="mt-0.5 block text-xs text-warn/80">
-                  Ruang tanpa foto hampir tidak pernah diklik, bahkan kalau harganya
-                  paling murah.
+                  Lahan tanpa foto hampir tidak pernah diklik, bahkan kalau harganya
+                  paling murah. Pedagang mau lihat mukanya ke jalan.
                 </span>
               </span>
             </div>
@@ -110,17 +146,18 @@ export default async function DasborHost() {
 
       {ruang.length === 0 ? (
         <div className="mt-8 rounded-2xl bg-card p-8 text-center ring-1 ring-line">
-          <p className="text-sm font-semibold">Mulai dari satu ruang</p>
+          <p className="text-sm font-semibold">Mulai dari satu lahan</p>
           <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted">
-            Lantai dua ruko yang belum tersewa, garasi yang mobilnya sudah dijual,
-            gudang belakang yang separuh kosong. Kamu yang menentukan harga, jendela
-            akses, dan barang apa yang boleh masuk — dan tetap berhak menolak
-            permintaan.
+            Halaman depan rumah yang cuma jadi tempat parkir sepeda, teras samping,
+            pojok lahan kosong yang menghadap jalan. Kamu yang menentukan harga, jam
+            boleh jualan, dan jenis usaha apa saja yang boleh — termasuk boleh
+            menggoreng atau tidak — dan tetap berhak menolak permintaan.
           </p>
           <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted">
-            Satu ruang tidak harus disewakan utuh ke satu orang. Yang menyewa biasanya
-            penjual online yang stoknya menumpuk di rumah, usaha rumahan, atau
-            keluarga yang sedang pindahan.
+            Yang menyewa biasanya pedagang makanan dan minuman, kopi keliling yang
+            capek pindah-pindah, laundry kiloan, atau tukang cuci motor. Ruang
+            tertutup — garasi, gudang, lantai ruko — juga tetap bisa didaftarkan di
+            sini.
           </p>
           <Link
             href="/host/ruang/baru"
@@ -142,7 +179,11 @@ export default async function DasborHost() {
                   <div className="min-w-0">
                     <p className="text-sm font-semibold leading-snug">{r.judul}</p>
                     <p className="angka mt-1 text-xs text-muted">
-                      {LABEL_TIPE[r.tipe]} · {r.kecamatan}, {r.kota} · {volume(r.volume_m3)}
+                      {LABEL_TIPE[r.tipe]} · {r.kecamatan}, {r.kota} ·{" "}
+                      {/* Satuan ikut tipenya: "0,60 m³" untuk halaman depan
+                          3×2 m benar secara aritmatika dan tidak berarti
+                          apa-apa. Lihat `pakaiLuas()`. */}
+                      {pakaiLuas(r.tipe) ? luas(r.luas_m2) : volume(r.volume_m3)}
                     </p>
                   </div>
                   <LencanaStatus status={r.status} />

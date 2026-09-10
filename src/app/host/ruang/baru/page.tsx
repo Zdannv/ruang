@@ -26,8 +26,13 @@ export default async function RuangBaru() {
         Sewakan lahanmu
       </h1>
       <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
-        Dua langkah: keterangan ruangnya dulu, lalu fotonya. Simpan sebagai draf
+        Dua langkah: keterangan lahannya dulu, lalu fotonya. Simpan sebagai draf
         kalau belum yakin — draf tidak terlihat siapa pun sampai kamu menayangkannya.
+      </p>
+      <p className="mt-2 max-w-xl text-xs leading-relaxed text-muted">
+        Bawaannya halaman depan rumah. Kalau yang kamu sewakan ruang tertutup —
+        garasi, gudang, lantai ruko — ganti tipenya di isian pertama, dan
+        pertanyaannya ikut berubah.
       </p>
 
       <DaftarRuangBaru hostId={sesi.profil.id} />

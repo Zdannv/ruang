@@ -3,7 +3,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import {
   ArrowRight,
-  CalendarClock,
   Ruler,
   Search,
   ShieldAlert,
@@ -11,6 +10,7 @@ import {
   Truck,
   UtensilsCrossed,
   Wrench,
+  Zap,
 } from "lucide-react";
 import KartuRuang from "@/components/KartuRuang";
 import SorotanPromo from "@/components/SorotanPromo";
@@ -87,13 +87,6 @@ const SEGMEN = [
 ];
 
 /*
-  Ketiganya sengaja cuma menyebut hal yang datanya BENAR-BENAR ada di
-  database. Rubrik yang paling dibutuhkan pedagang — lebar muka jalan,
-  listrik, air, atap, jam boleh jualan — belum ada kolomnya, jadi tidak
-  disebut di sini. Menjanjikannya sekarang berarti pengunjung pertama
-  membuka listing dan tidak menemukannya.
-*/
-/*
   Manfaat, bukan pembelaan.
 
   Versi sebelumnya berjudul "Kenapa nggak cari di grup jual-beli aja?" dan
@@ -102,25 +95,35 @@ const SEGMEN = [
   pembacanya bertahan, bukan tertarik. Marketplace besar tidak pernah
   menjelaskan kenapa bukan pesaingnya — mereka cuma menyebut apa yang didapat.
 
-  Tetap dibatasi hal yang datanya benar-benar ada: rubrik yang paling
-  dibutuhkan pedagang (lebar muka jalan, listrik, air, atap) belum ada
-  kolomnya, jadi tidak disebut.
+  Tetap dibatasi hal yang datanya benar-benar ada — dan sejak migrasi 19
+  rubrik yang paling dibutuhkan pedagang MEMANG sudah ada kolomnya: lebar muka
+  jalan, kelas jalan, listrik, air, atap, dan jenis usaha yang diizinkan. Itu
+  sebabnya ketiganya sekarang boleh menyebutnya; sebelum migrasi itu, kalimat
+  yang sama adalah janji yang tidak ada isinya di halaman listing.
+
+  Yang tetap TIDAK boleh disebut: ganti rugi, jaminan keamanan, dan asuransi.
+  Ketiganya tidak ada, dan tidak akan ada sampai ada penanggung berlisensi.
 */
 const ALASAN = [
   {
     ikon: Ruler,
-    judul: "Kondisinya jelas",
-    isi: "Muat gerobak atau nggak, pernah banjir atau nggak, siapa yang pegang kunci. Semua tertulis sebelum kamu berangkat.",
+    judul: "Ukurannya jelas dari awal",
+    isi: "Berapa meter muka jalannya, jalan raya atau dalam gang, pernah banjir atau nggak. Ketahuan sebelum kamu berangkat ke sana.",
   },
   {
-    ikon: CalendarClock,
-    judul: "Jam bukanya disepakati",
-    isi: "Pemilik menentukan hari dan jamnya. Janjian lewat aplikasi, tercatat, jadi nggak ada versi cerita yang beda.",
+    ikon: Zap,
+    judul: "Listrik, air, atap — ditulis",
+    isi: "Ada colokan atau nggak, boleh pakai air pemilik atau nggak, ada kanopi atau kena hujan. Tiga hal yang bikin jualan bisa jalan.",
+  },
+  {
+    ikon: Store,
+    judul: "Boleh menggoreng atau nggak",
+    isi: "Pemilik mencentang usaha apa saja yang boleh. Yang nggak dicentang ditolak sistem sebelum kamu nunggu jawaban.",
   },
   {
     ikon: ShieldAlert,
-    judul: "Alamat aman",
-    isi: "Yang umum lihat cuma kelurahan dan jarak. Alamat lengkap kebuka setelah deal.",
+    judul: "Alamat kebuka bertahap",
+    isi: "Yang umum lihat cuma kelurahan dan jaraknya. Alamat lengkap kebuka setelah deal, nomor kontak setelah bayar.",
   },
 ];
 
@@ -359,7 +362,7 @@ export default async function Beranda() {
           <h2 className="max-w-2xl font-display text-2xl font-bold tracking-tight sm:text-3xl">
             Yang kamu dapat
           </h2>
-          <div className="mt-8 grid gap-6 sm:grid-cols-3">
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {ALASAN.map((a) => (
               <div key={a.judul}>
                 <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-soft text-brand-dark">

@@ -29,9 +29,16 @@ import {
 export default function KelolaJendela({
   ruangId,
   jendela,
+  terbuka = false,
 }: {
   ruangId: string;
   jendela: Jendela[];
+  /**
+   * Lahan terbuka. Yang berubah cuma kata-katanya: untuk pedagang jadwal ini
+   * adalah JAM BOLEH JUALAN, bukan jam boleh datang mengambil barang — dan
+   * mengisinya sempit di sini berarti pedagangnya tidak bisa buka warung.
+   */
+  terbuka?: boolean;
 }) {
   const router = useRouter();
   const [hari, setHari] = useState<number[]>([1, 2, 3, 4, 5, 6]);
@@ -60,17 +67,20 @@ export default function KelolaJendela({
 
   return (
     <section className="rounded-2xl bg-card p-5 ring-1 ring-line">
-      <h2 className="font-display text-lg font-bold tracking-tight">Jendela akses</h2>
+      <h2 className="font-display text-lg font-bold tracking-tight">
+        {terbuka ? "Jam boleh jualan" : "Jendela akses"}
+      </h2>
       <p className="mt-1 text-xs leading-relaxed text-muted">
-        Jam saat penyewa boleh datang. Ini ditegakkan sistem: permintaan kunjungan di
-        luar jadwal ini ditolak otomatis, jadi penyewa tidak perlu menebak dan kamu
-        tidak perlu menolak satu-satu.
+        {terbuka
+          ? "Jam saat pedagang boleh buka di lahanmu. Ini ditegakkan sistem, jadi jangan diisi lebih sempit dari yang kamu benar-benar izinkan — di luar jam ini ia tidak bisa jualan."
+          : "Jam saat penyewa boleh datang. Ini ditegakkan sistem: permintaan kunjungan di luar jadwal ini ditolak otomatis, jadi penyewa tidak perlu menebak dan kamu tidak perlu menolak satu-satu."}
       </p>
 
       {jendela.length === 0 && (
         <p className="mt-3 rounded-xl bg-warn-soft px-3.5 py-2.5 text-sm text-warn">
-          Belum ada jadwal. Selama kosong, kunjungan boleh diminta kapan saja — supaya
-          penyewa tidak terkurung dari barangnya. Isi jadwalnya supaya batasnya jelas.
+          {terbuka
+            ? "Belum ada jadwal. Selama kosong, pedagang boleh jualan kapan saja. Isi jadwalnya kalau kamu mau membatasi — misalnya cuma sore sampai malam."
+            : "Belum ada jadwal. Selama kosong, kunjungan boleh diminta kapan saja — supaya penyewa tidak terkurung dari barangnya. Isi jadwalnya supaya batasnya jelas."}
         </p>
       )}
 

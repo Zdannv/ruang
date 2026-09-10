@@ -21,10 +21,14 @@ import {
   LABEL_KATEGORI,
   LABEL_STATUS,
   LABEL_TIPE,
+  LABEL_USAHA,
+  kuotaAkses,
+  pakaiLuas,
   rupiah,
   tanggal,
   tanggalJam,
 } from "@/lib/label";
+import type { TipeRuang } from "@/lib/ruang";
 
 export const metadata: Metadata = { title: "Detail pemesanan — Cari Ruang" };
 
@@ -78,6 +82,8 @@ export default async function HalamanDetailPemesanan({
   const besok = new Date(sekarang.getTime() + 86_400_000);
   besok.setUTCHours(3, 0, 0, 0); // 10.00 WIB
 
+  // Lahan terbuka tidak punya manifes barang; isi kesepakatannya jenis usaha.
+  const terbuka = pakaiLuas(p.tipe as TipeRuang);
   const nilaiManifes = manifes.reduce((t, m) => t + m.taksiran_nilai, 0);
   const versiTerbaru = manifes.length > 0 ? Math.max(...manifes.map((m) => m.versi)) : 1;
 
@@ -106,7 +112,7 @@ export default async function HalamanDetailPemesanan({
           {LABEL_TIPE[p.tipe as keyof typeof LABEL_TIPE] ?? p.tipe} · {p.kecamatan}, {p.kota}
           <span aria-hidden>·</span>
           <Link href={`/ruang/${p.ruang_id}`} className="font-semibold text-brand hover:text-brand-dark">
-            Lihat ruangnya
+            {terbuka ? "Lihat lahannya" : "Lihat ruangnya"}
           </Link>
         </p>
       </header>
@@ -146,54 +152,78 @@ export default async function HalamanDetailPemesanan({
               </div>
               <div className="flex justify-between gap-3">
                 <dt className="text-muted">Kuota kunjungan</dt>
-                <dd className="font-medium">{p.kuota_akses_bulanan}x / bulan</dd>
+                <dd className="font-medium">{kuotaAkses(p.kuota_akses_bulanan, true)}</dd>
               </div>
             </dl>
           </section>
 
-          <section className="rounded-2xl bg-card p-5 ring-1 ring-line">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
+          {terbuka ? (
+            <section className="rounded-2xl bg-card p-5 ring-1 ring-line">
               <h2 className="font-display text-lg font-bold tracking-tight">
-                Manifes barang
+                Jenis usaha yang disetujui
               </h2>
-              <p className="text-xs text-muted">versi {versiTerbaru}</p>
-            </div>
-            <p className="mt-1 text-xs leading-relaxed text-muted">
-              Daftar ini jadi acuan saat serah terima. Perubahan manifes membuat versi
-              baru, tidak menimpa yang lama.
-            </p>
-
-            <ul className="mt-3 divide-y divide-line">
-              {manifes
-                .filter((m) => m.versi === versiTerbaru)
-                .map((m) => (
-                  <li key={m.id} className="flex items-start justify-between gap-3 py-2.5">
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium">{m.nama}</p>
-                      <p className="text-xs text-muted">
-                        {LABEL_KATEGORI[m.kategori] ?? m.kategori.replace(/_/g, " ")}
-                        {" · "}
-                        <span className="angka">{m.jumlah} unit</span>
-                      </p>
-                    </div>
-                    <p className="angka shrink-0 text-sm text-muted">
-                      {m.taksiran_nilai > 0 ? rupiah(m.taksiran_nilai) : "—"}
-                    </p>
-                  </li>
-                ))}
-            </ul>
-
-            {nilaiManifes > 0 && (
-              <p className="angka mt-3 border-t border-line pt-3 text-sm">
-                <span className="text-muted">Total taksiran nilai </span>
-                <span className="font-semibold">{rupiah(nilaiManifes)}</span>
+              <p className="mt-1 text-xs leading-relaxed text-muted">
+                Ini yang dicocokkan dengan kebijakan pemilik sebelum permintaannya
+                diteruskan. Mau ganti jenis dagangan? Ajukan pemesanan baru — bukan
+                karena sistemnya kaku, tapi karena persetujuan pemiliknya berlaku untuk
+                usaha yang ini.
               </p>
-            )}
-            <p className="mt-2 text-xs leading-relaxed text-muted">
-              Taksiran nilai dipakai kalau ada sengketa. Platform menengahi, tapi tidak
-              memberi ganti rugi — tidak ada asuransi barang.
-            </p>
-          </section>
+              <p className="mt-3 inline-flex rounded-full bg-brand-soft px-4 py-2 text-sm font-semibold text-brand-dark">
+                {p.usaha
+                  ? (LABEL_USAHA[p.usaha] ?? p.usaha.replace(/_/g, " "))
+                  : "Belum dicatat"}
+              </p>
+              <p className="mt-4 text-xs leading-relaxed text-muted">
+                Tidak ada manifes barang untuk lahan usaha — gerobak dan alat dagang
+                dibawa pulang penyewa sendiri. Kalau ada sengketa, platform menengahi
+                tapi tidak memberi ganti rugi.
+              </p>
+            </section>
+          ) : (
+            <section className="rounded-2xl bg-card p-5 ring-1 ring-line">
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <h2 className="font-display text-lg font-bold tracking-tight">
+                  Manifes barang
+                </h2>
+                <p className="text-xs text-muted">versi {versiTerbaru}</p>
+              </div>
+              <p className="mt-1 text-xs leading-relaxed text-muted">
+                Daftar ini jadi acuan saat serah terima. Perubahan manifes membuat versi
+                baru, tidak menimpa yang lama.
+              </p>
+
+              <ul className="mt-3 divide-y divide-line">
+                {manifes
+                  .filter((m) => m.versi === versiTerbaru)
+                  .map((m) => (
+                    <li key={m.id} className="flex items-start justify-between gap-3 py-2.5">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium">{m.nama}</p>
+                        <p className="text-xs text-muted">
+                          {LABEL_KATEGORI[m.kategori] ?? m.kategori.replace(/_/g, " ")}
+                          {" · "}
+                          <span className="angka">{m.jumlah} unit</span>
+                        </p>
+                      </div>
+                      <p className="angka shrink-0 text-sm text-muted">
+                        {m.taksiran_nilai > 0 ? rupiah(m.taksiran_nilai) : "—"}
+                      </p>
+                    </li>
+                  ))}
+              </ul>
+
+              {nilaiManifes > 0 && (
+                <p className="angka mt-3 border-t border-line pt-3 text-sm">
+                  <span className="text-muted">Total taksiran nilai </span>
+                  <span className="font-semibold">{rupiah(nilaiManifes)}</span>
+                </p>
+              )}
+              <p className="mt-2 text-xs leading-relaxed text-muted">
+                Taksiran nilai dipakai kalau ada sengketa. Platform menengahi, tapi tidak
+                memberi ganti rugi — tidak ada asuransi barang.
+              </p>
+            </section>
+          )}
 
           {bolehAkses && (
             <JadwalKunjungan

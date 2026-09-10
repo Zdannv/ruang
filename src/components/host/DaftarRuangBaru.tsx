@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Images, SlidersHorizontal } from "lucide-react";
 import FormRuang from "@/components/host/FormRuang";
+import { pakaiLuas } from "@/lib/label";
+import type { TipeRuang } from "@/lib/ruang";
 import KelolaFoto from "@/components/host/KelolaFoto";
 import KelolaVideo from "@/components/host/KelolaVideo";
 
@@ -27,9 +29,14 @@ import KelolaVideo from "@/components/host/KelolaVideo";
  */
 export default function DaftarRuangBaru({ hostId }: { hostId: string }) {
   const [ruangId, setRuangId] = useState<string | null>(null);
+  // Tipenya dibawa dari langkah satu, bukan diambil ulang dari server: langkah
+  // dua tidak mengambil apa pun (lihat `KelolaFoto`), dan yang dibutuhkannya
+  // cuma tahu keterangan foto mana yang ditawarkan.
+  const [terbuka, setTerbuka] = useState(true);
 
-  const lanjutKeFoto = (id: string) => {
+  const lanjutKeFoto = (id: string, tipe: TipeRuang) => {
     setRuangId(id);
+    setTerbuka(pakaiLuas(tipe));
     // Formulir langkah satu panjang, dan tombolnya ada di paling bawah. Tanpa
     // ini host mendarat di ruang kosong bekas ujung formulir dan mengira
     // tombolnya tidak melakukan apa-apa.
@@ -39,7 +46,12 @@ export default function DaftarRuangBaru({ hostId }: { hostId: string }) {
   return (
     <>
       <ol className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
-        <Langkah nomor={1} label="Keterangan ruang" ikon={SlidersHorizontal} keadaan={ruangId ? "selesai" : "aktif"} />
+        <Langkah
+          nomor={1}
+          label="Keterangan lahan"
+          ikon={SlidersHorizontal}
+          keadaan={ruangId ? "selesai" : "aktif"}
+        />
         <span aria-hidden className="h-px w-6 bg-line" />
         <Langkah nomor={2} label="Foto & video" ikon={Images} keadaan={ruangId ? "aktif" : "nanti"} />
       </ol>
@@ -54,21 +66,21 @@ export default function DaftarRuangBaru({ hostId }: { hostId: string }) {
             Lahannya tersimpan sebagai draf. Sekarang fotonya.
           </p>
 
-          <KelolaFoto hostId={hostId} ruangId={ruangId} awal={[]} />
+          <KelolaFoto hostId={hostId} ruangId={ruangId} awal={[]} terbuka={terbuka} />
           <KelolaVideo hostId={hostId} ruangId={ruangId} awal={[]} />
 
           <div className="rounded-2xl bg-card p-5 ring-1 ring-line">
             <p className="text-sm font-semibold">Sudah cukup fotonya?</p>
             <p className="mt-1.5 text-xs leading-relaxed text-muted">
-              Langkah berikutnya — jendela akses dan menayangkan ruangnya — ada di
-              halaman ruang. Kamu bisa ke sana sekarang atau nanti; semua yang di
-              atas sudah tersimpan.
+              Langkah berikutnya — {terbuka ? "jam boleh jualan" : "jendela akses"} dan
+              menayangkannya — ada di halaman kelola. Kamu bisa ke sana sekarang atau
+              nanti; semua yang di atas sudah tersimpan.
             </p>
             <Link
               href={`/host/ruang/${ruangId}`}
               className="mt-4 inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
             >
-              Selesai, buka halaman ruang
+              Selesai, buka halaman kelola
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

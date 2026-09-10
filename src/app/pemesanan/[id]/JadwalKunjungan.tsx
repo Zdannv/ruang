@@ -48,8 +48,9 @@ export default function JadwalKunjungan({
 }: {
   pemesananId: string;
   jendelaAkses: string;
-  sisaKuotaBulanIni: number;
-  kuotaBulanan: number;
+  /** `null` = tanpa batas. Lihat `sisaKuota()`. */
+  sisaKuotaBulanIni: number | null;
+  kuotaBulanan: number | null;
   kunjungan: Kunjungan[];
   sayaPenyewa: boolean;
   sayaHost: boolean;
@@ -77,6 +78,10 @@ export default function JadwalKunjungan({
     }
   };
 
+  // Tanpa batas berarti tidak pernah habis; `null <= 0` menjawab true di
+  // JavaScript, jadi perbandingannya harus lewat penjaga ini.
+  const kuotaHabis = kuotaBulanan != null && (sisaKuotaBulanIni ?? 0) <= 0;
+
   const minta = (e: React.FormEvent) => {
     e.preventDefault();
     jalankan("minta", async () => {
@@ -90,7 +95,9 @@ export default function JadwalKunjungan({
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h2 className="font-display text-lg font-bold tracking-tight">Kunjungan</h2>
         <p className="angka text-xs text-muted">
-          sisa {sisaKuotaBulanIni} dari {kuotaBulanan} bulan ini
+          {kuotaBulanan == null
+            ? "tanpa batas kunjungan"
+            : `sisa ${sisaKuotaBulanIni ?? kuotaBulanan} dari ${kuotaBulanan} bulan ini`}
         </p>
       </div>
       <p className="mt-1 text-xs leading-relaxed text-muted">
@@ -153,7 +160,7 @@ export default function JadwalKunjungan({
 
           <button
             type="submit"
-            disabled={proses !== null || sisaKuotaBulanIni <= 0}
+            disabled={proses !== null || kuotaHabis}
             className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
           >
             {proses === "minta" ? (
@@ -163,7 +170,7 @@ export default function JadwalKunjungan({
             )}
             Ajukan jadwal
           </button>
-          {sisaKuotaBulanIni <= 0 && (
+          {kuotaHabis && (
             <p className="mt-2 text-xs text-muted">
               Kuota bulan ini sudah habis. Ajukan untuk bulan berikutnya, atau minta host
               menaikkan kuotanya.

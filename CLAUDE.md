@@ -775,6 +775,95 @@ Kerjakan berurutan. Jangan lompat.
     ringkasan "23 ulasan · 4,6/5", kartu kutipan yang benar-benar bisa
     digeser, dan "Ketepatan keterangan 5/5" di bawah nama.
 
+37. **Rubrik lahan usaha, dan pemesanan tanpa manifes** (10 Sep 2026). Lihat
+    `19_rubrik_usaha.sql`. Ini yang menutup tiga dari empat utang yang ditulis
+    di ekor `17_lahan_usaha.sql`.
+
+    **Yang paling menentukan bukan rubriknya, melainkan `buat_pemesanan`.** Ia
+    mewajibkan manifes barang tidak kosong, dan pedagang yang menyewa halaman
+    depan tidak menitipkan apa pun — gerobaknya dibawa pulang setiap hari.
+    Jadi sampai migrasi ini, fokus "lahan usaha untuk UMKM" berhenti di copy:
+    lahannya bisa didaftarkan, bisa ditemukan, dan **tidak bisa dipesan sama
+    sekali**.
+
+    Padanan manifes untuk lahan usaha adalah **jenis usaha**, dan ia
+    dicocokkan dengan `ruang.usaha_diizinkan` persis seperti kategori barang
+    dicocokkan dengan `kategori_diterima`. `masak_berminyak` sengaja dipisah
+    dari `makanan`: "boleh menggoreng atau tidak" adalah pertanyaan yang
+    jawabannya membatalkan sewa, dan asap yang menempel di dinding rumah orang
+    adalah alasan penolakan paling sering di lahan pinggir jalan.
+
+    `kuota_akses_bulanan` sekarang **nullable, dan NULL berarti tanpa batas**.
+    Untuk pedagang kuota kunjungan tidak ada artinya — ia di lahannya setiap
+    hari. Konsekuensinya menyebar ke tempat yang tidak terlihat dari
+    kolomnya: `sisaKuota()` dulu menulis `?? 0`, yang membaca TERBALIK — lahan
+    tanpa batas justru yang paling dilarang mengajukan kunjungan. Dan
+    `null <= 0` bernilai true di JavaScript, jadi setiap perbandingan kuota
+    harus lewat penjaga `kuotaBulanan != null` lebih dulu.
+
+    **Empat view ikut dibuat ulang, dan tiga di antaranya mudah terlupa.**
+    `ruang_publik` sudah jelas. Tapi `ruang_saya` adalah satu-satunya sumber
+    isi formulir ubah — kalau ia tidak memuat kolom barunya, host bisa
+    MENGISI rubriknya, membuka lagi halaman yang sama, menemukannya kosong,
+    dan menyimpan sekali lagi untuk menimpanya dengan null. `pemesanan_saya`
+    butuh `usaha` karena halaman pemesanan lahan tidak punya manifes untuk
+    ditampilkan. Semua kolom baru ditambahkan **di ujung**; `create or replace
+    view` menolak perubahan urutan.
+
+    **Layarnya bercabang per kelompok tipe, bukan menambah bagian.** Formulir
+    pesan menampilkan "Jenis usaha" ATAU "Manifes barang", tidak pernah
+    keduanya. Formulir ruang menyembunyikan tinggi, lebar pintu, posisi
+    lantai, kondisi bangunan, kelembapan, dan penguncian untuk lahan terbuka —
+    dan `gantiTipe()` ikut **menukar nilainya**, bukan cuma menyembunyikan
+    isiannya: kolomnya NOT NULL dan tetap tersimpan, jadi tanpa itu sebuah
+    halaman depan rumah menyimpan "berdinding dan beratap" dan "kunci dipegang
+    penyewa" — dua keterangan yang tidak pernah tampil di layar untuk tipe itu,
+    tapi tetap ada di database dan tetap salah.
+
+    Halaman detail dapat bagian **"Buat jualan"** di atas rubrik kondisi, dan
+    rubrik yang tersisa dipangkas untuk lahan: "Kelembapan: kering, ada
+    ventilasi" pada halaman depan rumah bukan keterangan yang kurang berguna,
+    ia keterangan yang MENYESATKAN — ia membaca seolah lahannya berdinding.
+    Yang belum diisi pemilik ditulis "Belum diisi pemilik" dengan nada
+    waspada, bukan disembunyikan.
+
+    **`TIPE_URUT` di `/cari` ternyata masih memuat delapan tipe tertutup
+    saja** — sisa dari masa sebelum migrasi 17. Jadi selama tiga hari keempat
+    tipe lahan terbuka tidak bisa dipilih sama sekali di halaman pencarian,
+    padahal keempatnya justru fokus aplikasinya. Ketemu saat menambahkan
+    penyaring jenis usaha, bukan dicari.
+
+    Penyaring baru di `/cari`: **jenis usaha** dan **lebar muka jalan**,
+    keduanya di sisi klien seperti tipe dan kategori. Urutan panel filternya
+    diubah jadi usaha → lebar muka → harga → ukuran → kategori; ukuran (m³)
+    turun karena ia cuma berarti untuk ruang tertutup, dan keterangannya
+    sekarang mengatakannya.
+
+    Dasbor host dapat peringatan **"N lahan belum menyebut usaha yang
+    boleh"**. Ini bukan kelengkapan yang kurang, ia jalan yang tertutup:
+    daftar kosong berarti TIDAK ADA jenis usaha yang lolos, jadi lahannya
+    tayang, dilihat orang, dan tidak satu pun pedagang bisa mengirim
+    permintaan — tanpa pemiliknya pernah tahu kenapa. Formulirnya juga menolak
+    menyimpan lahan terbuka tanpa satu pun centang.
+
+    Bagian "Yang kamu dapat" di halaman depan **akhirnya boleh menyebut
+    rubriknya** — lebar muka jalan, listrik, air, atap, jenis usaha. Sebelum
+    migrasi ini kalimat yang sama adalah janji tanpa isi, dan itu sebabnya ia
+    dulu ditulis lebih kabur. Yang tetap tidak boleh disebut: ganti rugi,
+    jaminan keamanan, asuransi.
+
+    Kedua cabang formulir **sudah diuji di peramban** dengan props tiruan
+    lewat rute sementara — sama seperti `SuaraPenyewa` — karena database
+    sasarannya belum menjalankan migrasi 17 sehingga tidak ada satu pun lahan
+    terbuka yang bisa dibuka di sana. Yang diperiksa: chip jenis usaha muncul
+    dan manifes hilang, isian yang disembunyikan benar-benar hilang, dan
+    berpindah ke `gudang` memulihkan keenam isian itu beserta nilainya.
+
+    **Yang masih belum**: serah terima per tipe (menunggu pembayaran), dan
+    `permintaan` masih menanyakan **volume m³** — untuk pedagang yang benar
+    adalah lebar muka jalan dan jenis usaha. Itu butuh migrasi sendiri dan
+    `permintaan_kecamatan` ikut berubah bentuk, jadi dipisah.
+
 ### Berikutnya, selama pembayaran belum ada
 
 Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris
@@ -784,7 +873,8 @@ Artinya: **tidak ada lagi fitur berarti yang bisa dibangun tanpa jalur
 pembayaran.** Serah terima, pengakhiran lebih awal, dan kontrak PDF semuanya
 menunggu `menunggu_pembayaran` bisa dilewati. Yang tersisa cuma pekerjaan yang
 tidak menambah alur: verifikasi nomor HP (menunggu WhatsApp/SMS), memisahkan
-properti dari ruang (utang no. 4), dan mengganti foto seed.
+properti dari ruang (utang no. 4), dan **memindahkan `permintaan` dari volume
+m³ ke lebar muka jalan + jenis usaha** (lihat ekor nomor 37).
 
 Kalau ada waktu dan pembayaran masih jauh, yang paling berguna dikerjakan
 adalah **menyiapkan integrasi pembayarannya sendiri**: pilih penyedia, daftar

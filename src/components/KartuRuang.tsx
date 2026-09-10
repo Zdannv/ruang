@@ -6,9 +6,11 @@ import { sudahDiperkecil, type RuangDenganFoto } from "@/lib/ruang";
 import {
   LABEL_AKSES,
   LABEL_BANJIR,
+  LABEL_LISTRIK_PENDEK,
   LABEL_TIPE,
   banjirPerluPerhatian,
   jarak,
+  lebarMuka,
   luas,
   pakaiLuas,
   rupiah,
@@ -48,12 +50,23 @@ export default function KartuRuang({
 }) {
   const Ikon = IKON_TIPE[ruang.tipe];
   const banjirWaspada = banjirPerluPerhatian(ruang.riwayat_banjir);
+  const terbuka = pakaiLuas(ruang.tipe);
 
   // `luas_m2` nol berarti migrasi 17 belum dijalankan di database ini.
   const ukuran =
-    pakaiLuas(ruang.tipe) && ruang.luas_m2 > 0
-      ? luas(ruang.luas_m2)
-      : volume(ruang.volume_m3);
+    terbuka && ruang.luas_m2 > 0 ? luas(ruang.luas_m2) : volume(ruang.volume_m3);
+
+  /*
+    Lencana kedua mengikuti tipenya.
+
+    Untuk lahan terbuka, "Muat mobil pikap" bukan yang sedang dicari orangnya —
+    ia mencari berapa meter yang menghadap jalan dan ada colokan atau tidak.
+    Keduanya baru ada sejak migrasi 19, jadi lencananya hilang sendiri di
+    database yang belum menjalankannya, bukan menampilkan "muka null m".
+  */
+  const muka = terbuka ? lebarMuka(ruang.lebar_muka_m, true) : null;
+  const listrik =
+    terbuka && ruang.listrik ? (LABEL_LISTRIK_PENDEK[ruang.listrik] ?? null) : null;
 
   return (
     <Link
@@ -122,12 +135,28 @@ export default function KartuRuang({
           <span className="angka rounded-full bg-paper px-2 py-0.5 font-semibold text-ink">
             {ukuran}
           </span>
-          {/* Akses masuk cuma muat dari sm ke atas, dan di sana ia memang
-              lebih berguna: yang memilih dari laptop biasanya sedang
-              membandingkan, bukan menelusuri. */}
-          <span className="hidden rounded-full bg-brand-soft px-2 py-0.5 font-medium text-brand-dark sm:inline">
-            {LABEL_AKSES[ruang.akses_masuk]}
-          </span>
+          {/* Lebar muka jalan ikut tampil di HP — untuk pedagang ia sama
+              menentukannya dengan harga, jadi ia tidak boleh cuma muncul di
+              laptop seperti lencana-lencana di bawahnya. */}
+          {muka && (
+            <span className="angka rounded-full bg-brand-soft px-2 py-0.5 font-semibold text-brand-dark">
+              {muka}
+            </span>
+          )}
+          {/* Sisanya cuma muat dari sm ke atas, dan di sana ia memang lebih
+              berguna: yang memilih dari laptop biasanya sedang membandingkan,
+              bukan menelusuri. */}
+          {terbuka ? (
+            listrik && (
+              <span className="hidden rounded-full bg-paper px-2 py-0.5 font-medium text-ink sm:inline">
+                {listrik}
+              </span>
+            )
+          ) : (
+            <span className="hidden rounded-full bg-brand-soft px-2 py-0.5 font-medium text-brand-dark sm:inline">
+              {LABEL_AKSES[ruang.akses_masuk]}
+            </span>
+          )}
           {!banjirWaspada && (
             <span className="hidden rounded-full bg-good-soft px-2 py-0.5 font-medium text-good sm:inline">
               {LABEL_BANJIR[ruang.riwayat_banjir]}

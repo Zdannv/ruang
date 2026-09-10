@@ -15,9 +15,10 @@ import KartuRuang from "@/components/KartuRuang";
 import { IKON_TIPE } from "@/components/IkonTipe";
 import { cariRuang, type RuangDenganFoto, type TipeRuang } from "@/lib/ruang";
 import { klienBrowser } from "@/lib/supabase/browser";
-import { LABEL_KATEGORI, LABEL_TIPE, rupiah } from "@/lib/label";
+import { LABEL_KATEGORI, LABEL_TIPE, LABEL_USAHA, pakaiLuas, rupiah } from "@/lib/label";
 import {
   HARGA_PILIHAN,
+  MUKA_PILIHAN,
   RADIUS_BAWAAN,
   RADIUS_PILIHAN,
   TITIK_BAWAAN,
@@ -39,11 +40,23 @@ const PIL_AKTIF = "border border-brand bg-brand text-white";
 const PIL_MATI =
   "border border-line bg-card text-ink hover:border-brand/40 hover:bg-brand-soft";
 
+/*
+  Urutan pilihan tipe, dan keempat lahan terbuka ada di DEPAN.
+
+  Sebelum ini daftarnya cuma memuat delapan tipe tertutup — sisa dari
+  masa sebelum migrasi 17 — jadi halaman depan rumah, lahan kosong, teras, dan
+  kios tidak bisa dipilih sama sekali di halaman pencarian. Keempatnya justru
+  yang jadi fokus aplikasi, dan sudah bisa didaftarkan host sejak migrasi 17.
+*/
 const TIPE_URUT: TipeRuang[] = [
+  "halaman_depan",
+  "teras",
+  "lahan_kosong",
+  "kios",
+  "lantai_ruko",
   "kamar",
   "garasi",
   "gudang",
-  "lantai_ruko",
   "mezanin",
   "bawah_tangga",
   "loteng",
@@ -75,6 +88,8 @@ export default function PencarianRuang() {
   const hargaMaks = angkaDari(searchParams.get("harga"), 0);
   const tipe = (searchParams.get("tipe") ?? "") as TipeRuang | "";
   const kategori = searchParams.get("kategori") ?? "";
+  const usaha = searchParams.get("usaha") ?? "";
+  const mukaMin = angkaDari(searchParams.get("muka"), 0);
 
   // Dipakai label titik supaya tertulis "Ketawanggede", bukan "lokasimu",
   // untuk titik yang datang dari wilayah pendaftaran.
@@ -293,9 +308,15 @@ export default function PencarianRuang() {
       semua.filter(
         (r) =>
           (!tipe || r.tipe === tipe) &&
-          (!kategori || r.kategori_diterima.includes(kategori))
+          (!kategori || r.kategori_diterima.includes(kategori)) &&
+          (!usaha || r.usaha_diizinkan.includes(usaha)) &&
+          // Lahan yang lebar mukanya belum diisi pemilik ikut tersaring keluar
+          // saat penyaring ini menyala. Menampilkannya berarti pedagang membuka
+          // lahan yang belum tentu selebar yang ia minta — dan yang ia minta
+          // adalah satu-satunya alasan ia menyalakan penyaringnya.
+          (mukaMin === 0 || Number(r.lebar_muka_m ?? 0) >= mukaMin)
       ),
-    [semua, tipe, kategori]
+    [semua, tipe, kategori, usaha, mukaMin]
   );
 
   // Tipe yang memang ada isinya dalam radius sekarang. Menawarkan "Kontainer"
@@ -320,11 +341,31 @@ export default function PencarianRuang() {
     return Object.keys(LABEL_KATEGORI).filter((k) => ada.has(k));
   }, [semua, kategori]);
 
+  // Jenis usaha yang benar-benar diizinkan seseorang dalam radius sekarang.
+  // Sama seperti `kategoriTersedia`, ia sekaligus menahan keadaan "migrasi 19
+  // belum dijalankan": di sana kolomnya tidak terkirim, jadi barisan
+  // pilihannya tidak muncul alih-alih memberi penyaring yang selalu nol.
+  const usahaTersedia = useMemo(() => {
+    const ada = new Set(semua.flatMap((r) => r.usaha_diizinkan));
+    if (usaha) ada.add(usaha);
+    return Object.keys(LABEL_USAHA).filter((u) => ada.has(u));
+  }, [semua, usaha]);
+
+  // Penyaring lebar muka hanya berguna kalau memang ada lahan terbuka di
+  // radius ini — di daftar yang isinya gudang semua ia cuma satu baris kendali
+  // yang tidak pernah dipakai.
+  const adaLahanTerbuka = useMemo(
+    () => semua.some((r) => pakaiLuas(r.tipe)) || mukaMin > 0,
+    [semua, mukaMin]
+  );
+
   // Dipakai bilah ringkas: apa saja yang sedang menyaring, dalam kata yang
   // bisa dibaca. Radius dan titik TIDAK ikut — keduanya selalu ada nilainya,
   // jadi menghitungnya sebagai "filter" membuat angkanya tidak pernah nol.
   const ringkasanFilter = [
     tipe ? LABEL_TIPE[tipe] : null,
+    usaha ? (LABEL_USAHA[usaha] ?? usaha) : null,
+    mukaMin > 0 ? `muka ≥ ${mukaMin} m` : null,
     kategori ? LABEL_KATEGORI[kategori] : null,
     volumeMin > 0 ? `≥ ${volumeMin} m³` : null,
     hargaMaks > 0 ? `≤ ${rupiah(hargaMaks)}` : null,
@@ -332,6 +373,16 @@ export default function PencarianRuang() {
   const jumlahFilter = ringkasanFilter.length;
 
   const bersihkan = () => router.replace(pathname, { scroll: false });
+
+  /*
+    Kata bendanya ikut tipe yang sedang dipilih.
+
+    Bawaannya "lahan", bukan "ruang", karena itu fokus aplikasinya sekarang —
+    dan "3 ruang" untuk tiga halaman depan rumah salah menggambarkan apa yang
+    ditemukan orangnya. Kalau ia justru sedang menyaring tipe tertutup,
+    katanya kembali jadi "ruang".
+  */
+  const kataTempat = tipe && !pakaiLuas(tipe) ? "ruang" : "lahan";
 
   /*
     `adaFilter` dibuang bersama tombol "Hapus filter" yang kedua.
@@ -356,7 +407,7 @@ export default function PencarianRuang() {
           dan kartu pertama sudah terlihat tanpa menggulir. */}
       <section className="sticky top-[var(--tinggi-header)] z-40 border-b border-line bg-card/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-2 px-4 py-3 sm:px-6 lg:px-8">
-          <h1 className="sr-only">Cari ruang</h1>
+          <h1 className="sr-only">Cari lahan usaha</h1>
 
           {/* Titik mengambil satu baris penuh di layar telepon. Bertiga dalam
               satu baris di lebar 375px membuat namanya terpangkas jadi satu
@@ -520,16 +571,18 @@ export default function PencarianRuang() {
         </div>
 
         <section
-          aria-label="Tipe ruang"
+          aria-label="Tipe lahan"
           hidden={!bukaFilter}
           className="pt-3 sm:pt-4"
         >
           {/* Judulnya dulu "Mau menyimpan apa?" — pertanyaan tentang barang yang
               dijawab dengan bentuk ruang. Sejak penyaring kategori barang ada di
               bawah, keduanya bertabrakan: dua judul menanyakan hal yang sama dan
-              cuma satu yang benar-benar menyaring barang. */}
+              cuma satu yang benar-benar menyaring barang. Sekarang ia menanyakan
+              BENTUK tempatnya, dan pertanyaan "mau jualan apa" ada di panel
+              filter — di sana ia menyaring `usaha_diizinkan`, bukan bentuk. */}
           <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
-            Ruang seperti apa?
+            Tempat seperti apa?
           </h2>
 
           {memuat ? (
@@ -587,14 +640,115 @@ export default function PencarianRuang() {
 
         {/* ── Filter lain ────────────────────────────────────────────────── */}
         <section
-          aria-label="Filter ukuran dan harga"
+          aria-label="Filter usaha, harga, dan ukuran"
           hidden={!bukaFilter}
           className="mt-4 space-y-4"
         >
+          {usahaTersedia.length > 0 && (
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
+                Mau jualan apa?
+              </h3>
+              <p className="mt-1 text-xs text-muted">
+                Pemilik lahan menuliskan usaha apa saja yang boleh jalan di tempatnya.
+                Menyaringnya di sini berarti kamu tidak membuka lahan yang sudah pasti
+                menolak daganganmu — termasuk yang tidak mengizinkan menggoreng.
+              </p>
+              <div className="geser-x -mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+                <div className="flex w-max gap-2 pb-1 sm:w-auto sm:flex-wrap">
+                  <button
+                    type="button"
+                    aria-pressed={!usaha}
+                    onClick={() => ubah({ usaha: null })}
+                    className={`${PIL} ${usaha ? PIL_MATI : PIL_AKTIF} whitespace-nowrap`}
+                  >
+                    Semua usaha
+                  </button>
+                  {usahaTersedia.map((kode) => {
+                    const aktif = usaha === kode;
+                    return (
+                      <button
+                        key={kode}
+                        type="button"
+                        aria-pressed={aktif}
+                        onClick={() => ubah({ usaha: aktif ? null : kode })}
+                        className={`${PIL} ${aktif ? PIL_AKTIF : PIL_MATI} whitespace-nowrap`}
+                      >
+                        {LABEL_USAHA[kode]}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {adaLahanTerbuka && (
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
+                Lebar muka jalan
+              </h3>
+              <p className="mt-1 text-xs text-muted">
+                Yang menghadap jalan, bukan luas totalnya. Lahan yang lebar mukanya
+                belum diisi pemilik tidak ikut ditampilkan saat penyaring ini menyala.
+              </p>
+              <div className="geser-x -mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+                <div className="flex w-max gap-2 pb-1 sm:w-auto sm:flex-wrap">
+                  {MUKA_PILIHAN.map((m) => {
+                    const aktif = mukaMin === m.nilai;
+                    return (
+                      <button
+                        key={m.nilai}
+                        type="button"
+                        aria-pressed={aktif}
+                        onClick={() => ubah({ muka: m.nilai ? String(m.nilai) : null })}
+                        className={`${PIL} ${aktif ? PIL_AKTIF : PIL_MATI} whitespace-nowrap`}
+                      >
+                        {m.label}
+                        {m.bantuan && (
+                          <span className={aktif ? "ml-1.5 text-white/75" : "ml-1.5 text-muted"}>
+                            {m.bantuan}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div>
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
+              Harga maksimum
+            </h3>
+            <div className="geser-x -mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+              <div className="flex w-max gap-2 pb-1 sm:w-auto sm:flex-wrap">
+                {HARGA_PILIHAN.map((h) => {
+                  const aktif = hargaMaks === h.nilai;
+                  return (
+                    <button
+                      key={h.nilai}
+                      type="button"
+                      aria-pressed={aktif}
+                      onClick={() => ubah({ harga: h.nilai ? String(h.nilai) : null })}
+                      className={`angka ${PIL} ${aktif ? PIL_AKTIF : PIL_MATI} whitespace-nowrap`}
+                    >
+                      {h.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
               Ukuran minimum
             </h3>
+            <p className="mt-1 text-xs text-muted">
+              Volume, jadi ini berlaku untuk ruang tertutup. Untuk lahan terbuka
+              pakai lebar muka jalan di atas.
+            </p>
             <div className="geser-x -mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
               <div className="flex w-max gap-2 pb-1 sm:w-auto sm:flex-wrap">
                 {VOLUME_PILIHAN.map((v) => {
@@ -620,37 +774,15 @@ export default function PencarianRuang() {
             </div>
           </div>
 
-          <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
-              Harga maksimum
-            </h3>
-            <div className="geser-x -mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-              <div className="flex w-max gap-2 pb-1 sm:w-auto sm:flex-wrap">
-                {HARGA_PILIHAN.map((h) => {
-                  const aktif = hargaMaks === h.nilai;
-                  return (
-                    <button
-                      key={h.nilai}
-                      type="button"
-                      aria-pressed={aktif}
-                      onClick={() => ubah({ harga: h.nilai ? String(h.nilai) : null })}
-                      className={`angka ${PIL} ${aktif ? PIL_AKTIF : PIL_MATI} whitespace-nowrap`}
-                    >
-                      {h.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
           {kategoriTersedia.length > 0 && (
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
                 Barang yang mau disimpan
               </h3>
               <p className="mt-1 text-xs text-muted">
-                Host berhak menolak kategori yang tidak ia terima, jadi menyaringnya
-                di sini menghemat permintaan yang sudah pasti ditolak.
+                Untuk ruang tertutup: pemiliknya berhak menolak kategori yang tidak ia
+                terima, jadi menyaringnya di sini menghemat permintaan yang sudah pasti
+                ditolak.
               </p>
               <div className="geser-x -mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
                 <div className="flex w-max gap-2 pb-1 sm:w-auto sm:flex-wrap">
@@ -686,16 +818,18 @@ export default function PencarianRuang() {
         <div className="mt-8 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
           <h2 aria-live="polite" className="font-display text-xl font-bold tracking-tight sm:text-2xl">
             {memuat
-              ? "Mencari ruang terdekat…"
+              ? "Mencari yang terdekat…"
               : galat
                 ? "Hasil tidak bisa dimuat"
                 : daftar.length === 0
-                  ? `Belum ada ruang dalam ${radiusKm} km`
-                  : `${daftar.length} ruang dalam ${radiusKm} km`}
+                  ? `Belum ada ${kataTempat} dalam ${radiusKm} km`
+                  : `${daftar.length} ${kataTempat} dalam ${radiusKm} km`}
           </h2>
           <p className="text-sm text-muted">
             dari {namaTitik}
-            {tipe ? ` · ${LABEL_TIPE[tipe].toLowerCase()} saja` : ""} · terdekat lebih dulu
+            {tipe ? ` · ${LABEL_TIPE[tipe].toLowerCase()} saja` : ""}
+            {usaha ? ` · buat ${(LABEL_USAHA[usaha] ?? usaha).toLowerCase()}` : ""} ·
+            terdekat lebih dulu
           </p>
         </div>
 
@@ -720,7 +854,9 @@ export default function PencarianRuang() {
             <SearchX className="h-8 w-8 text-muted" />
             <p className="text-sm font-semibold">Belum ada yang cocok di sini</p>
             <p className="max-w-md text-xs leading-relaxed text-muted">
-              Coba perlebar radiusnya, atau longgarkan tipe, ukuran, dan harganya.
+              Coba perlebar radiusnya, atau longgarkan jenis usaha, lebar muka, dan
+              harganya. Bisa juga menitipkan kriteriamu di halaman permintaan — pemilik
+              lahan di kecamatanmu bisa melihat hitungannya.
             </p>
             <div className="mt-1 flex flex-wrap justify-center gap-2">
               {radiusKm < 15 && (
@@ -757,9 +893,9 @@ export default function PencarianRuang() {
             membayar ganti rugi. Kalimatnya ditulis apa adanya di layar pencarian
             supaya tidak ada yang datang ke sini mengira barangnya diasuransikan. */}
         <p className="mt-12 border-t border-line pt-6 text-xs leading-relaxed text-muted">
-          Alamat lengkap dibuka setelah jadwal survei disetujui host. Ruang di sini
-          disewakan langsung oleh pemiliknya — platform menengahi kalau ada sengketa,
-          tapi tidak memberi ganti rugi.
+          Alamat lengkap dibuka setelah jadwal survei disetujui pemiliknya. Lahan dan
+          ruang di sini disewakan langsung oleh pemiliknya — platform menengahi kalau
+          ada sengketa, tapi tidak memberi ganti rugi.
         </p>
       </div>
     </>

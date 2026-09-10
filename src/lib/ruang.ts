@@ -65,6 +65,12 @@ export type HasilRuang = {
   lng_publik: number;
   /** Untuk lahan terbuka, ini ukuran yang berarti — bukan volume. */
   luas_m2: number;
+  /* Empat kolom di bawah baru ada sejak 19_rubrik_usaha.sql, dan cuma berarti
+     untuk lahan terbuka. Dinormalkan di `cariRuang`. */
+  usaha_diizinkan: string[];
+  lebar_muka_m: number | null;
+  listrik: string | null;
+  kelas_jalan: string | null;
   volume_m3: number;
   harga_bulanan: number;
   akses_masuk: AksesMasuk;
@@ -144,6 +150,10 @@ export async function cariRuang(
     // `luas_m2` yang undefined akan tampil sebagai "NaN m²" di kartu.
     kategori_diterima: r.kategori_diterima ?? [],
     luas_m2: r.luas_m2 ?? 0,
+    usaha_diizinkan: r.usaha_diizinkan ?? [],
+    lebar_muka_m: r.lebar_muka_m ?? null,
+    listrik: r.listrik ?? null,
+    kelas_jalan: r.kelas_jalan ?? null,
     foto: foto.get(r.id) ?? null,
   }));
 }
@@ -254,8 +264,15 @@ export type RuangPublik = {
   pengawasan: string[];
   fasilitas: string[];
   kategori_diterima: string[];
+  usaha_diizinkan: string[];
+  lebar_muka_m: number | null;
+  listrik: string | null;
+  air: string | null;
+  atap: string | null;
+  kelas_jalan: string | null;
   jendela_akses: string;
-  kuota_akses_bulanan: number;
+  /** NULL berarti tanpa batas — lihat migrasi 19. */
+  kuota_akses_bulanan: number | null;
   durasi_min_hari: number;
   harga_bulanan: number;
   deposit: number;

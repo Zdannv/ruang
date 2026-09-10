@@ -46,6 +46,21 @@ export const VOLUME_PILIHAN = [
   { nilai: 40, label: "≥ 40 m³", bantuan: "stok dagangan" },
 ];
 
+/**
+ * Lebar muka jalan, disertai apa yang muat di sana.
+ *
+ * Ini ukuran yang dipikirkan pedagang, dan ia menggantikan volume sebagai
+ * penyaring utama untuk lahan terbuka: yang menentukan bukan berapa kubik
+ * udara di atas lahannya, melainkan berapa meter yang menghadap jalan.
+ */
+export const MUKA_PILIHAN = [
+  { nilai: 0, label: "Semua lebar", bantuan: null },
+  { nilai: 2, label: "≥ 2 m", bantuan: "gerobak" },
+  { nilai: 3, label: "≥ 3 m", bantuan: "gerobak + kursi" },
+  { nilai: 4, label: "≥ 4 m", bantuan: "tenda kecil" },
+  { nilai: 6, label: "≥ 6 m", bantuan: "warung tenda" },
+];
+
 export const HARGA_PILIHAN = [
   { nilai: 0, label: "Semua harga" },
   { nilai: 300_000, label: "≤ Rp300rb" },

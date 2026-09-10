@@ -6,6 +6,8 @@ import FormPesan from "./FormPesan";
 import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { getRuangUntukPesan } from "@/lib/pemesanan";
+import { pakaiLuas } from "@/lib/label";
+import type { TipeRuang } from "@/lib/ruang";
 
 export const metadata: Metadata = { title: "Ajukan sewa — Cari Ruang" };
 
@@ -26,6 +28,7 @@ export default async function HalamanPesan({ params }: PageProps<"/ruang/[id]/pe
   if (!ruang) notFound();
 
   const ruangSendiri = sesi.profil?.id === ruang.host_id;
+  const terbuka = pakaiLuas(ruang.tipe as TipeRuang);
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
@@ -38,19 +41,23 @@ export default async function HalamanPesan({ params }: PageProps<"/ruang/[id]/pe
       </Link>
 
       <h1 className="mt-4 font-display text-2xl font-bold tracking-tight sm:text-3xl">
-        Ajukan sewa
+        {terbuka ? "Ajukan sewa lahan" : "Ajukan sewa"}
       </h1>
       <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
-        Pilih tanggalnya dan daftarkan barang yang akan disimpan. Permintaan ini masih
-        bisa ditolak host, dan belum ada pembayaran di langkah ini.
+        {terbuka
+          ? "Pilih tanggalnya dan jenis usaha yang mau kamu jalankan. Permintaan ini masih bisa ditolak pemilik, dan belum ada pembayaran di langkah ini."
+          : "Pilih tanggalnya dan daftarkan barang yang akan disimpan. Permintaan ini masih bisa ditolak host, dan belum ada pembayaran di langkah ini."}
       </p>
 
       <div className="mt-6">
         {ruangSendiri ? (
           <div className="rounded-2xl bg-card p-6 ring-1 ring-line">
-            <p className="text-sm font-semibold">Ini ruangmu sendiri</p>
+            <p className="text-sm font-semibold">
+              {terbuka ? "Ini lahanmu sendiri" : "Ini ruangmu sendiri"}
+            </p>
             <p className="mt-1.5 text-sm text-muted">
-              Host tidak bisa menyewa ruangnya sendiri. Kelola permintaan yang masuk di{" "}
+              Pemilik tidak bisa menyewa lahannya sendiri. Kelola permintaan yang masuk
+              di{" "}
               <Link href="/pemesanan" className="font-semibold text-brand hover:text-brand-dark">
                 daftar pemesanan
               </Link>

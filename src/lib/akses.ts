@@ -45,17 +45,25 @@ export async function daftarKunjungan(
  * sama persis dengan yang ditegakkan `minta_akses` — kalau dihitung ulang di
  * sini, dua tempat itu pasti akan berbeda pendapat suatu saat.
  */
+/**
+ * `null` berarti TANPA BATAS, bukan nol.
+ *
+ * Sejak migrasi 19 `kuota_akses_bulanan` boleh NULL — keadaan yang wajar untuk
+ * lahan usaha — dan fungsinya ikut mengembalikan NULL. Versi sebelumnya
+ * menulis `?? 0`, dan itu membaca terbalik: lahan tanpa batas kunjungan justru
+ * yang paling dilarang mengajukan kunjungan.
+ */
 export async function sisaKuota(
   db: SupabaseClient,
   pemesananId: string,
   tanggal: string
-): Promise<number> {
+): Promise<number | null> {
   const { data, error } = await db.rpc("sisa_kuota_akses", {
     p_pemesanan: pemesananId,
     p_bulan: tanggal,
   });
   if (error) throw error;
-  return (data as number) ?? 0;
+  return (data as number | null) ?? null;
 }
 
 /**

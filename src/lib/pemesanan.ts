@@ -40,10 +40,16 @@ export type PemesananRingkas = {
   kota: string;
   deposit: number;
   jendela_akses: string;
-  kuota_akses_bulanan: number;
+  /** NULL berarti tanpa batas — yang biasa dipakai lahan usaha. */
+  kuota_akses_bulanan: number | null;
   host_id: string;
   host_nama: string;
   foto: string | null;
+  /**
+   * Jenis usaha yang disetujui, untuk lahan terbuka. Untuk ruang tertutup
+   * selalu null — di sana isi kesepakatannya manifes barang.
+   */
+  usaha: string | null;
 };
 
 export type ManifesItem = {
@@ -83,8 +89,11 @@ export type RuangUntukPesan = {
   deposit: number;
   durasi_min_hari: number;
   kategori_diterima: string[];
+  /** Migrasi 19. Kosong untuk ruang tertutup — di sana yang berlaku manifes. */
+  usaha_diizinkan: string[];
   jendela_akses: string;
-  kuota_akses_bulanan: number;
+  /** NULL berarti tanpa batas. */
+  kuota_akses_bulanan: number | null;
   host_id: string;
   host_nama: string;
   tersewa_sampai: string | null;
@@ -95,22 +104,22 @@ export async function getRuangUntukPesan(
   ruangId: string
 ): Promise<RuangUntukPesan | null> {
   const [r, k] = await Promise.all([
-    db
-      .from("ruang_publik")
-      .select(
-        "id, judul, tipe, kecamatan, kota, harga_bulanan, deposit, durasi_min_hari, " +
-          "kategori_diterima, jendela_akses, kuota_akses_bulanan, host_id, host_nama"
-      )
-      .eq("id", ruangId)
-      .maybeSingle(),
+    // `*`, bukan daftar kolom: `ruang_publik` memang tidak memuat satu pun
+    // kolom rahasia — itu seluruh gunanya — dan daftar kolom eksplisit di sini
+    // berarti setiap migrasi yang menambah rubrik baru mematikan halaman ini
+    // dengan 42703 selama jarak antara push dan menjalankan migrasinya.
+    db.from("ruang_publik").select("*").eq("id", ruangId).maybeSingle(),
     db.from("ruang_ketersediaan").select("tersewa_sampai").eq("ruang_id", ruangId).maybeSingle(),
   ]);
   if (r.error) throw r.error;
   if (k.error) throw k.error;
   if (!r.data) return null;
 
+  const baris = r.data as unknown as RuangUntukPesan;
   return {
-    ...(r.data as unknown as Omit<RuangUntukPesan, "tersewa_sampai">),
+    ...baris,
+    usaha_diizinkan: baris.usaha_diizinkan ?? [],
+    kuota_akses_bulanan: baris.kuota_akses_bulanan ?? null,
     tersewa_sampai:
       (k.data as { tersewa_sampai: string | null } | null)?.tersewa_sampai ?? null,
   };
@@ -187,15 +196,32 @@ export async function getDetailPemesanan(
 // Perpindahan status — semuanya lewat RPC
 // ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * `usaha` dikirim HANYA kalau ada isinya, dan itu bukan kerapian.
+ *
+ * PostgREST memilih fungsinya dari nama argumen yang dikirim. Pemesanan ruang
+ * tertutup tidak butuh `p_usaha`, jadi dengan menghilangkannya ia tetap cocok
+ * ke `buat_pemesanan` versi empat argumen — yaitu yang masih hidup di database
+ * yang belum menjalankan migrasi 19. Tanpa ini, jarak antara push dan
+ * menjalankan migrasinya mematikan SELURUH pemesanan, bukan cuma yang lahan
+ * usaha.
+ */
 export async function buatPemesanan(
   db: SupabaseClient,
-  input: { ruangId: string; mulai: string; selesai: string; manifes: BarisManifesBaru[] }
+  input: {
+    ruangId: string;
+    mulai: string;
+    selesai: string;
+    manifes: BarisManifesBaru[];
+    usaha?: string | null;
+  }
 ): Promise<string> {
   const { data, error } = await db.rpc("buat_pemesanan", {
     p_ruang: input.ruangId,
     p_mulai: input.mulai,
     p_selesai: input.selesai,
     p_manifes: input.manifes,
+    ...(input.usaha ? { p_usaha: input.usaha } : {}),
   });
   if (error) throw error;
   return data as string;
