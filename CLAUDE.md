@@ -587,9 +587,8 @@ Kerjakan berurutan. Jangan lompat.
     sudah dinyatakan sebagai teks HTML di bagian "Yang kamu dapat", jadi tidak
     ada keterangan yang benar-benar lenyap.
 
-    Geseran mendatar dengan snap, bukan pemutar otomatis: tidak butuh
-    JavaScript sama sekali, dan orang yang sedang membaca satu kartu tidak
-    direbut oleh kartu berikutnya.
+    Geseran mendatar dengan snap, **dulu** tanpa pemutar otomatis sama
+    sekali. Dibalik 10 September 2026 — lihat nomor 39.
 
 32. **Gambar sorotan: dua ilustrasi** (9 Sep 2026). Sumbernya di
     `desain/sorotan/`; yang disajikan hasil `skrip/pasang-sorotan.mjs`.
@@ -907,6 +906,54 @@ Kerjakan berurutan. Jangan lompat.
     yang dulu membuat "Cara pakainya" dipecah dua kolom. Dua kolom di sini:
     **767px**, diukur di 375×812. Aturannya sekarang berlaku umum: **begitu
     sebuah daftar kartu dapat ilustrasi, ia dua kolom di telepon.**
+
+39. **Sorotan jadi pemutar dengan titik penunjuk** (10 Sep 2026). Membalik
+    bagian dari nomor 29, atas permintaan pemiliknya.
+
+    Alasan pembalikannya sah, dan ia soal yang tidak kelihatan waktu
+    memutuskan: **di laptop kartunya selebar penuh**, jadi tidak ada kartu
+    sebelah yang mengintip — dan isyarat "ini bisa digeser" yang dulu
+    diandalkan cuma ada di layar telepon. Di laptop, kartu kedua praktis tidak
+    pernah ditemukan orang.
+
+    Jeda 5 detik, dan **10 detik setelah disentuh tangan**. Yang kedua itu
+    intinya: keberatan lama — "orang yang sedang membaca satu kartu tidak
+    boleh direbut kartu berikutnya" — dijawab dengan memberi orang yang jelas
+    sedang memperhatikan waktu dua kali lipat, bukan dengan membuang
+    pemutarnya. Sekali disentuh, jedanya tetap 10 detik seterusnya.
+
+    Empat hal yang menahannya supaya tidak jadi pemutar yang menyebalkan:
+
+    1. **`prefers-reduced-motion: reduce` mematikannya total**, bukan
+       memperlambat. Titik penunjuknya tetap ada, jadi kartunya tetap bisa
+       dipindah sendiri.
+    2. **Tab yang tidak dilihat tidak digeser** (`document.hidden`), dan
+       efeknya mulai lagi lewat `visibilitychange`. Bukan penghematan:
+       geseran halus tidak beranimasi di tab tersembunyi, jadi orang yang
+       kembali mendarat di kartu acak.
+    3. **Menggeser wadahnya, bukan `scrollIntoView`.** Yang terakhir boleh
+       ikut menggeser HALAMANNYA kalau sorotannya sedang di luar layar — dan
+       pemutarnya berjalan terus, jadi halaman akan melompat sendiri saat
+       orangnya membaca bagian lain.
+    4. Isyarat manual diredam 400 ms. Satu geseran jari menghasilkan puluhan
+       event `scroll`, dan tanpa peredam tiap satu memicu render ulang.
+
+    **Jebakan yang ketemu saat mengujinya, dan bentuknya sama persis dengan
+    `useRef` sekali-jalan di nomor 24:** versi pertama meredam penghitungan
+    kartu aktif dengan `requestAnimationFrame` plus penanda "sudah
+    dijadwalkan" — dan **rAF tidak pernah berjalan di tab yang tersembunyi**.
+    Kalau orangnya berpindah tab tepat saat kartunya bergeser, penandanya
+    tertinggal menyala selamanya, dan sekembalinya ia titik penunjuknya
+    berhenti mengikuti kartu tanpa galat apa pun. Sekarang dihitung langsung
+    di penanganan event; kartunya cuma dua dan peramban sudah menggabungkan
+    event scroll per frame sendiri.
+
+    Aturan turunannya: **jangan memakai rAF sebagai kunci sekali-jalan.** Ia
+    berhenti di tab tersembunyi, dan kunci yang tidak pernah dibuka tidak
+    meninggalkan jejak apa pun untuk ditelusuri.
+
+    Diukur dengan `setTimeout` yang dipasangi pencatat: 5,0 detik berulang
+    saat belum disentuh, dan tepat 10,0 detik sesudah satu `pointerdown`.
 
 ### Berikutnya, selama pembayaran belum ada
 
