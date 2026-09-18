@@ -1613,6 +1613,54 @@ yang lebih boros) dan y=513 di 375×812. Keduanya masih di atas lipatan.
 Kalau nanti ada pintasan lain yang mau ditambahkan di atas hasil, ukur lagi;
 batasnya tetap sama, hasil pencarian harus terlihat tanpa menggulir.
 
+### Panel filter jadi dialog dua kolom — 18 September 2026
+
+Keluhannya: *"filternya gini banget yaa, kok aneh gitulo, mending liat
+punyanya olx"*, dengan tangkapan layar dialog "Semua Kategori" OLX.
+
+Yang lama membuka lima kelompok sekaligus sebagai baris pil bertumpuk, di
+tengah halaman, mendorong hasilnya ke bawah. Dua hal salah sekaligus, dan
+yang kedua lebih dalam:
+
+1. Aturan lipatan yang sudah pernah diukur dan diperbaiki dilanggar lagi,
+   cuma kali ini hanya saat panelnya dibuka.
+2. **Lima kelompok yang terlihat sekaligus tidak terbaca sebagai lima
+   pertanyaan.** Yang muncul di layar cuma dinding pil, dan tidak ada satu
+   pun yang mengundang dijawab.
+
+Sekarang `PanelFilter`: dialog di laptop, lembar bawah di telepon, dengan
+daftar kelompok di kiri dan pilihannya di kanan. Halamannya tidak bergeser
+sama sekali, dan yang sedang dijawab cuma satu kelompok.
+
+Tiga hal yang membuatnya bekerja:
+
+- **Kolom kirinya menampilkan pilihan yang sedang berlaku** di bawah tiap
+  judul, dengan warna merek. Tanpa itu orang harus menekan kelima kelompok
+  satu per satu untuk tahu apa yang sedang menyaring.
+- **Tidak ada tombol "Terapkan".** Penyaringnya langsung berlaku, dan tombol
+  bawahnya berbunyi "Lihat N lahan" dengan N yang ikut berubah. Itu yang
+  benar-benar ingin diketahui orangnya sebelum menutup panelnya, dan
+  menundanya sampai "Terapkan" membuat angka itu mustahil ditampilkan.
+- **Kelompoknya data, bukan JSX** (`KelompokFilter[]`). Kolom kiri butuh tahu
+  judul dan ringkasan tiap kelompok SEBELUM kelompoknya dibuka, dan itu tidak
+  bisa dibaca dari JSX yang bersarang.
+
+Kelompok aktifnya **diturunkan, bukan disimpan mentah**: "Jenis usaha" dan
+"Barang yang disimpan" hilang sendiri kalau tidak ada lahan yang
+menyebutkannya di radius ini, dan kunci yang disimpan mentah akan menunjuk
+kelompok yang sudah tidak ada — kolom kanan kosong tanpa penjelasan apa pun.
+
+**Keterangan panjang di tiap kelompok dibuang.** Tiga paragraf yang dulu
+menjelaskan kenapa sebuah penyaring berguna tidak muat di kolom selebar itu,
+dan memang tidak ada yang membacanya. Yang tersisa satu baris di bawah
+pilihan yang membutuhkannya.
+
+Satu cacat yang cuma ketahuan dari melihat layarnya: overlay-nya `z-50`,
+**sama dengan navigasi bawah**, dan karena navigasinya dirender belakangan di
+layout akar ia menang. Tombol "Hapus semua" dan "Lihat N lahan" tertutup rapi
+di telepon, tanpa satu pun galat. Sekarang `z-[60]`.
+
+
 ### Halaman depan berhenti terbaca seperti template — 18 September 2026
 
 Keluhannya: *"desainnya kurang unik dan keliatan vibe codingnya."* Diagnosisnya

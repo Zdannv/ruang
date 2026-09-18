@@ -21,6 +21,7 @@ import {
   Wallet,
 } from "lucide-react";
 import KartuRuang from "@/components/KartuRuang";
+import PanelFilter, { type KelompokFilter } from "@/components/PanelFilter";
 import { IKON_TIPE } from "@/components/IkonTipe";
 import { cariRuang, type RuangDenganFoto, type TipeRuang } from "@/lib/ruang";
 import { klienBrowser } from "@/lib/supabase/browser";
@@ -41,13 +42,6 @@ import {
   simpanTitik,
   titikProfil,
 } from "@/lib/lokasiTersimpan";
-
-const PIL =
-  "cursor-pointer rounded-full px-3.5 py-2 text-sm font-medium transition-colors " +
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
-const PIL_AKTIF = "border border-brand bg-brand text-white";
-const PIL_MATI =
-  "border border-line bg-card text-ink hover:border-brand/40 hover:bg-brand-soft";
 
 /**
  * Radius kueri kedua, yang mengisi bagian "di luar radiusmu".
@@ -529,6 +523,121 @@ export default function PencarianRuang() {
     return cocok ?? null;
   }, [diLuar]);
 
+  /*
+    Isi panel filter, disusun sebagai data.
+
+    Bentuk ini yang membuat panel dua kolomnya mungkin: kolom kirinya butuh
+    tahu judul dan pilihan yang sedang berlaku SEBELUM kelompoknya dibuka,
+    dan itu tidak bisa dibaca dari JSX yang bersarang.
+
+    Dua kelompok bisa tidak ada sama sekali. "Jenis usaha" dan "Barang yang
+    disimpan" cuma muncul kalau memang ada lahan yang menyebutkannya di
+    radius ini — penyaring yang setiap pilihannya menghasilkan nol lebih
+    buruk daripada penyaring yang tidak ada.
+  */
+  const kelompokFilter = useMemo<KelompokFilter[]>(() => {
+    const daftarKelompok: KelompokFilter[] = [];
+
+    if (usahaTersedia.length > 0) {
+      daftarKelompok.push({
+        kunci: "usaha",
+        judul: "Jenis usaha",
+        ringkas: usaha ? (LABEL_USAHA[usaha] ?? usaha) : null,
+        opsi: [
+          {
+            kunci: "semua",
+            label: "Semua usaha",
+            aktif: !usaha,
+            pilih: () => ubah({ usaha: null }),
+          },
+          ...usahaTersedia.map((kode) => ({
+            kunci: kode,
+            label: LABEL_USAHA[kode] ?? kode,
+            aktif: usaha === kode,
+            pilih: () => ubah({ usaha: usaha === kode ? null : kode }),
+          })),
+        ],
+      });
+    }
+
+    if (adaLahanTerbuka) {
+      daftarKelompok.push({
+        kunci: "muka",
+        judul: "Lebar muka jalan",
+        ringkas: mukaMin > 0 ? `≥ ${mukaMin} m` : null,
+        opsi: MUKA_PILIHAN.map((m) => ({
+          kunci: String(m.nilai),
+          label: m.label,
+          bantuan: m.bantuan,
+          aktif: mukaMin === m.nilai,
+          pilih: () => ubah({ muka: m.nilai ? String(m.nilai) : null }),
+        })),
+      });
+    }
+
+    daftarKelompok.push({
+      kunci: "harga",
+      judul: "Harga maksimum",
+      ringkas: hargaMaks > 0 ? `≤ ${rupiah(hargaMaks)}` : null,
+      opsi: HARGA_PILIHAN.map((h) => ({
+        kunci: String(h.nilai),
+        label: h.label,
+        aktif: hargaMaks === h.nilai,
+        pilih: () => ubah({ harga: h.nilai ? String(h.nilai) : null }),
+      })),
+    });
+
+    daftarKelompok.push({
+      kunci: "volume",
+      judul: "Ukuran ruang",
+      ringkas: volumeMin > 0 ? `≥ ${volumeMin} m³` : null,
+      opsi: VOLUME_PILIHAN.map((v) => ({
+        kunci: String(v.nilai),
+        label: v.label,
+        // Cuma berarti untuk ruang tertutup, dan itu ditulis di keterangan
+        // pilihan pertamanya saja. Mengulangnya di tiap pilihan membuat
+        // kolomnya penuh kalimat yang sama.
+        bantuan: v.bantuan ?? (v.nilai === 0 ? "Volume, untuk ruang tertutup" : null),
+        aktif: volumeMin === v.nilai,
+        pilih: () => ubah({ volume: v.nilai ? String(v.nilai) : null }),
+      })),
+    });
+
+    if (kategoriTersedia.length > 0) {
+      daftarKelompok.push({
+        kunci: "kategori",
+        judul: "Barang yang disimpan",
+        ringkas: kategori ? LABEL_KATEGORI[kategori] : null,
+        opsi: [
+          {
+            kunci: "semua",
+            label: "Semua barang",
+            aktif: !kategori,
+            pilih: () => ubah({ kategori: null }),
+          },
+          ...kategoriTersedia.map((kode) => ({
+            kunci: kode,
+            label: LABEL_KATEGORI[kode],
+            aktif: kategori === kode,
+            pilih: () => ubah({ kategori: kategori === kode ? null : kode }),
+          })),
+        ],
+      });
+    }
+
+    return daftarKelompok;
+  }, [
+    ubah,
+    usaha,
+    usahaTersedia,
+    adaLahanTerbuka,
+    mukaMin,
+    hargaMaks,
+    volumeMin,
+    kategori,
+    kategoriTersedia,
+  ]);
+
   const bersihkan = () => router.replace(pathname, { scroll: false });
 
   /*
@@ -692,8 +801,8 @@ export default function PencarianRuang() {
         <div className="geser-x -mx-4 flex items-center gap-2 overflow-x-auto px-4 pt-5 pb-1 sm:mx-0 sm:px-0">
           <button
             type="button"
-            onClick={() => setBukaFilter((b) => !b)}
-            aria-expanded={bukaFilter}
+            onClick={() => setBukaFilter(true)}
+            aria-haspopup="dialog"
             className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
               jumlahFilter > 0
                 ? "bg-brand text-white hover:bg-brand-dark"
@@ -702,10 +811,11 @@ export default function PencarianRuang() {
           >
             <SlidersHorizontal className="h-4 w-4" />
             Filter
-            {jumlahFilter > 0 && <span className="angka">({jumlahFilter})</span>}
-            <ChevronDown
-              className={`h-3.5 w-3.5 transition-transform ${bukaFilter ? "rotate-180" : ""}`}
-            />
+            {jumlahFilter > 0 && (
+              <span className="angka flex h-5 w-5 items-center justify-center rounded-full bg-white/25 text-xs">
+                {jumlahFilter}
+              </span>
+            )}
           </button>
 
           {ringkasanFilter.map((r) => (
@@ -783,180 +893,18 @@ export default function PencarianRuang() {
           })}
         </div>
 
-        {/* ── Filter lain ────────────────────────────────────────────────── */}
-        <section
-          aria-label="Filter usaha, harga, dan ukuran"
-          hidden={!bukaFilter}
-          className="mt-4 space-y-4"
-        >
-          {usahaTersedia.length > 0 && (
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
-                Mau jualan apa?
-              </h3>
-              <p className="mt-1 text-xs text-muted">
-                Pemilik lahan menuliskan usaha apa saja yang boleh jalan di tempatnya.
-                Menyaringnya di sini berarti kamu tidak membuka lahan yang sudah pasti
-                menolak daganganmu, termasuk yang tidak mengizinkan menggoreng.
-              </p>
-              <div className="geser-x -mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-                <div className="flex w-max gap-2 pb-1 sm:w-auto sm:flex-wrap">
-                  <button
-                    type="button"
-                    aria-pressed={!usaha}
-                    onClick={() => ubah({ usaha: null })}
-                    className={`${PIL} ${usaha ? PIL_MATI : PIL_AKTIF} whitespace-nowrap`}
-                  >
-                    Semua usaha
-                  </button>
-                  {usahaTersedia.map((kode) => {
-                    const aktif = usaha === kode;
-                    return (
-                      <button
-                        key={kode}
-                        type="button"
-                        aria-pressed={aktif}
-                        onClick={() => ubah({ usaha: aktif ? null : kode })}
-                        className={`${PIL} ${aktif ? PIL_AKTIF : PIL_MATI} whitespace-nowrap`}
-                      >
-                        {LABEL_USAHA[kode] ?? kode}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {adaLahanTerbuka && (
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
-                Lebar muka jalan
-              </h3>
-              <p className="mt-1 text-xs text-muted">
-                Sisi yang menghadap jalan, bukan luas totalnya.
-              </p>
-              <div className="geser-x -mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-                <div className="flex w-max gap-2 pb-1 sm:w-auto sm:flex-wrap">
-                  {MUKA_PILIHAN.map((m) => {
-                    const aktif = mukaMin === m.nilai;
-                    return (
-                      <button
-                        key={m.nilai}
-                        type="button"
-                        aria-pressed={aktif}
-                        onClick={() => ubah({ muka: m.nilai ? String(m.nilai) : null })}
-                        className={`${PIL} ${aktif ? PIL_AKTIF : PIL_MATI} whitespace-nowrap`}
-                      >
-                        {m.label}
-                        {m.bantuan && (
-                          <span className={aktif ? "ml-1.5 text-white/75" : "ml-1.5 text-muted"}>
-                            {m.bantuan}
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
-              Harga maksimum
-            </h3>
-            <div className="geser-x -mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-              <div className="flex w-max gap-2 pb-1 sm:w-auto sm:flex-wrap">
-                {HARGA_PILIHAN.map((h) => {
-                  const aktif = hargaMaks === h.nilai;
-                  return (
-                    <button
-                      key={h.nilai}
-                      type="button"
-                      aria-pressed={aktif}
-                      onClick={() => ubah({ harga: h.nilai ? String(h.nilai) : null })}
-                      className={`angka ${PIL} ${aktif ? PIL_AKTIF : PIL_MATI} whitespace-nowrap`}
-                    >
-                      {h.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-          <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
-              Ukuran minimum
-            </h3>
-            <p className="mt-1 text-xs text-muted">
-              Volume, jadi ini berlaku untuk ruang tertutup. Untuk lahan terbuka
-              pakai lebar muka jalan di atas.
-            </p>
-            <div className="geser-x -mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-              <div className="flex w-max gap-2 pb-1 sm:w-auto sm:flex-wrap">
-                {VOLUME_PILIHAN.map((v) => {
-                  const aktif = volumeMin === v.nilai;
-                  return (
-                    <button
-                      key={v.nilai}
-                      type="button"
-                      aria-pressed={aktif}
-                      onClick={() => ubah({ volume: v.nilai ? String(v.nilai) : null })}
-                      className={`${PIL} ${aktif ? PIL_AKTIF : PIL_MATI} whitespace-nowrap`}
-                    >
-                      {v.label}
-                      {v.bantuan && (
-                        <span className={aktif ? "ml-1.5 text-white/75" : "ml-1.5 text-muted"}>
-                          {v.bantuan}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {kategoriTersedia.length > 0 && (
-            <div>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
-                Barang yang mau disimpan
-              </h3>
-              <p className="mt-1 text-xs text-muted">
-                Untuk ruang tertutup: pemiliknya berhak menolak kategori yang tidak ia
-                terima, jadi menyaringnya di sini menghemat permintaan yang sudah pasti
-                ditolak.
-              </p>
-              <div className="geser-x -mx-4 mt-2.5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-                <div className="flex w-max gap-2 pb-1 sm:w-auto sm:flex-wrap">
-                  <button
-                    type="button"
-                    aria-pressed={!kategori}
-                    onClick={() => ubah({ kategori: null })}
-                    className={`${PIL} ${kategori ? PIL_MATI : PIL_AKTIF} whitespace-nowrap`}
-                  >
-                    Semua barang
-                  </button>
-                  {kategoriTersedia.map((kode) => {
-                    const aktif = kategori === kode;
-                    return (
-                      <button
-                        key={kode}
-                        type="button"
-                        aria-pressed={aktif}
-                        onClick={() => ubah({ kategori: aktif ? null : kode })}
-                        className={`${PIL} ${aktif ? PIL_AKTIF : PIL_MATI} whitespace-nowrap`}
-                      >
-                        {LABEL_KATEGORI[kode]}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
-        </section>
+        <PanelFilter
+          buka={bukaFilter}
+          tutup={() => setBukaFilter(false)}
+          kelompok={kelompokFilter}
+          jumlahFilter={jumlahFilter}
+          bersihkan={bersihkan}
+          ringkasanHasil={
+            memuat
+              ? "Lihat hasil"
+              : `Lihat ${daftar.length} ${kataTempat}`
+          }
+        />
 
         {/* ── Hasil ──────────────────────────────────────────────────────── */}
         <div className="mt-8 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
