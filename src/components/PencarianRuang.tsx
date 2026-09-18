@@ -63,6 +63,23 @@ const TIPE_URUT: TipeRuang[] = [
   "kontainer",
 ];
 
+/**
+ * Kategori yang selalu tampil di bilah pintasan.
+ *
+ * Enam, bukan dua belas: barisnya harus muat tanpa digeser di layar 375px
+ * bersama satu pintasan yang terpotong sedikit di kanan — potongan itu yang
+ * memberi tahu bahwa barisnya bisa digeser. Sisanya tetap bisa dipilih dari
+ * panel Filter.
+ */
+const KATEGORI: TipeRuang[] = [
+  "halaman_depan",
+  "teras",
+  "lahan_kosong",
+  "kios",
+  "lantai_ruko",
+  "garasi",
+];
+
 function angkaDari(nilai: string | null, bawaan: number): number {
   const n = Number(nilai);
   return Number.isFinite(n) && nilai !== null && nilai !== "" ? n : bawaan;
@@ -377,6 +394,29 @@ export default function PencarianRuang() {
   ].filter((v): v is string => Boolean(v));
   const jumlahFilter = ringkasanFilter.length;
 
+  /*
+    Hasilnya dipecah jadi beberapa bagian bertema, pola yang diminta dengan
+    OLX dan Travelio sebagai rujukan.
+
+    Dipartisi, BUKAN diulang: tiap lahan muncul di tepat satu bagian. Dengan
+    lima belas lahan pertama, bagian bertema yang saling meminjam isi akan
+    menampilkan lahan yang sama dua-tiga kali dalam satu layar, dan itu
+    terbaca sebagai aplikasi yang isinya sedikit dan sedang ditutup-tutupi.
+
+    Cuma menyala kalau hasilnya cukup banyak (>= 8) dan tidak ada penyaring
+    yang aktif. Orang yang sudah memilih "kios di bawah Rp500rb" sedang
+    mencari, bukan melihat-lihat, dan memecah hasilnya jadi tiga bagian
+    justru menyembunyikan yang ia minta.
+  */
+  const bagian = useMemo(() => {
+    if (jumlahFilter > 0 || daftar.length < 8) return null;
+    const dekat = daftar.slice(0, 4);
+    const sisa = daftar.slice(4);
+    const murah = [...sisa].sort((a, b) => a.harga_bulanan - b.harga_bulanan).slice(0, 4);
+    const kunciMurah = new Set(murah.map((r) => r.id));
+    return { dekat, murah, lainnya: sisa.filter((r) => !kunciMurah.has(r.id)) };
+  }, [daftar, jumlahFilter]);
+
   const bersihkan = () => router.replace(pathname, { scroll: false });
 
   /*
@@ -573,6 +613,46 @@ export default function PencarianRuang() {
               Hapus
             </button>
           )}
+        </div>
+
+        {/* ── Kategori ────────────────────────────────────────────────────────
+            Pintu masuk cepat per tipe, pola yang dipakai hampir semua
+            marketplace dan diminta 18 September 2026 dengan OLX sebagai
+            rujukan.
+
+            Daftarnya TETAP, bukan hanya tipe yang kebetulan ada isinya di
+            radius sekarang. Kategori yang muncul dan hilang mengikuti hasil
+            membuat orang mengira aplikasinya rusak, dan tidak ada cara
+            menemukan tipe yang sedang kosong untuk memperlebar radiusnya.
+
+            Ia di LUAR panel filter dan selalu terlihat: penyaring rinci
+            sesekali dipakai, tapi "saya cuma mau lihat kios" adalah niat yang
+            dibawa orang sejak sebelum halaman ini terbuka. */}
+        <div className="geser-x -mx-4 flex gap-2 overflow-x-auto px-4 pt-3 pb-1 sm:mx-0 sm:px-0">
+          {KATEGORI.map((t) => {
+            const Ikon = IKON_TIPE[t];
+            const aktif = tipe === t;
+            return (
+              <button
+                key={t}
+                type="button"
+                aria-pressed={aktif}
+                onClick={() => ubah({ tipe: aktif ? null : t })}
+                className={`flex w-[4.6rem] shrink-0 cursor-pointer flex-col items-center gap-1.5 rounded-2xl px-1.5 py-2.5 text-center text-[11px] font-semibold leading-tight transition-colors sm:w-20 sm:text-xs ${
+                  aktif ? "bg-brand text-white" : "text-ink hover:bg-card"
+                }`}
+              >
+                <span
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl sm:h-11 sm:w-11 ${
+                    aktif ? "bg-white/20" : "bg-brand-soft"
+                  }`}
+                >
+                  <Ikon className={`h-5 w-5 ${aktif ? "text-white" : "text-brand"}`} />
+                </span>
+                {LABEL_TIPE[t]}
+              </button>
+            );
+          })}
         </div>
 
         <section
@@ -883,7 +963,28 @@ export default function PencarianRuang() {
           </div>
         )}
 
-        {!memuat && daftar.length > 0 && (
+        {!memuat && daftar.length > 0 && bagian && (
+          <>
+            <Deret judul={`Paling dekat dari ${namaTitik}`} isi={bagian.dekat} />
+            <Deret judul="Paling murah di sekitarmu" isi={bagian.murah} />
+            {bagian.lainnya.length > 0 && (
+              <>
+                <h3 className="mt-8 font-display text-lg font-bold tracking-tight">
+                  Lahan lainnya
+                </h3>
+                <ul className="mt-4 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
+                  {bagian.lainnya.map((ruang) => (
+                    <li key={ruang.id}>
+                      <KartuRuang ruang={ruang} />
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </>
+        )}
+
+        {!memuat && daftar.length > 0 && !bagian && (
           <ul className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
             {daftar.map((ruang) => (
               <li key={ruang.id}>
@@ -903,5 +1004,32 @@ export default function PencarianRuang() {
         </p>
       </div>
     </>
+  );
+}
+
+/**
+ * Satu deret lahan bertema.
+ *
+ * **Digeser mendatar di telepon, kisi di laptop.** Di layar 375px, empat
+ * kartu dalam kisi dua kolom memakan dua baris penuh dan mendorong bagian
+ * berikutnya jauh ke bawah; digeser, satu bagian cuma setinggi satu kartu dan
+ * orang tetap tahu ada lebih banyak karena kartu berikutnya mengintip.
+ *
+ * Pakai snap, bukan tombol panah: tidak butuh JavaScript sama sekali, dan di
+ * telepon jari memang alat yang benar.
+ */
+function Deret({ judul, isi }: { judul: string; isi: RuangDenganFoto[] }) {
+  if (isi.length === 0) return null;
+  return (
+    <section className="mt-8">
+      <h3 className="font-display text-lg font-bold tracking-tight">{judul}</h3>
+      <div className="geser-x -mx-4 mt-4 flex snap-x gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-5 sm:overflow-visible sm:px-0 lg:grid-cols-4">
+        {isi.map((ruang) => (
+          <div key={ruang.id} className="w-[10.5rem] shrink-0 snap-start sm:w-auto">
+            <KartuRuang ruang={ruang} />
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }

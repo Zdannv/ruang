@@ -1508,6 +1508,46 @@ Aturan yang mengikutinya:
   padanya. Sebelumnya ketiganya menulis `68px` sendiri-sendiri dan ketiganya
   salah, sehingga bilah filter menyelinap 10px ke balik header.
 
+### `/cari` jadi halaman jelajah, bukan cuma kisi hasil — 18 September 2026
+
+Diminta dengan OLX dan Travelio sebagai rujukan: *"harusnya gak cuma gini
+doang"*. Dua hal yang ditambahkan, dan keduanya menghormati aturan "halaman
+alat kerja tidak punya hero" yang sudah berlaku di sini.
+
+1. **Baris kategori**, pola OLX. Enam tipe, di luar panel filter dan selalu
+   terlihat: penyaring rinci sesekali dipakai, tapi "saya cuma mau lihat kios"
+   adalah niat yang dibawa orang sejak sebelum halaman ini terbuka.
+
+   Daftarnya **tetap**, bukan hanya tipe yang kebetulan ada isinya di radius
+   sekarang. Kategori yang muncul dan hilang mengikuti hasil membuat orang
+   mengira aplikasinya rusak, dan tidak ada cara menemukan tipe yang sedang
+   kosong untuk memperlebar radiusnya. Enam, bukan dua belas, supaya barisnya
+   muat di 375px dengan satu pintasan terpotong sedikit di kanan — potongan
+   itu yang memberi tahu barisnya bisa digeser.
+
+2. **Hasil dipecah jadi bagian bertema**: "Paling dekat dari X", "Paling murah
+   di sekitarmu", lalu "Lahan lainnya".
+
+   **Dipartisi, BUKAN diulang.** Tiap lahan muncul di tepat satu bagian.
+   Bagian bertema yang saling meminjam isi akan menampilkan lahan yang sama
+   dua-tiga kali dalam satu layar saat isinya masih lima belas, dan itu
+   terbaca sebagai aplikasi yang isinya sedikit dan sedang ditutup-tutupi.
+
+   Cuma menyala kalau hasilnya **>= 8 dan tidak ada penyaring aktif**. Orang
+   yang sudah memilih "kios di bawah Rp500rb" sedang mencari, bukan
+   melihat-lihat, dan memecah hasilnya jadi tiga bagian justru menyembunyikan
+   yang ia minta.
+
+   Tiap deret digeser mendatar di telepon, kisi di laptop. Empat kartu dalam
+   kisi dua kolom memakan dua baris penuh di 375px dan mendorong bagian
+   berikutnya jauh ke bawah.
+
+**Aturan lipatan tetap dijaga, dan diukur ulang**: kartu hasil pertama di
+y=401 di laptop (sebelumnya 419 — baris kategori justru menggantikan ruang
+yang lebih boros) dan y=513 di 375×812. Keduanya masih di atas lipatan.
+Kalau nanti ada pintasan lain yang mau ditambahkan di atas hasil, ukur lagi;
+batasnya tetap sama, hasil pencarian harus terlihat tanpa menggulir.
+
 ### Halaman depan berhenti terbaca seperti template — 18 September 2026
 
 Keluhannya: *"desainnya kurang unik dan keliatan vibe codingnya."* Diagnosisnya
