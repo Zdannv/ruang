@@ -1508,6 +1508,43 @@ Aturan yang mengikutinya:
   padanya. Sebelumnya ketiganya menulis `68px` sendiri-sendiri dan ketiganya
   salah, sehingga bilah filter menyelinap 10px ke balik header.
 
+### Halaman depan berhenti terbaca seperti template — 18 September 2026
+
+Keluhannya: *"desainnya kurang unik dan keliatan vibe codingnya."* Diagnosisnya
+bukan soal warna atau font, melainkan **irama**: delapan bagian berturut-turut
+dengan bentuk yang sama persis — judul, lalu kisi kartu putih bergaris tipis di
+atas kertas, semuanya `max-w-6xl`, semuanya berjarak sama.
+
+Empat hal yang diubah, dan ketiganya berlaku umum untuk halaman baru:
+
+1. **Judulnya tidak boleh muncul dua kali.** Hero dulu menaruh H1 di kiri dan
+   `SorotanPromo` di kanan — dan kartu sorotan pertama memuat slogan yang sama
+   persis. Judul yang sama, bersebelahan, adalah hal pertama yang membuat
+   halaman terbaca seperti disusun tanpa pernah dilihat.
+2. **Hero satu kolom, dan yang mengisi kolom kedua adalah RUANG.** Judulnya
+   naik ke 4,25rem dengan leading 0,98 dan dua warna, dan itu satu-satunya hal
+   di layar pertama. Membagi dua semuanya adalah refleks yang membuat setiap
+   halaman terlihat sama.
+3. **Satu bidang gelap memecah iramanya.** "Cara pakainya" jadi `bg-ink`. Ini
+   perkecualian sadar dari aturan "yang berwarna besar hanya foto": yang
+   ditambahkan bukan warna baru melainkan nilai gelap dari palet yang sudah
+   ada, dan ilustrasi krem di atasnya justru lebih menonjol.
+4. **Bagian yang mengerjakan hal yang sama digabung.** "Mau jualan apa?" dan
+   "Butuh lahan seperti apa?" dua-duanya kisi kartu menuju `/cari` dengan
+   penyaring berbeda; sekarang satu bagian, tipe ruangnya jadi barisan chip di
+   kakinya. "Sorotan" dan "Yang kamu dapat" dua-duanya bergambar dan berkisi;
+   digabung jadi satu bagian dua kolom, gambarnya mendampingi teks yang
+   menjelaskannya.
+
+Hasilnya diukur: **delapan bagian jadi tujuh, 4963px jadi 4755px**, dan
+latarnya sekarang berganti-ganti putih → kertas → putih → tinta → merek alih-alih
+kertas terus-menerus.
+
+Aturan turunannya: **kalau dua bagian berurutan punya bentuk yang sama, salah
+satunya harus berubah bentuk atau keduanya digabung.** Bukan soal isi, soal
+irama — dan irama yang seragam persis itulah yang terbaca sebagai "dibuat
+tanpa dipikirkan".
+
 ## Bahasa
 
 Seluruh UI dan copy dalam Bahasa Indonesia. Nama kolom database juga

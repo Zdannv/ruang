@@ -191,54 +191,52 @@ export default async function Beranda() {
           membuat foto ruang serta harganya, hal yang benar-benar ingin dilihat
           orang, kalah menonjol. Warnanya sekarang cuma tersisa sebagai kilau
           tipis di sudut. */}
+      {/*
+        SATU KOLOM, dan itu perbaikan 18 September 2026.
+
+        Versi sebelumnya menaruh judul di kiri dan `SorotanPromo` di kanan —
+        dan kartu sorotan PERTAMA memuat slogan yang sama persis dengan H1 di
+        sebelahnya. Judul yang sama dua kali, bersebelahan, adalah hal pertama
+        yang membuat halaman ini terbaca seperti disusun tanpa dilihat.
+        Sorotannya turun ke tengah halaman, tempat ia menguatkan alih-alih
+        mengulang.
+
+        Yang menggantikan kolom kanan bukan gambar lain melainkan RUANG dan
+        ukuran huruf. Judul 4,25rem dengan leading rapat adalah satu-satunya
+        hal di layar pertama, dan itu yang membedakannya dari halaman yang
+        membagi dua semuanya.
+      */}
       <section className="relative -mt-[var(--tinggi-header)] overflow-hidden border-b border-line bg-card pt-[var(--tinggi-header)]">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(110%_75%_at_88%_-10%,#f7e3d9_0%,transparent_58%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(90%_70%_at_82%_-15%,#f7e3d9_0%,transparent_60%)]" />
 
-        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:px-8 lg:py-20">
-          <div>
-            <span className="inline-flex items-center rounded-full border border-line bg-paper px-3 py-1 text-xs font-semibold text-muted">
-              Lahan nganggur jadi cuan
-            </span>
+        <div className="relative mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+          <h1 className="max-w-4xl font-display text-[2.5rem] font-bold leading-[0.98] tracking-tight text-ink sm:text-6xl lg:text-[4.25rem]">
+            Halaman depan nganggur?{" "}
+            <span className="text-brand">Jadikan cuan.</span>
+          </h1>
 
-            <h1 className="mt-5 font-display text-[2.1rem] font-bold leading-[1.08] text-ink sm:text-5xl">
-              Halaman depan nganggur? Jadikan cuan.
-            </h1>
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
+            Sewakan bulanan ke pedagang di sekitarmu. Atau kalau kamu yang mau
+            jualan, sewa lahan di pinggir jalan, tanpa beli tanah.
+          </p>
 
-            <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-muted">
-              Sewakan bulanan ke pedagang di sekitarmu. Atau kalau kamu yang mau
-              jualan, sewa lahan di pinggir jalan, tanpa beli tanah.
-            </p>
-
-            {/* Kotak pencarian dulu di sini. Dipindah ke `/cari` saja: di
-                halaman depan ia meminta orang memilih titik dan radius sebelum
-                mereka tahu isi aplikasinya seperti apa. Yang menggantikannya
-                dua tombol, dan contoh listing di bawah. */}
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Link
-                href="/cari"
-                className="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
-              >
-                <Search className="h-4 w-4" />
-                Cari lahan
-              </Link>
-              <Link
-                href="/host/lahan/baru"
-                className="inline-flex items-center gap-2 rounded-full bg-card px-6 py-3 text-sm font-semibold text-ink ring-1 ring-line transition-colors hover:bg-paper"
-              >
-                Sewakan lahanku
-              </Link>
-            </div>
-
-            {/* Deret angka "N lahan tayang · N kecamatan · termurah Rp X"
-                dibuang 9 September 2026. Dengan dua lahan di database ia
-                membaca sebagai aplikasi yang kosong, dan bahkan dengan lima
-                belas ia tidak menjawab pertanyaan yang sedang dipikirkan
-                pengunjung. Yang menggantikannya contoh listing sungguhan di
-                bawah, itu yang benar-benar memberi tahu isinya seperti apa. */}
-          </div>
-
-          <div className="lg:pl-2">
-            <SorotanPromo />
+          {/* Kotak pencarian dulu di sini. Dipindah ke `/cari` saja: di
+              halaman depan ia meminta orang memilih titik dan radius sebelum
+              mereka tahu isi aplikasinya seperti apa. */}
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href="/cari"
+              className="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark sm:text-base"
+            >
+              <Search className="h-4 w-4" />
+              Cari lahan
+            </Link>
+            <Link
+              href="/host/lahan/baru"
+              className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold text-ink ring-1 ring-ink/15 transition-colors hover:bg-paper sm:text-base"
+            >
+              Sewakan lahanku
+            </Link>
           </div>
         </div>
       </section>
@@ -301,7 +299,12 @@ export default async function Beranda() {
         </section>
       )}
 
-      {/* ── Buat siapa ─────────────────────────────────────────────────────── */}
+      {/* ── Cari berdasarkan ───────────────────────────────────────────────
+          Dulu DUA bagian berturut-turut yang sama-sama berjudul "mau X apa?"
+          dan sama-sama berisi kisi kartu bertaut ke `/cari` dengan penyaring
+          berbeda. Dua bagian untuk satu pekerjaan membuat halaman ini terasa
+          diulur; digabung, tipe ruangnya jadi barisan chip di kaki bagian
+          yang sama. */}
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
         <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
           Mau jualan apa?
@@ -343,73 +346,87 @@ export default async function Beranda() {
             </Link>
           ))}
         </div>
-      </section>
 
-      {/* ── Tipe ruang ─────────────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
-        <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-          Butuh lahan seperti apa?
-        </h2>
-        <div className="geser-x -mx-4 mt-6 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-          <div className="flex w-max gap-3 pb-1 sm:grid sm:w-auto sm:grid-cols-3 lg:grid-cols-6">
-            {TIPE_UNGGULAN.map((t) => {
-              const Ikon = IKON_TIPE[t];
-              return (
-                <Link
-                  key={t}
-                  href={`/cari?tipe=${t}&radius=15`}
-                  className="flex h-28 w-28 shrink-0 flex-col items-center justify-center gap-2 rounded-2xl bg-card px-3 text-center text-sm font-semibold ring-1 ring-line transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-ink/5 sm:h-32 sm:w-auto"
-                >
-                  <Ikon className="h-7 w-7 text-brand" />
-                  {LABEL_TIPE[t]}
-                </Link>
-              );
-            })}
-          </div>
+        <div className="geser-x -mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
+          <span className="shrink-0 self-center pr-1 text-xs font-semibold uppercase tracking-wide text-muted">
+            Atau per tipe
+          </span>
+          {TIPE_UNGGULAN.map((t) => {
+            const Ikon = IKON_TIPE[t];
+            return (
+              <Link
+                key={t}
+                href={`/cari?tipe=${t}&radius=15`}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-card px-3.5 py-2 text-sm font-medium text-ink ring-1 ring-line transition-colors hover:bg-brand-soft"
+              >
+                <Ikon className="h-4 w-4 text-brand" />
+                {LABEL_TIPE[t]}
+              </Link>
+            );
+          })}
         </div>
-
       </section>
 
-      {/* ── Kenapa ─────────────────────────────────────────────────────────── */}
+
+      {/* ── Kenapa ─────────────────────────────────────────────────────────
+          DUA KOLOM, dan itu penggabungan dua bagian yang dulu berdiri
+          sendiri-sendiri: sorotan bergambar, lalu empat alasan bergambar.
+          Keduanya bergambar, keduanya berkisi, dan berurutan mereka terbaca
+          sebagai satu bagian yang diulang. Digabung, gambarnya mengerjakan
+          sesuatu — ia mendampingi teks yang menjelaskannya — dan halaman ini
+          berkurang sekitar 500px.
+
+          Ilustrasi alasannya turun jadi lencana 56px di kiri tiap baris.
+          Di ukuran itu yang terbaca cuma satu bentuk tegas per gambar, dan
+          itu memang yang digambar `skrip/buat-ilustrasi.py`. */}
       <section className="bg-card py-14 sm:py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <h2 className="max-w-2xl font-display text-2xl font-bold tracking-tight sm:text-3xl">
-            Yang kamu dapat
-          </h2>
-          {/* Dua kolom di telepon, dengan alasan yang sama persis seperti
-              kartu langkah, dan di sini ia diukur setelah salah dulu: satu
-              kolom berilustrasi membuat bagian ini 1758px, dan orang berhenti
-              menggulir sebelum sampai alasan keempat. Dua kolom: 908px. */}
-          <div className="mt-8 grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-6 lg:grid-cols-4">
-            {ALASAN.map((a) => (
-              <div key={a.judul}>
-                {/* Ilustrasi di atas judul, bentuk yang sama dengan kartu
-                    langkah, keduanya bagian penjelasan, dan dua pola berbeda
-                    di satu halaman terbaca sebagai dua bagian yang tidak
-                    berhubungan. Kartunya sekitar 250px di laptop. */}
-                <Image
-                  src={`/alasan/${a.gambar}.svg`}
-                  alt=""
-                  width={400}
-                  height={300}
-                  unoptimized
-                  className="h-auto w-full rounded-2xl"
-                />
-                <h3 className="mt-3 font-display text-base font-bold leading-snug tracking-tight sm:mt-4 sm:text-lg">
-                  {a.judul}
-                </h3>
-                <p className="mt-1.5 text-xs leading-relaxed text-muted sm:mt-2 sm:text-sm">
-                  {a.isi}
-                </p>
-              </div>
-            ))}
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:gap-14 lg:px-8">
+          <SorotanPromo />
+
+          <div>
+            <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+              Yang kamu dapat
+            </h2>
+            <ul className="mt-6 space-y-5">
+              {ALASAN.map((a) => (
+                <li key={a.judul} className="flex gap-4">
+                  <Image
+                    src={`/alasan/${a.gambar}.svg`}
+                    alt=""
+                    width={400}
+                    height={300}
+                    unoptimized
+                    className="h-11 w-14 shrink-0 rounded-lg sm:h-14 sm:w-[4.6rem]"
+                  />
+                  <div className="min-w-0">
+                    <h3 className="font-display text-base font-bold leading-snug tracking-tight sm:text-lg">
+                      {a.judul}
+                    </h3>
+                    <p className="mt-1 text-xs leading-relaxed text-muted sm:text-sm">
+                      {a.isi}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
 
-      {/* ── Cara kerja ─────────────────────────────────────────────────────── */}
-      <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
-        <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+      {/* ── Cara kerja ─────────────────────────────────────────────────────
+          Bidang GELAP, dan itu satu-satunya di halaman ini.
+
+          Sebelumnya delapan bagian berturut-turut berlatar terang dengan kisi
+          kartu bergaris tipis yang sama, dan akibatnya halaman ini terbaca
+          seperti satu bagian yang diulang delapan kali. Satu bidang gelap di
+          tengah memecah iramanya tanpa menambah warna baru ke palet, dan
+          kebetulan ia mendarat di bagian yang paling ingin dibaca orang.
+
+          Ilustrasi langkahnya tetap berlatar krem, jadi di atas tinta ia
+          justru lebih menonjol daripada di atas kertas. */}
+      <section className="bg-ink py-14 sm:py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <h2 className="font-display text-2xl font-bold tracking-tight text-paper sm:text-3xl">
           Cara pakainya
         </h2>
         {/* Dua kolom di telepon, bukan satu. Lima kartu berilustrasi satu
@@ -418,10 +435,7 @@ export default async function Beranda() {
             sengaja tegas supaya tetap terbaca di lebar 150px. */}
         <ol className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
           {LANGKAH.map((l, i) => (
-            <li
-              key={l.judul}
-              className="rounded-2xl bg-card p-3 ring-1 ring-line sm:p-5"
-            >
+            <li key={l.judul} className="rounded-2xl bg-white/5 p-3 sm:p-5">
               {/* Ilustrasi menggantikan ikon lucide yang dulu di sini.
                   SVG, bukan raster seperti kartu sorotan, karena ukuran
                   tampilnya: kartu ini lebarnya sekitar 210px di laptop dan
@@ -440,12 +454,13 @@ export default async function Beranda() {
                 <span className="angka flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
                   {i + 1}
                 </span>
-                <h3 className="text-sm font-bold leading-snug">{l.judul}</h3>
+                <h3 className="text-sm font-bold leading-snug text-paper">{l.judul}</h3>
               </div>
-              <p className="mt-1.5 text-xs leading-relaxed text-muted">{l.isi}</p>
+              <p className="mt-1.5 text-xs leading-relaxed text-paper/70">{l.isi}</p>
             </li>
           ))}
         </ol>
+        </div>
       </section>
 
       {/* ── Sisi pemilik lahan ──────────────────────────────────────────────────────── */}
