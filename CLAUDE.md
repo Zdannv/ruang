@@ -1307,6 +1307,54 @@ Kerjakan berurutan. Jangan lompat.
     nol **di layar**, bukan di database — hanya layar yang tahu rentang mana
     yang sedang digambar.
 
+46. **`/cari` berhenti jadi kisi hasil** (18 Sep 2026). Diminta dengan OLX dan
+    Travelio sebagai rujukan, lalu diminta lagi karena perubahan pertamanya
+    tidak terlihat sama sekali dari sisi pemiliknya.
+
+    **Dan itu sebabnya yang penting bukan bagian bertemanya.** Versi pertama
+    memecah hasil jadi "paling dekat / paling murah / muka jalan paling lebar",
+    dan ketiganya cuma menyala kalau hasilnya banyak. Database produksi isinya
+    empat lahan yang tersebar di tiga kota, jadi di layar tidak ada satu pun
+    yang berubah. Aturan yang ditinggalkannya: **bagian yang butuh isi untuk
+    muncul tidak menjawab keluhan "halamannya kosong".**
+
+    Yang benar-benar mengisi halamannya tiga hal yang tidak bergantung jumlah
+    lahan:
+
+    1. **Kueri kedua tanpa radius** (`RADIUS_LUAS_KM` = 150), yang mengisi
+       bagian "Yang terdekat di luar N km". Ini yang paling menentukan: dengan
+       lahan sebanyak ini, radius yang wajar hampir selalu kosong, dan satu
+       kotak "belum ada yang cocok" membuat orang menutup aplikasinya alih-alih
+       memperlebar radiusnya sendiri. Jaraknya ditulis apa adanya di tiap kartu
+       dan ada tombol yang memperlebar radiusnya ke angka yang menjangkau.
+
+       Kuncinya cuma titik, bukan seluruh filter, jadi menggeser harga atau
+       ukuran tidak memanggilnya lagi. Konsekuensinya penyaringnya **diulang di
+       layar** — dan itu wajib: tanpa itu lahan Rp400rb muncul di bawah judul
+       yang baru saja bilang tidak ada satu pun di bawah Rp500rb.
+
+       Galatnya sengaja tidak ditampilkan. Ia pelengkap, dan dua kotak galat
+       untuk satu halaman terbaca seperti aplikasi yang rusak.
+    2. **"Cari cepat"** — enam pintasan niat ke `/cari` dengan parameter yang
+       memang sudah ditangani halaman ini. Pintasan yang menjanjikan penyaring
+       yang belum ada mengantar orang ke hasil kosong yang tidak bisa ia
+       perbaiki.
+    3. **"Belum nemu"** — dua kartu ke `/permintaan` dan `/host/lahan/baru`.
+
+    Barisan **kategori** di luar panel filter daftarnya TETAP, bukan hanya tipe
+    yang kebetulan ada isinya di radius sekarang: kategori yang muncul dan
+    hilang mengikuti hasil membuat orang mengira aplikasinya rusak, dan tidak
+    ada cara menemukan tipe yang sedang kosong untuk memperlebar radiusnya.
+    Versi pertamanya menduplikasi penyaring tipe yang masih ada di dalam panel;
+    yang di panel dibuang.
+
+    Ambang bagian bertemanya diturunkan dari 8 ke 4, dan partisinya
+    dipertahankan: tiap lahan muncul di tepat satu bagian. Bagian bertema yang
+    saling meminjam isi menampilkan lahan yang sama dua-tiga kali dalam satu
+    layar, dan itu terbaca sebagai aplikasi yang isinya sedikit dan sedang
+    ditutup-tutupi.
+
+
 ### Berikutnya
 
 Fokus rilis pertama: **mengumpulkan pemilik lahan dan pedagang**, bukan

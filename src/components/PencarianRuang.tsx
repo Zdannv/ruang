@@ -1,15 +1,24 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   AlertCircle,
   ChevronDown,
   Crosshair,
+  Droplets,
+  Flame,
+  Home,
+  Inbox,
   MapPin,
+  Ruler,
   Search,
   SearchX,
   SlidersHorizontal,
+  Store,
+  UtensilsCrossed,
+  Wallet,
 } from "lucide-react";
 import KartuRuang from "@/components/KartuRuang";
 import { IKON_TIPE } from "@/components/IkonTipe";
@@ -39,6 +48,33 @@ const PIL =
 const PIL_AKTIF = "border border-brand bg-brand text-white";
 const PIL_MATI =
   "border border-line bg-card text-ink hover:border-brand/40 hover:bg-brand-soft";
+
+/**
+ * Radius kueri kedua, yang mengisi bagian "di luar radiusmu".
+ *
+ * 150 km, bukan tanpa batas: sejauh itu masih terbaca sebagai "agak jauh tapi
+ * masih mungkin didatangi", dan lahan di pulau lain bukan jawaban atas
+ * pertanyaan siapa pun. Kalau nanti lahannya sudah ribuan, angka ini yang
+ * pertama diturunkan.
+ */
+const RADIUS_LUAS_KM = 150;
+
+/**
+ * Pintasan niat di kaki halaman.
+ *
+ * Tiap parameternya HARUS yang benar-benar ditangani halaman ini — `usaha`,
+ * `muka`, `harga`, `tipe`. Pintasan yang menjanjikan penyaring yang belum ada
+ * mengantar orang ke hasil kosong yang tidak bisa ia perbaiki, dan itu lebih
+ * buruk daripada tidak ada pintasan.
+ */
+const PINTASAN = [
+  { label: "Gerobak makanan", param: "usaha=makanan", ikon: UtensilsCrossed },
+  { label: "Boleh menggoreng", param: "usaha=masak_berminyak", ikon: Flame },
+  { label: "Cuci motor", param: "usaha=cuci_motor", ikon: Droplets },
+  { label: "Di bawah Rp500rb", param: "harga=500000", ikon: Wallet },
+  { label: "Muka jalan ≥ 3 m", param: "muka=3", ikon: Ruler },
+  { label: "Halaman depan", param: "tipe=halaman_depan", ikon: Home },
+];
 
 /**
  * Kategori yang selalu tampil di bilah pintasan.
@@ -282,6 +318,46 @@ export default function PencarianRuang() {
       });
   }, [filter, kunci, siapCari]);
 
+  /*
+    Kueri kedua, dan ia TIDAK ikut radius yang dipilih orangnya.
+
+    Gunanya satu: halaman ini tidak boleh berhenti di "belum ada lahan dalam
+    5 km". Dengan lima belas lahan pertama yang tersebar di beberapa
+    kecamatan, radius yang wajar hampir selalu kosong, dan layar kosong
+    membuat orang menutup aplikasinya alih-alih memperlebar radiusnya sendiri.
+    Jadi yang di luar radius tetap diambil, ditandai jaraknya apa adanya, dan
+    ditawarkan di bawah hasil utama.
+
+    Kuncinya cuma titik, bukan seluruh filter: mengubah radius, harga, atau
+    ukuran tidak perlu memanggilnya lagi. Penyaringnya dikerjakan di layar,
+    di `diLuar` bawah.
+  */
+  const kunciLuas = `${lat}|${lng}`;
+  const [luas, setLuas] = useState<{ kunci: string; daftar: RuangDenganFoto[] } | null>(
+    null
+  );
+  const permintaanLuas = useRef(0);
+
+  const filterLuas = useMemo(
+    () => ({ lat, lng, radiusKm: RADIUS_LUAS_KM, volumeMin: 0, hargaMaks: 0 }),
+    [lat, lng]
+  );
+
+  useEffect(() => {
+    if (!siapCari) return;
+    const id = ++permintaanLuas.current;
+    cariRuang(klienBrowser(), filterLuas)
+      .then((daftar) => {
+        if (id === permintaanLuas.current) setLuas({ kunci: kunciLuas, daftar });
+      })
+      .catch(() => {
+        // Galatnya sengaja tidak ditampilkan. Ini bagian pelengkap; yang
+        // ditanyakan orangnya sudah dijawab hasil utama di atas, dan dua
+        // kotak galat untuk satu halaman terbaca seperti aplikasi yang rusak.
+        if (id === permintaanLuas.current) setLuas({ kunci: kunciLuas, daftar: [] });
+      });
+  }, [filterLuas, kunciLuas, siapCari]);
+
   const memuat = !siapCari || hasil?.kunci !== kunci;
   const galat = memuat ? null : hasil?.galat;
   // Dibungkus useMemo supaya rujukan arraynya stabil; `tipeTersedia` di bawah
@@ -375,13 +451,83 @@ export default function PencarianRuang() {
     justru menyembunyikan yang ia minta.
   */
   const bagian = useMemo(() => {
-    if (jumlahFilter > 0 || daftar.length < 8) return null;
-    const dekat = daftar.slice(0, 4);
-    const sisa = daftar.slice(4);
-    const murah = [...sisa].sort((a, b) => a.harga_bulanan - b.harga_bulanan).slice(0, 4);
-    const kunciMurah = new Set(murah.map((r) => r.id));
-    return { dekat, murah, lainnya: sisa.filter((r) => !kunciMurah.has(r.id)) };
+    if (jumlahFilter > 0 || daftar.length < 4) return null;
+    const ambil = (dari: RuangDenganFoto[], n: number) => dari.slice(0, n);
+    const dekat = ambil(daftar, 4);
+    const dipakai = new Set(dekat.map((r) => r.id));
+
+    const sisa1 = daftar.filter((r) => !dipakai.has(r.id));
+    const murah = ambil([...sisa1].sort((a, b) => a.harga_bulanan - b.harga_bulanan), 4);
+    murah.forEach((r) => dipakai.add(r.id));
+
+    const sisa2 = daftar.filter((r) => !dipakai.has(r.id));
+    const lebar = ambil(
+      [...sisa2].sort(
+        (a, b) => Number(b.lebar_muka_m ?? b.lebar_m ?? 0) - Number(a.lebar_muka_m ?? a.lebar_m ?? 0)
+      ),
+      4
+    );
+    lebar.forEach((r) => dipakai.add(r.id));
+
+    return { dekat, murah, lebar, lainnya: daftar.filter((r) => !dipakai.has(r.id)) };
   }, [daftar, jumlahFilter]);
+
+  /*
+    Lahan di luar radius yang sedang dipilih, terdekat lebih dulu.
+
+    Penyaringnya diulang di sini, dan itu tidak bisa dihindari: kueri keduanya
+    sengaja dipanggil tanpa harga dan ukuran supaya tidak perlu diulang tiap
+    kali salah satunya digeser. Yang dijaga cuma satu hal — apa yang tampil di
+    bagian ini HARUS lolos penyaring yang sama dengan hasil utama, kalau tidak
+    orang akan menemukan lahan di bawah Rp500rb di bawah judul yang bilang
+    tidak ada satu pun.
+
+    `jarak_km > radiusKm` bukan sekadar pembeda dari hasil utama; ia yang
+    membuat judulnya jujur. Tanpa itu, lahan yang sudah tampil di atas muncul
+    lagi di bawah judul "di luar radiusmu".
+  */
+  const diLuar = useMemo(() => {
+    if (luas?.kunci !== kunciLuas) return [];
+    return luas.daftar
+      .filter(
+        (r) =>
+          Number(r.jarak_km) > radiusKm &&
+          (!tipe || r.tipe === tipe) &&
+          (!kategori || r.kategori_diterima.includes(kategori)) &&
+          (!usaha || r.usaha_diizinkan.includes(usaha)) &&
+          (mukaMin === 0 || Number(r.lebar_muka_m ?? r.lebar_m ?? 0) >= mukaMin) &&
+          (hargaMaks === 0 || r.harga_bulanan <= hargaMaks) &&
+          (volumeMin === 0 || Number(r.volume_m3) >= volumeMin)
+      )
+      .slice(0, 8);
+  }, [
+    luas,
+    kunciLuas,
+    radiusKm,
+    tipe,
+    kategori,
+    usaha,
+    mukaMin,
+    hargaMaks,
+    volumeMin,
+  ]);
+
+  /*
+    Radius terkecil yang cukup untuk menjangkau lahan terdekat di luar radius
+    sekarang, dibulatkan ke atas ke satuan utuh.
+
+    Null kalau lahan itu lebih jauh dari pilihan radius terbesar: tombol
+    "perlebar jadi 83 km" akan mengantar orang ke keadaan yang tidak bisa ia
+    kembalikan lewat daftar radius biasa, dan angka sebesar itu bukan lagi
+    "sekitar sini".
+  */
+  const radiusMenjangkau = useMemo(() => {
+    const terdekat = diLuar[0];
+    if (!terdekat) return null;
+    const perlu = Math.ceil(Number(terdekat.jarak_km));
+    const cocok = RADIUS_PILIHAN.find((km) => km >= perlu);
+    return cocok ?? null;
+  }, [diLuar]);
 
   const bersihkan = () => router.replace(pathname, { scroll: false });
 
@@ -881,6 +1027,7 @@ export default function PencarianRuang() {
           <>
             <Deret judul={`Paling dekat dari ${namaTitik}`} isi={bagian.dekat} />
             <Deret judul="Paling murah di sekitarmu" isi={bagian.murah} />
+            <Deret judul="Muka jalannya paling lebar" isi={bagian.lebar} />
             {bagian.lainnya.length > 0 && (
               <>
                 <h3 className="mt-8 font-display text-lg font-bold tracking-tight">
@@ -907,6 +1054,113 @@ export default function PencarianRuang() {
             ))}
           </ul>
         )}
+
+        {/* ── Di luar radius ─────────────────────────────────────────────────
+            Bagian yang paling menentukan saat lahannya masih sedikit.
+
+            Tanpa ini, orang yang radiusnya kosong melihat satu kotak "belum
+            ada yang cocok" dan tidak punya alasan menggulir lebih jauh —
+            padahal sering kali ADA lahan, cuma di kecamatan sebelah. Jaraknya
+            ditulis apa adanya di kartunya, jadi tidak ada yang disamarkan:
+            yang jauh terlihat jauh, dan orangnya sendiri yang memutuskan.
+
+            Cuma muncul kalau hasil utamanya belum cukup untuk mengisi layar.
+            Di radius yang sudah ramai ia jadi gangguan. */}
+        {!memuat && !galat && diLuar.length > 0 && daftar.length < 6 && (
+          <section className="mt-10 border-t border-line pt-8">
+            <h3 className="font-display text-lg font-bold tracking-tight">
+              {daftar.length === 0
+                ? `Yang terdekat di luar ${radiusKm} km`
+                : `Agak jauh, tapi mungkin cocok`}
+            </h3>
+            <p className="mt-1 text-sm text-muted">
+              Masih di luar radius yang kamu pilih. Jaraknya ada di tiap kartu.
+            </p>
+            <div className="geser-x -mx-4 mt-4 flex snap-x gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-5 sm:overflow-visible sm:px-0 lg:grid-cols-4">
+              {diLuar.map((ruang) => (
+                <div key={ruang.id} className="w-[10.5rem] shrink-0 snap-start sm:w-auto">
+                  <KartuRuang ruang={ruang} />
+                </div>
+              ))}
+            </div>
+            {radiusMenjangkau !== null && (
+              <button
+                type="button"
+                onClick={() => ubah({ radius: String(radiusMenjangkau) })}
+                className="mt-4 cursor-pointer rounded-full bg-card px-5 py-2.5 text-sm font-semibold text-ink ring-1 ring-line transition-colors hover:bg-brand-soft"
+              >
+                Perlebar radius jadi {radiusMenjangkau} km
+              </button>
+            )}
+          </section>
+        )}
+
+        {/* ── Cari cepat ─────────────────────────────────────────────────────
+            Pintasan niat, bukan daftar lahan — dan itu sebabnya ia berguna
+            justru saat isinya masih sedikit. Bagian bertema di atas butuh
+            lahan untuk ditampilkan; yang ini tidak, ia menawarkan JALAN
+            mencari, dan tetap menjawab "terus saya ngapain sekarang" waktu
+            radiusnya kosong.
+
+            Semuanya tautan ke `/cari` dengan parameter yang memang sudah
+            ditangani halaman ini. Tidak ada satu pun yang menjanjikan
+            penyaring yang belum ada. */}
+        <section className="mt-12 border-t border-line pt-8">
+          <h3 className="font-display text-lg font-bold tracking-tight">Cari cepat</h3>
+          <p className="mt-1 text-sm text-muted">
+            Pintasan yang paling sering dipakai pedagang.
+          </p>
+          {/* Dua kolom di telepon, bukan satu pintasan per baris: enam baris
+              penuh membuat bagian ini lebih tinggi daripada hasil yang ada di
+              atasnya. Dari `sm` ia kembali jadi barisan yang membungkus, karena
+              di sana enam pintasan muat dalam dua baris. */}
+          <div className="mt-4 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+            {PINTASAN.map((p) => (
+              <Link
+                key={p.label}
+                href={`/cari?lat=${lat}&lng=${lng}&radius=${radiusKm}&${p.param}`}
+                className="flex items-center gap-2 rounded-full bg-card px-3.5 py-2.5 text-xs font-medium text-ink ring-1 ring-line transition-colors hover:bg-brand-soft hover:ring-brand/30 sm:inline-flex sm:px-4 sm:text-sm"
+              >
+                <p.ikon className="h-4 w-4 shrink-0 text-brand" />
+                <span className="min-w-0 truncate">{p.label}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* ── Belum nemu ─────────────────────────────────────────────────────
+            Dua jalan keluar, dan keduanya menguntungkan aplikasinya: yang
+            tidak menemukan lahan menitipkan kriterianya (itu yang menarik
+            pemilik lahan ke kecamatan itu), dan yang kebetulan PUNYA lahan
+            nganggur diingatkan bahwa ia bisa memasangnya. */}
+        <section className="mt-6 grid gap-3 sm:grid-cols-2">
+          <Link
+            href="/permintaan"
+            className="naik naik-hover flex items-start gap-3 rounded-2xl bg-card p-5 ring-1 ring-line"
+          >
+            <Inbox className="mt-0.5 h-5 w-5 shrink-0 text-brand" />
+            <span>
+              <span className="block text-sm font-bold">Belum ada yang cocok?</span>
+              <span className="mt-1 block text-xs leading-relaxed text-muted">
+                Titipkan kriterianya. Pemilik lahan di kecamatanmu bisa melihat ada
+                berapa orang yang sedang mencari.
+              </span>
+            </span>
+          </Link>
+          <Link
+            href="/host/lahan/baru"
+            className="naik naik-hover flex items-start gap-3 rounded-2xl bg-card p-5 ring-1 ring-line"
+          >
+            <Store className="mt-0.5 h-5 w-5 shrink-0 text-brand" />
+            <span>
+              <span className="block text-sm font-bold">Punya lahan nganggur?</span>
+              <span className="mt-1 block text-xs leading-relaxed text-muted">
+                Halaman depan rumah yang cuma jadi tempat parkir sepeda sudah cukup.
+                Gratis, dan kamu yang menentukan harganya.
+              </span>
+            </span>
+          </Link>
+        </section>
 
         {/* Kalimatnya ditulis apa adanya di layar pencarian supaya tidak ada yang
             sampai ke sini mengira uangnya lewat aplikasi. Sejak papan iklan
