@@ -30,9 +30,12 @@ import {
 import GaleriFoto from "@/components/GaleriFoto";
 import PemutarVideo from "@/components/PemutarVideo";
 import TanyaHost from "@/components/TanyaHost";
+import PetaLahan from "@/components/PetaLahan";
+import KontakPemilik from "@/components/KontakPemilik";
 import BarisRubrik from "@/components/BarisRubrik";
 import { IKON_TIPE } from "@/components/IkonTipe";
 import { getDetailRuang } from "@/lib/ruang";
+import { kontakLahan } from "@/lib/verifikasi";
 import { klienServer } from "@/lib/supabase/server";
 import { supabaseSiap } from "@/lib/supabase/env";
 import {
@@ -107,6 +110,13 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
   if (!data) notFound();
 
   const { ruang, host, foto, video, ulasan, tersewaSampai, alamatLengkap } = data;
+  /*
+    Nomor pemiliknya, dan `null` kalau pengunjungnya belum masuk — gerbangnya
+    di `kontak_lahan()`, bukan di sini. Di luar `Promise.all` halaman ini
+    supaya database yang belum menjalankan migrasi 21 menjawab null alih-alih
+    mematikan halamannya.
+  */
+  const kontak = await kontakLahan(await klienServer(), id);
   const IkonTipe = IKON_TIPE[ruang.tipe];
 
   /*
@@ -470,6 +480,13 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
               <p className="text-sm font-medium">
                 {ruang.kelurahan}, {ruang.kecamatan}, {ruang.kota}
               </p>
+
+              {/*
+                Tiga keadaan, dan urutannya menentukan mana yang menang.
+                `alamatLengkap` datang dari alamat yang dibuka pemilik khusus
+                untuk orang ini lewat chat; ia lebih spesifik daripada alamat
+                yang memang publik, jadi ia didahulukan.
+              */}
               {alamatLengkap ? (
                 <>
                   <p className="mt-2 text-sm font-medium">{alamatLengkap.alamat}</p>
@@ -480,16 +497,27 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
                     Alamat ini dibuka khusus untukmu. Jangan dibagikan ke orang lain.
                   </p>
                 </>
+              ) : ruang.alamat_terbuka && ruang.alamat_publik ? (
+                <>
+                  <p className="mt-2 text-sm font-medium">{ruang.alamat_publik}</p>
+                  {ruang.patokan_publik && (
+                    <p className="text-sm text-muted">Patokan: {ruang.patokan_publik}</p>
+                  )}
+                </>
               ) : (
                 <p className="mt-2 flex items-start gap-2 text-xs leading-relaxed text-muted">
                   <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
-                  {ruang.terbuka_alamat
-                    ? "Tempat komersial, alamat lengkap dan patokannya dibuka pemiliknya lewat chat."
-                    : "Di rumah tinggal. Titik di peta digeser sekitar 200 m, dan alamat lengkapnya dibuka pemiliknya sendiri lewat chat."}
+                  Pemiliknya belum membuka alamat lengkapnya. Titik di peta digeser
+                  sekitar 200 m; tanyakan alamat persisnya lewat chat.
                 </p>
               )}
-              {/* TODO: peta. Butuh penyedia tile; yang diplot nanti
-                  lat_publik/lng_publik, jangan pernah koordinat aslinya. */}
+
+              <PetaLahan
+                lat={ruang.peta_lat}
+                lng={ruang.peta_lng}
+                judul={ruang.judul}
+                persis={ruang.alamat_terbuka || alamatLengkap != null}
+              />
             </div>
           </section>
 
@@ -602,10 +630,11 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
                   </p>
                 </div>
               </div>
-              <p className="mt-3 text-xs leading-relaxed text-muted">
-                Mulai dari chat di aplikasi. Nomor dan alamat lengkapnya dibuka
-                pemiliknya sendiri kalau ia sudah cocok.
-              </p>
+              <KontakPemilik
+                ruangId={ruang.id}
+                nama={host.nama}
+                telepon={kontak?.telepon ?? null}
+              />
             </div>
           )}
         </aside>

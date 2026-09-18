@@ -58,7 +58,13 @@ const AWAL: IsiRuang = {
   kota: "",
   lat: -7.3527,
   lng: 112.7294,
-  terbuka_alamat: false,
+  /*
+    Menyala secara bawaan sejak 18 September 2026. Papan iklan yang alamatnya
+    disembunyikan memaksa orang chat cuma untuk tahu lahannya di mana, dan
+    sebagian besar tidak akan melakukannya. Yang tidak mau tetap bisa
+    mematikannya, dan pilihannya dihormati database (migrasi 21).
+  */
+  terbuka_alamat: true,
   panjang_m: 3,
   lebar_m: 3,
   tinggi_m: 2.5,
@@ -437,10 +443,11 @@ export default function FormRuang({
               className="mt-0.5 h-4 w-4 cursor-pointer accent-[var(--color-brand)]"
             />
             <span className="text-sm">
-              Buka alamat lebih awal
+              Tampilkan alamat lengkap di listing
               <span className="mt-0.5 block text-xs leading-relaxed text-muted">
-                Untuk ruang komersial seperti ruko, gudang, atau kios, alamatnya biasanya
-                memang sudah publik. Jangan dinyalakan untuk ruang di rumah tinggal.
+                Pedagang lebih sering menghubungi lahan yang alamatnya jelas. Kalau
+                dimatikan, yang tampil cuma kelurahan dan titik peta yang digeser
+                sekitar 200 m.
               </span>
             </span>
           </label>

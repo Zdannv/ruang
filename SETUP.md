@@ -14,7 +14,7 @@ pihak luar, bukan karena sengaja dipalsukan.
    `04_pesan.sql`, `05_host.sql`, `06_akses.sql`, `07_advisor.sql`,
    `08_jendela.sql`, `09_notifikasi.sql`, `10_push.sql`, `11_pesan_chat.sql`,
    `12_balasan_cepat.sql`, `13_umkm.sql`, `14_foto_kecil.sql`, `16_wilayah_profil.sql`, `17_lahan_usaha.sql`, `18_video.sql`,
-   `19_rubrik_usaha.sql`, `20_verifikasi.sql`.
+   `19_rubrik_usaha.sql`, `20_verifikasi.sql`, `21_alamat_terbuka.sql`.
    **Semuanya wajib.** Aplikasi membaca lewat view yang dibuat di `03`–`05`
    dan menulis lewat fungsi di `04`; tanpa itu layarnya menjawab "relation
    does not exist". `05` juga membuat bucket Storage `ruang-foto` beserta

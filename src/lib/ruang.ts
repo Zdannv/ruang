@@ -279,6 +279,17 @@ export type RuangPublik = {
   /** Migrasi 20: petugas sudah datang dan mencocokkan keterangannya. */
   tempat_terverifikasi: boolean;
   verifikasi_pada: string | null;
+  /*
+    Migrasi 21. `alamat_terbuka` menentukan arti tiga kolom berikutnya:
+    menyala berarti alamat dan patokannya terisi dan `peta_*` titik ASLI;
+    mati berarti keduanya null dan `peta_*` pin yang digeser 200 m. Layar
+    WAJIB membedakannya, kalau tidak orang datang ke rumah tetangga.
+  */
+  alamat_terbuka: boolean;
+  alamat_publik: string | null;
+  patokan_publik: string | null;
+  peta_lat: number;
+  peta_lng: number;
   jendela_akses: string;
   /** NULL berarti tanpa batas, lihat migrasi 19. */
   kuota_akses_bulanan: number | null;
@@ -367,7 +378,21 @@ export async function getDetailRuang(
   if (k.error) throw k.error;
   if (!r.data) return null;
 
-  const ruang = r.data as unknown as RuangPublik;
+  const baris = r.data as unknown as RuangPublik;
+  /*
+    Keempat kolom alamat baru ada sejak migrasi 21, dan database yang belum
+    menjalankannya tidak mengirim satu pun. Tanpa mundur ke pin geseran,
+    petanya digambar dari `undefined` dan `bbox=NaN` — iframe abu-abu tanpa
+    satu pun galat di konsol. Ketahuan di layar, bukan dari membaca kodenya.
+  */
+  const ruang: RuangPublik = {
+    ...baris,
+    alamat_terbuka: baris.alamat_terbuka ?? false,
+    alamat_publik: baris.alamat_publik ?? null,
+    patokan_publik: baris.patokan_publik ?? null,
+    peta_lat: baris.peta_lat ?? baris.lat_publik,
+    peta_lng: baris.peta_lng ?? baris.lng_publik,
+  };
 
   const { data: alamat } = await db
     .from("ruang")

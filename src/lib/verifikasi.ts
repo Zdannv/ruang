@@ -84,3 +84,23 @@ export async function antreanVerifikasi(db: SupabaseClient): Promise<BarisVerifi
   if (error) throw error;
   return (data ?? []) as BarisVerifikasi[];
 }
+
+/** Nama dan nomor pemilik lahan. Menolak pemanggil yang belum masuk. */
+export type KontakLahan = { nama: string; telepon: string | null };
+
+/**
+ * Nomor yang bisa dihubungi, dari `kontak_lahan()`.
+ *
+ * Lewat RPC, bukan kolom di `ruang_publik`, supaya nomor pemilik lahan tidak
+ * bisa dipanen satu permintaan oleh siapa pun tanpa akun. Mengembalikan null
+ * kalau pemanggilnya belum masuk, dan layar menawarkan tombol masuk di situ.
+ */
+export async function kontakLahan(
+  db: SupabaseClient,
+  ruangId: string
+): Promise<KontakLahan | null> {
+  const { data, error } = await db.rpc("kontak_lahan", { p_ruang: ruangId });
+  if (error) return null;
+  const baris = (data ?? []) as KontakLahan[];
+  return baris[0] ?? null;
+}

@@ -92,21 +92,35 @@ alasannya. Jangan menambahkan jalan pintas sebelum jalur pembayaran ada.
 - **Jangan simpan foto KTP** di database sendiri — nanti cukup simpan ID
   rujukan dari vendor e-KYC. Berlaku juga untuk data pembayaran.
 
-## Keterbukaan alamat — tiga tingkat
+## Keterbukaan alamat — satu saklar milik pemiliknya
 
-| Tingkat | Untuk siapa | Yang terlihat |
-|---|---|---|
-| 1 | Siapa pun | Kelurahan, kecamatan, **jarak persis**, pin digeser ±200 m |
-| 2 | Penyewa yang alamatnya dibuka host dari percakapan | Alamat lengkap, patokan |
-| 3 | Setelah dibayar | Nomor kontak langsung |
+**Diubah 18 September 2026** (migrasi 21), mengganti tiga tingkat yang lama.
+Tingkat 2 dan 3 dulu dipicu persetujuan host dan pembayaran; begitu alur
+pemesanan dibuang, tidak ada lagi peristiwa yang bisa memicunya, dan alamat
+yang tidak pernah terbuka memaksa orang chat cuma untuk tahu lahannya di mana.
 
-Host memilih tingkat awalnya. Bawaan: tingkat 1 untuk ruang di rumah tinggal,
-tingkat 2 untuk ruang komersial (ruko, gudang, kios).
+| `terbuka_alamat` | Yang terlihat siapa pun |
+|---|---|
+| **menyala** (bawaan) | Alamat lengkap, patokan, titik peta **asli** |
+| mati | Kelurahan, kecamatan, **jarak persis**, pin digeser ±200 m |
+
+Pemiliknya yang memilih, dari formulir lahannya. Yang sudah terdaftar
+**tidak ikut dinyalakan**: mereka mengisi alamat itu saat layar berjanji
+alamatnya tidak akan pernah publik.
+
+Nomor telepon **tidak ikut saklar ini**. Ia selalu lewat `kontak_lahan()`,
+yang menolak pemanggil yang belum masuk — supaya nomor pemilik lahan tidak
+bisa dipanen satu permintaan tanpa akun.
 
 **Penting**: jarak selalu dihitung dari koordinat asli dan ditampilkan persis.
 Penyamaran tidak boleh mengurangi kualitas pencarian terdekat.
 Pergeseran pin harus **deterministik per properti** — pergeseran acak yang
 berubah tiap load justru membocorkan titik aslinya.
+
+Yang diplot di peta SELALU `peta_lat`/`peta_lng` dari `ruang_publik`, tidak
+pernah `lat`/`lng` mentah. Databaselah yang memutuskan isinya titik asli atau
+pin geseran; layar cuma menggambar, dan `alamat_terbuka` yang memberitahunya
+mana yang sedang ia tampilkan.
 
 ## Skema
 
@@ -1130,6 +1144,53 @@ Kerjakan berurutan. Jangan lompat.
     jualan adalah keterangan listing yang berguna), `/permintaan` (sinyal
     permintaan per kecamatan justru makin penting untuk menarik pemilik lahan),
     verifikasi, dan seluruh rubrik lahan.
+
+44. **Alamat, peta, dan nomor kontak di listing** (18 Sep 2026). Lihat
+    `21_alamat_terbuka.sql`. Lanjutan langsung dari nomor 43: papan iklan yang
+    alamatnya disembunyikan memaksa orang chat cuma untuk tahu lahannya di
+    mana, dan sebagian besar tidak akan melakukannya.
+
+    **Semua orang tetap bebas memasang listing.** Tidak ada moderasi dan tidak
+    ada syarat verifikasi; draf jadi tayang begitu pemiliknya menekannya.
+    Verifikasi (nomor 40) murni opsional dan cuma menambah lencana.
+
+    **Saklarnya `terbuka_alamat`, kolom yang sudah ada sejak
+    `01_schema.sql`** dan selama ini cuma memajukan tingkat awal. Sekarang ia
+    yang menentukan isi empat kolom baru di `ruang_publik`. Bawaannya menyala
+    untuk lahan BARU; barisan yang sudah ada sengaja tidak disentuh, karena
+    pemiliknya mengisi alamat itu saat layar berjanji alamatnya tidak akan
+    pernah publik.
+
+    **Penjaganya diubah sadar, bukan dihindari.**
+    `periksa_permukaan_publik()` mencocokkan NAMA kolom, jadi godaan
+    tercepatnya adalah menamai kolomnya `alamat_publik` supaya penjaganya diam
+    — dan penjaga yang bisa dilewati dengan mengganti nama sudah tidak menjaga
+    apa pun. Yang dilakukan sebaliknya: keempat nama baru MASUK ke daftar
+    terlarang, lalu diberi satu pengecualian yang disebut namanya
+    (`ruang_publik`). View baru yang membocorkan alamat tetap menggagalkan
+    migrasi.
+
+    **Nomor telepon tidak ikut ke view.** Ia lewat `kontak_lahan()`, yang
+    menolak pemanggil tanpa `auth.uid()`. Nomor di view publik berarti seluruh
+    nomor pemilik lahan bisa dipanen satu permintaan tanpa akun, dan nomor
+    yang dipanen begitu berakhir di daftar telemarketing. Menuntut akun tidak
+    menghentikan yang niat, tapi ia mengubah "satu permintaan" jadi "buat akun
+    dulu". Nomornya TIDAK disamarkan jadi "0812****" — di papan iklan, nomor
+    itu justru alasan orang membuka halamannya.
+
+    **Petanya OpenStreetMap, tautannya Google Maps.** Embed Google butuh kunci
+    Maps Embed API beserta akun penagihannya, dan varian tanpa kunci
+    (`output=embed`) di luar ketentuannya. OSM tidak butuh kunci, tidak
+    menagih, dan tidak memasang cookie ke pengunjung kita. Yang orang
+    benar-benar butuhkan dari Google — rute berkendara — tetap didapat lewat
+    tombol di bawah petanya, dan di situ ia pergi atas kemauannya sendiri.
+    `loading="lazy"`, karena petanya di bawah lipatan.
+
+    **Satu cacat yang cuma ketahuan dari melihat layarnya:** keempat kolom itu
+    belum ada di database yang belum menjalankan migrasi 21, jadi petanya
+    digambar dari `undefined` dan jadi `bbox=NaN` — iframe abu-abu tanpa satu
+    pun galat di konsol. Sekarang `getDetailRuang` mundur ke `lat_publik`/
+    `lng_publik`, yang memang selalu ada.
 
 ### Berikutnya
 
