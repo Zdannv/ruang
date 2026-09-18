@@ -1507,6 +1507,56 @@ Kerjakan berurutan. Jangan lompat.
     copy melainkan baris pertama `TITIK_PRESET`.
 
 
+50. **Egress Supabase: tiga kebocoran ditutup** (18 Sep 2026). Ditanyakan
+    pemiliknya setelah tahu kuota gratisnya 5 GB/bulan. Ketiganya gratis
+    diperbaiki dan tidak satu pun butuh pindah layanan.
+
+    **Yang paling besar: `cacheControl` tidak pernah diset saat unggah.**
+    Bawaan Supabase Storage **3600 detik, satu jam**. Jadi tiap foto diunduh
+    ulang dari Supabase tiap jam, per pengunjung, selamanya. Sekarang setahun
+    (`src/lib/cacheBerkas.ts`), untuk foto, video, dan posternya.
+
+    Setahun aman **karena berkasnya immutable**: tiap nama memuat
+    `crypto.randomUUID()` dan tiap unggahan memakai `upsert: false`, jadi satu
+    nama selamanya menunjuk isi yang sama. Foto yang diganti host adalah
+    berkas BARU dengan nama baru. Cache panjang cuma berbahaya untuk alamat
+    yang isinya bisa berubah, dan keadaan itu tidak bisa terjadi di sini.
+
+    **Kedua: `minimumCacheTTL` masih bawaan 4 jam.** Itu yang menentukan
+    seberapa sering Vercel menarik ULANG berkas aslinya dari Supabase; dengan
+    4 jam, satu foto yang sama ditarik enam kali sehari. Sekarang 31 hari.
+    Umur yang berlaku adalah yang TERBESAR antara nilai ini dan header
+    upstream, jadi keduanya harus panjang, bukan salah satu.
+
+    **Ketiga, dan ini membalik migrasi 14: `unoptimized` di `KartuRuang`
+    dibuang.** Alasan lamanya benar tapi menghitung ongkos yang salah. Versi
+    800px memang sudah berukuran tepat, jadi pengubah ukuran tidak menghemat
+    byte, dan sampai di situ penalarannya sah. Yang terlewat: `unoptimized`
+    juga berarti peramban mengambil berkasnya LANGSUNG dari Supabase, tanpa
+    satu pun cache di antaranya. Jadi tiap kartu yang tampil di layar siapa pun
+    memotong kuota egress.
+
+    Lewat pengubah ukuran, Supabase dilayani sekali per gambar per ukuran;
+    sesudahnya Vercel yang menyajikan dari tepi, dengan kuota bandwidth
+    20 kali lebih besar (100 GB lawan 5 GB). Ongkosnya satu transformasi per
+    gambar unik, bukan per tampilan.
+
+    **Aturan turunannya, dan ia berlaku umum: `unoptimized` bukan cuma soal
+    ukuran berkas, ia juga melepas cache tepi.** Pakai ia hanya untuk aset
+    yang disajikan dari domain kita sendiri (SVG di `public/`), tidak pernah
+    untuk berkas di penyimpanan pihak ketiga yang kuotanya kita bayar.
+
+    `KelolaFoto` sengaja tidak ikut diubah: layar itu cuma dibuka pemiliknya
+    beberapa kali, jadi cache tepinya tidak pernah sempat terpakai sementara
+    transformasinya tetap terpakai.
+
+    **Yang belum, dan urutannya kalau nanti kurang:** Supabase Pro (250 GB),
+    lalu memindahkan bucket ke penyimpanan objek tanpa biaya egress. Yang
+    kedua tidak butuh migrasi data sama sekali, karena `url` disimpan per
+    baris sehingga berkas lama dan baru boleh tinggal di tempat berbeda. Itu
+    sudah diantisipasi sejak `18_video.sql`.
+
+
 ### Berikutnya
 
 Fokus rilis pertama: **mengumpulkan pemilik lahan dan pedagang**, bukan

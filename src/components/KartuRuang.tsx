@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPin, TriangleAlert } from "lucide-react";
 import { IKON_TIPE } from "@/components/IkonTipe";
-import { sudahDiperkecil, type RuangDenganFoto } from "@/lib/ruang";
+import type { RuangDenganFoto } from "@/lib/ruang";
 import {
   LABEL_AKSES,
   LABEL_BANJIR,
@@ -85,7 +85,26 @@ export default function KartuRuang({
             fill
             /* Dua kolom di HP: kartunya sekitar setengah lebar layar. */
             sizes="(min-width: 1024px) 360px, (min-width: 640px) 45vw, 50vw"
-            unoptimized={sudahDiperkecil(ruang.foto)}
+            /*
+              `unoptimized` DIBUANG 18 September 2026, membalik migrasi 14.
+
+              Alasan lamanya benar tapi menghitung ongkos yang salah: versi
+              800px memang sudah berukuran tepat, jadi menyerahkannya ke
+              pengubah ukuran tidak menghemat byte. Yang terlewat, `unoptimized`
+              juga berarti peramban mengambil berkasnya LANGSUNG dari Supabase,
+              tanpa satu pun cache di antaranya. Jadi tiap kartu yang tampil di
+              layar siapa pun memotong kuota egress, dan egress itulah yang
+              paling sempit di paket gratis, bukan penyimpanan.
+
+              Lewat pengubah ukuran, Supabase cuma dilayani SEKALI per gambar
+              per ukuran; sesudahnya Vercel yang menyajikannya dari tepi, dengan
+              kuota bandwidth 20 kali lebih besar. Ongkosnya satu transformasi
+              per gambar unik, bukan per tampilan, dan jumlah gambarnya ratusan.
+
+              `KelolaFoto` sengaja TIDAK ikut diubah: layar itu cuma dibuka
+              pemiliknya sendiri beberapa kali, jadi cache tepinya tidak pernah
+              sempat terpakai sementara transformasinya tetap terpakai.
+            */
             className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
           />
         ) : (

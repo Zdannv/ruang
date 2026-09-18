@@ -24,6 +24,7 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { CACHE_SETAHUN } from "@/lib/cacheBerkas";
 
 export const BUCKET_VIDEO = "ruang-video";
 
@@ -144,7 +145,11 @@ export async function unggahVideo(
 
   const naik = await db.storage
     .from(BUCKET_VIDEO)
-    .upload(namaVideo, opsi.file, { contentType: opsi.file.type, upsert: false });
+    .upload(namaVideo, opsi.file, {
+      contentType: opsi.file.type,
+      upsert: false,
+      cacheControl: CACHE_SETAHUN,
+    });
   if (naik.error) throw naik.error;
 
   let posterUrl: string | null = null;
@@ -152,7 +157,11 @@ export async function unggahVideo(
     const namaPoster = `${dasar}-poster.webp`;
     const naikPoster = await db.storage
       .from(BUCKET_VIDEO)
-      .upload(namaPoster, poster, { contentType: "image/webp", upsert: false });
+      .upload(namaPoster, poster, {
+        contentType: "image/webp",
+        upsert: false,
+        cacheControl: CACHE_SETAHUN,
+      });
     // Poster gagal bukan alasan membatalkan videonya yang sudah terunggah.
     if (!naikPoster.error) {
       posterUrl = db.storage.from(BUCKET_VIDEO).getPublicUrl(namaPoster).data.publicUrl;

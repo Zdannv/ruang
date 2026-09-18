@@ -22,6 +22,7 @@ import type {
   TipeRuang,
 } from "@/lib/ruang";
 import { AKHIRAN_KECIL } from "@/lib/ruang";
+import { CACHE_SETAHUN } from "@/lib/cacheBerkas";
 
 export type StatusRuang = "draf" | "moderasi" | "tayang" | "ditangguhkan";
 
@@ -309,7 +310,7 @@ export async function unggahFoto(
   const kirim = (nama: string, g: Gambar) =>
     db.storage
       .from(BUCKET_FOTO)
-      .upload(nama, g.blob, { contentType: g.mime, upsert: false });
+      .upload(nama, g.blob, { contentType: g.mime, upsert: false, cacheControl: CACHE_SETAHUN });
 
   const u1 = await kirim(namaBesar, besar);
   if (u1.error) throw u1.error;
