@@ -113,8 +113,8 @@ const ALASAN = [
   },
   {
     gambar: "4-alamat",
-    judul: "Alamat kebuka bertahap",
-    isi: "Yang umum lihat cuma kelurahan dan jaraknya. Alamat lengkapnya dibuka pemiliknya sendiri dari chat.",
+    judul: "Alamat dan nomornya ada",
+    isi: "Tiap listing punya peta yang bisa dibuka di Google Maps, dan nomor pemiliknya bisa langsung dihubungi.",
   },
 ];
 
@@ -122,6 +122,11 @@ const ALASAN = [
   Empat langkah, bukan lima, dan yang hilang persis yang dibuang 18 September
   2026: "ajukan sewa" dan "bayar lewat aplikasi". Sewanya disepakati langsung
   antara pedagang dan pemiliknya. Lihat nomor 43 di CLAUDE.md.
+
+  Urutannya juga berubah setelah alamat tampil di listing (nomor 44): dulu
+  "tanya dulu" mendahului "lihat lokasi", karena alamatnya memang cuma bisa
+  didapat dari chat. Sekarang orang melihat lokasinya lebih dulu dan baru
+  menghubungi kalau tempatnya masuk akal — itu urutan yang sebenarnya terjadi.
 */
 const LANGKAH = [
   {
@@ -130,14 +135,14 @@ const LANGKAH = [
     isi: "Atur radius, ukuran, dan budget. Jaraknya dari titik asli lahannya.",
   },
   {
-    gambar: "2-tanya",
-    judul: "Tanya pemiliknya",
-    isi: "\u201CBoleh gorengan nggak?\u201D \u201CAda listrik?\u201D Chat dulu, gratis.",
+    gambar: "4-jawab",
+    judul: "Lihat lokasinya",
+    isi: "Alamat dan petanya ada di listing. Cek dulu jalannya seramai apa sebelum berangkat.",
   },
   {
-    gambar: "4-jawab",
-    judul: "Janjian lihat lokasi",
-    isi: "Kalau cocok, pemiliknya kasih alamat lengkap dan kalian ketemuan di sana.",
+    gambar: "2-tanya",
+    judul: "Hubungi pemiliknya",
+    isi: "Chat, telepon, atau WhatsApp. \u201CBoleh gorengan nggak?\u201D Tanya dulu, gratis.",
   },
   {
     gambar: "5-bayar",
@@ -443,7 +448,7 @@ export default async function Beranda() {
         </ol>
       </section>
 
-      {/* ── Sisi host ──────────────────────────────────────────────────────── */}
+      {/* ── Sisi pemilik lahan ──────────────────────────────────────────────────────── */}
       <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
         <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-ink via-brand-dark to-brand p-8 sm:p-12">
           <div className="max-w-2xl">
@@ -481,7 +486,7 @@ export default async function Beranda() {
                 href="/host"
                 className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white ring-1 ring-white/40 transition-colors hover:bg-white/10"
               >
-                Dasbor host
+                Dasbor pemilik
               </Link>
             </div>
           </div>

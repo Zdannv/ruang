@@ -185,7 +185,7 @@ export default function FormPermintaan({
               }))
             }
             opsi={Object.entries(LABEL_FREKUENSI)}
-            bantuan="Menentukan kuota kunjungan yang cocok untukmu."
+            bantuan="Membantu pemilik menilai apakah lahannya cocok untukmu."
           />
         </div>
 

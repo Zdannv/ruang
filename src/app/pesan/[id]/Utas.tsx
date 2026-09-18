@@ -252,8 +252,9 @@ export default function Utas({
 
         <p className="mt-2 flex items-start gap-1.5 text-xs leading-relaxed text-muted">
           <ShieldAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-          Nomor telepon dan email disamarkan otomatis. Sewa yang diurus di luar
-          aplikasi tidak punya manifes, log akses, maupun penengah saat bersengketa.
+          Percakapan ini tersimpan dan tidak bisa diubah, jadi yang dijanjikan di
+          sini tetap ada catatannya. Sisanya kalian urus berdua: Cari Ruang tidak
+          ikut memegang uang dan tidak menengahi kalau bersengketa.
         </p>
 
         {galat && (

@@ -58,8 +58,8 @@ const JAMINAN = [
   },
   {
     ikon: MapPin,
-    judul: "Alamat bertahap",
-    isi: "Yang umum lihat cuma kelurahan dan jarak. Titik di peta digeser sekitar 200 meter, dan pergeserannya tidak bisa dimatikan pemilik.",
+    judul: "Pemiliknya bisa dihubungi",
+    isi: "Nomornya ada di listing, bisa ditelepon atau di-WhatsApp. Bukan lewat perantara, jadi kamu tahu sejak awal sedang bicara dengan siapa.",
   },
 ];
 

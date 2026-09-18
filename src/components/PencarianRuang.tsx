@@ -893,13 +893,13 @@ export default function PencarianRuang() {
           </ul>
         )}
 
-        {/* Keputusan produk yang dikunci: platform menengahi sengketa, tapi tidak
-            membayar ganti rugi. Kalimatnya ditulis apa adanya di layar pencarian
-            supaya tidak ada yang datang ke sini mengira barangnya diasuransikan. */}
+        {/* Kalimatnya ditulis apa adanya di layar pencarian supaya tidak ada yang
+            sampai ke sini mengira uangnya lewat aplikasi. Sejak papan iklan
+            (nomor 43) ia lebih keras: kami bahkan tidak menengahi. */}
         <p className="mt-12 border-t border-line pt-6 text-xs leading-relaxed text-muted">
-          Alamat lengkap dibuka setelah jadwal survei disetujui pemiliknya. Lahan dan
-          ruang di sini disewakan langsung oleh pemiliknya, platform menengahi kalau
-          ada sengketa, tapi tidak memberi ganti rugi.
+          Lahan di sini dipasang langsung oleh pemiliknya, dan sewanya kalian
+          sepakati berdua. Cari Ruang tidak ikut memegang uang dan tidak memberi
+          ganti rugi. Datangi dulu lahannya sebelum menyerahkan uang apa pun.
         </p>
       </div>
     </>

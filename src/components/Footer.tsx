@@ -51,7 +51,7 @@ export default function Footer() {
                 Menyewakan
               </p>
               <Link href="/host" className="block text-ink hover:text-brand">
-                Dasbor host
+                Dasbor pemilik
               </Link>
               <Link href="/host/lahan/baru" className="block text-ink hover:text-brand">
                 Sewakan lahan
@@ -62,9 +62,9 @@ export default function Footer() {
 
         <div className="mt-8 space-y-1.5 border-t border-line pt-6 text-xs leading-relaxed text-muted">
           <p>
-            Alamat lengkap sebuah lahan dibuka bertahap: kelurahan dan jarak persis
-            untuk semua orang, alamat dan nomor kontaknya dibuka pemiliknya sendiri
-            lewat chat.
+            Alamat dan peta lahan tampil di listing kalau pemiliknya membukanya.
+            Yang tidak membukanya cuma menampilkan kelurahan dan titik peta yang
+            digeser sekitar 200 m. Nomor pemiliknya bisa dilihat yang punya akun.
           </p>
           <p>
             Cari Ruang mempertemukan pemilik lahan dengan pedagang. Sewanya

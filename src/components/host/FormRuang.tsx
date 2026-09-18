@@ -140,7 +140,7 @@ export default function FormRuang({
     semua orang adalah cara tercepat membuat host berhenti mengisi.
 
     Lahan terbuka: jenis usaha yang diizinkan, lebar muka jalan, listrik, air,
-    atap, kelas jalan. Ruang tertutup: kategori barang dan kuota kunjungan.
+    atap, kelas jalan. Ruang tertutup: kategori barang.
 
     "Kelas jalan" untuk sebuah loteng tidak ada artinya, dan "kategori barang"
     untuk halaman depan yang disewa pedagang juga tidak.

@@ -144,7 +144,7 @@ export default function FormProfil({
       {usaha && (
         <Bagian
           judul="Usaha (opsional)"
-          keterangan="Isi kalau kamu menyewa untuk berdagang. Nama usaha ikut tertulis di berita acara serah terima, dan NPWP dipakai kalau kamu perlu bukti sewanya untuk pembukuan. Keduanya tidak pernah ditampilkan ke publik."
+          keterangan="Isi kalau kamu berdagang dan perlu menyebutkannya saat menghubungi pemilik lahan. Keduanya tidak pernah ditampilkan ke publik."
         >
           <Kolom
             id="nama_usaha"

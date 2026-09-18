@@ -1186,6 +1186,15 @@ Kerjakan berurutan. Jangan lompat.
     tombol di bawah petanya, dan di situ ia pergi atas kemauannya sendiri.
     `loading="lazy"`, karena petanya di bawah lipatan.
 
+    **Copy di seluruh layar ikut disesuaikan**, dan yang paling berubah
+    urutannya: "Cara pakainya" dulu menaruh "tanya dulu" SEBELUM "lihat
+    lokasi", karena alamatnya memang cuma bisa didapat dari chat. Sekarang
+    orang melihat lokasinya lebih dulu dan menghubungi kalau tempatnya masuk
+    akal. Yang ikut dibersihkan: "alamat kebuka bertahap" di halaman depan,
+    footer, blok kepercayaan, kaki halaman pencarian, catatan penyamaran nomor
+    di chat, dan sisa kata "manifes", "kuota kunjungan", serta "berita acara
+    serah terima" di formulir permintaan dan profil.
+
     **Satu cacat yang cuma ketahuan dari melihat layarnya:** keempat kolom itu
     belum ada di database yang belum menjalankan migrasi 21, jadi petanya
     digambar dari `undefined` dan jadi `bbox=NaN` — iframe abu-abu tanpa satu
