@@ -50,9 +50,9 @@ export default function manifest(): MetadataRoute.Manifest {
         icons: [{ src: "/icon-192.png", sizes: "192x192" }],
       },
       {
-        name: "Pemesanan saya",
-        short_name: "Pemesanan",
-        url: "/pemesanan",
+        name: "Pesan saya",
+        short_name: "Pesan",
+        url: "/pesan",
         icons: [{ src: "/icon-192.png", sizes: "192x192" }],
       },
       {

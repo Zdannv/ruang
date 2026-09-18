@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Inbox, Search, UserRound } from "lucide-react";
+import { House, MessageCircle, Search, UserRound } from "lucide-react";
 
 /**
  * Navigasi bawah untuk layar kecil.
@@ -29,13 +29,13 @@ export default function NavBawah({ masuk }: { masuk: boolean }) {
   const tampil = masuk
     ? [
         { href: "/cari", label: "Cari", ikon: Search },
-        { href: "/pemesanan", label: "Pemesanan", ikon: Inbox },
+        { href: "/pesan", label: "Pesan", ikon: MessageCircle },
         { href: "/host", label: "Sewakan", ikon: House },
         { href: "/profil", label: "Akun", ikon: UserRound },
       ]
     : [
         { href: "/cari", label: "Cari", ikon: Search },
-        { href: "/pemesanan", label: "Pemesanan", ikon: Inbox },
+        { href: "/pesan", label: "Pesan", ikon: MessageCircle },
         { href: "/host", label: "Sewakan", ikon: House },
         { href: "/masuk", label: "Masuk", ikon: UserRound },
       ];

@@ -36,7 +36,10 @@ Jangan tawarkan alternatif untuk empat ini kecuali diminta:
 
 1. **Akses bebas terjadwal** — penyewa bisa datang berkali-kali, janjian lewat
    aplikasi dari jendela akses yang ditetapkan host.
-2. **Pemesanan & pembayaran lewat platform** — bukan papan iklan.
+2. ~~**Pemesanan & pembayaran lewat platform** — bukan papan iklan.~~
+   **DIBALIK 18 September 2026.** Rilis pertama justru papan iklan: orang
+   bertanya lewat chat lalu bertemu sendiri dengan pemiliknya, seperti OLX.
+   Lihat nomor 43. Tiga keputusan lain di daftar ini tetap berlaku.
 3. **Harga per ruangan, ditentukan host** — bukan satuan boks seragam.
 4. **Web app / PWA** — bukan native. Mobile-first.
 
@@ -46,8 +49,11 @@ Konsekuensi yang sudah diputuskan:
   Penggantinya: manifes berfoto + berita acara serah terima + log akses.
 - **Tidak ada asuransi dan tidak ada jaminan ganti rugi dari platform.**
   Jangan pernah menulis "garansi keamanan" atau "barang dijamin aman" di UI.
-  Kalimat yang benar: *platform memutuskan siapa yang benar, platform tidak
-  membayar ganti rugi.*
+  Sejak 18 September 2026 kalimatnya lebih keras lagi, karena uangnya tidak
+  pernah lewat aplikasi: *aplikasi mempertemukan, tidak memegang uang, tidak
+  menengahi, dan tidak memberi ganti rugi.* Kalimat lama ("platform memutuskan
+  siapa yang benar") sudah TIDAK BOLEH dipakai — tanpa pemesanan, manifes, dan
+  log akses, tidak ada bukti apa pun yang bisa dipakai memutuskan.
 - **Host berhak melihat dan menolak barang.** Manifes wajib, kategori
   dideklarasikan penyewa dan dicocokkan sistem dengan kebijakan host
   sebelum permintaan sampai ke host.
@@ -1071,22 +1077,74 @@ Kerjakan berurutan. Jangan lompat.
     orang yang baru saja masuk sudah lewat tahap itu. `?lanjut=` tetap
     menang. Berlaku juga untuk pendaftaran yang langsung bersesi.
 
-### Berikutnya, selama pembayaran belum ada
+43. **Rilis pertama jadi papan iklan** (18 Sep 2026). **Ini membalik
+    keputusan produk nomor 2**, yang dikunci 4 September dan berbunyi persis
+    "bukan papan iklan". Diputuskan pemiliknya bersama timnya: rilis pertama
+    tugasnya mengumpulkan pemilik lahan dan pedagang, bukan memindahkan uang,
+    dan model bisnis yang banyak justru memperlambat itu.
 
-Tinggal utang no. 3 (pisahkan dua tanda tangan serah terima jadi baris
-sendiri), dan itu pun lebih baik dikerjakan bersamaan dengan serah terimanya.
+    Alurnya sekarang: orang menemukan lahan, bertanya lewat chat, pemiliknya
+    membuka alamat kalau sudah cocok, lalu keduanya bertemu dan sepakat
+    sendiri. Seperti OLX.
 
-Artinya: **tidak ada lagi fitur berarti yang bisa dibangun tanpa jalur
-pembayaran.** Serah terima, pengakhiran lebih awal, dan kontrak PDF semuanya
-menunggu `menunggu_pembayaran` bisa dilewati. Yang tersisa cuma pekerjaan yang
-tidak menambah alur: verifikasi nomor HP (menunggu WhatsApp/SMS), memisahkan
-properti dari ruang (utang no. 4), dan **memindahkan `permintaan` dari volume
-m³ ke lebar muka jalan + jenis usaha** (lihat ekor nomor 37).
+    **Yang dibuang dari permukaan aplikasi**, bukan dari database:
 
-Kalau ada waktu dan pembayaran masih jauh, yang paling berguna dikerjakan
-adalah **menyiapkan integrasi pembayarannya sendiri**: pilih penyedia, daftar
-akun bisnis, lalu bangun `bayar_pemesanan()` beserta webhook-nya. Itu satu-
-satunya hal yang membuka enam langkah berikutnya sekaligus.
+    - `src/app/pemesanan/` dan `src/app/ruang/[id]/pesan/`
+    - `src/lib/pemesanan.ts`; `bulanDari()` pindah ke `lib/label.ts`, itu
+      satu-satunya isinya yang masih terpakai
+    - tautan "Pemesanan" di header, nav bawah, footer, dan manifest PWA,
+      diganti "Pesan" yang memang jadi alur utamanya sekarang
+    - kartu "N permintaan menunggu jawabanmu" dan "N permintaan baru" di
+      dasbor host
+    - kuota kunjungan dan seluruh keterangan manifes di halaman detail
+    - kesepuluh status pemesanan di `LABEL_STATUS`, diganti keempat status
+      LISTING yang sebenarnya dipakai `LencanaStatus`
+
+    **Skemanya sengaja TIDAK disentuh.** Tidak ada migrasi yang menghapus
+    `pemesanan`, `manifes_item`, `serah_terima`, atau `akses_log`. Alasannya
+    bukan kemalasan: yang diminta "untuk sekarang belum diperlukan", jadi ini
+    penyempitan cakupan rilis, bukan pembatalan model. Migrasi penghapus tabel
+    tidak bisa dibatalkan; rute yang dibuang ada utuh di riwayat git dan bisa
+    dikembalikan kapan saja.
+
+    **Konsekuensi yang paling gampang terlewat: ulasan jadi mustahil.**
+    `boleh_ulas()` mensyaratkan pemesanan lewat aplikasi, dan pemesanan sudah
+    tidak ada. Jadi bagian ulasan di halaman detail disembunyikan seluruhnya
+    saat kosong, dan `SuaraPenyewa` tidak lagi menjanjikan "jumlahnya bertambah
+    lambat" — ia menyebut alasan sebenarnya: sewanya terjadi di luar aplikasi,
+    jadi tidak ada cara memastikan sebuah ulasan datang dari orang yang memang
+    pernah menyewa.
+
+    **Yang menggantikan kepercayaan yang hilang**: verifikasi petugas (nomor
+    40) naik jadi mekanisme utama, ditambah alamat bertahap dan jejak chat yang
+    tidak bisa diubah. Ketiganya sudah ada dan bisa diperiksa; tidak ada yang
+    dijanjikan tanpa isi.
+
+    **Kalimat keselamatan sekarang WAJIB menyebut bahwa aplikasi tidak
+    memegang uang**, dan ada di tiga tempat: panel harga halaman detail,
+    footer, dan blok kepercayaan halaman depan. "Datangi dulu lahannya dan
+    temui orangnya sebelum menyerahkan uang apa pun" bukan basa-basi hukum, ia
+    satu-satunya perlindungan yang benar-benar kita punya sekarang.
+
+    **Yang TETAP ada dan tidak boleh ikut dibuang**: jendela akses (jam boleh
+    jualan adalah keterangan listing yang berguna), `/permintaan` (sinyal
+    permintaan per kecamatan justru makin penting untuk menarik pemilik lahan),
+    verifikasi, dan seluruh rubrik lahan.
+
+### Berikutnya
+
+Fokus rilis pertama: **mengumpulkan pemilik lahan dan pedagang**, bukan
+menambah alur. Yang paling berguna dikerjakan sekarang bukan fitur melainkan
+isi — lima belas lahan sungguhan di Sidoarjo, difoto dan diverifikasi sendiri.
+
+Alur pembayaran, serah terima, dan kontrak PDF **ditunda, bukan dibatalkan**
+(lihat nomor 43). Skemanya masih utuh di database, jadi menghidupkannya lagi
+berarti mengembalikan rutenya dari riwayat git, bukan membangun ulang.
+
+Yang masih pantas dikerjakan tanpa menambah model bisnis: verifikasi nomor HP
+(menunggu WhatsApp/SMS), memisahkan properti dari ruang (utang no. 4), dan
+memindahkan `permintaan` dari volume m³ ke lebar muka jalan + jenis usaha
+(lihat ekor nomor 37).
 
 ## Yang masih menunggu pihak luar
 
@@ -1096,7 +1154,7 @@ mengaku "sudah dibayar" tanpa uang sungguhan adalah kebohongan, bukan demo.
 
 | Bagian | Kenapa belum | Yang boleh dikerjakan sekarang |
 |---|---|---|
-| Pembayaran | payment gateway berlisensi + akun bisnis | model pemesanan & transisi status |
+| Pembayaran | **tidak dipakai di rilis pertama** (nomor 43), bukan lagi soal vendor | tidak ada; jangan bangun ulang sebelum diminta |
 | Verifikasi identitas | vendor e-KYC | kolom rujukan id vendor; jangan simpan foto KTP sendiri |
 | Notifikasi WhatsApp | WhatsApp Business API provider | notifikasi in-app **sudah ada**; email lewat Supabase belum |
 
@@ -1104,8 +1162,6 @@ mengaku "sudah dibayar" tanpa uang sungguhan adalah kebohongan, bukan demo.
 kunci VAPID dibuat sendiri. Pemberitahuan sampai ke perangkat meski aplikasinya
 tertutup — untuk host, itu justru keadaan yang paling sering terjadi. Cara
 menyalakannya ada di SETUP.md; opsional, aplikasinya jalan penuh tanpanya.
-| Kontrak PDF | menunggu alur pesan | dibuat dari data pemesanan, bukan berkas contoh |
-
 **Login tidak lagi masuk daftar ini.** Switcher peran dibuang; yang dipakai
 auth Supabase sungguhan (lihat nomor 3 di urutan bangun).
 

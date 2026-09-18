@@ -137,7 +137,7 @@ export type UlasanSorotan = {
  * penyewa.
  *
  * Akan mengembalikan array kosong untuk waktu yang cukup lama, dan itu bukan
- * kegagalan: `boleh_ulas()` mensyaratkan pemesanan yang SUDAH DIBAYAR, dan
+ * kegagalan: `boleh_ulas()` mensyaratkan pemesanan lewat aplikasi, dan
  * alur pembayaran belum bisa dilewati. Pemanggilnya wajib menangani keadaan
  * kosong dengan jujur — jangan pernah mengisinya dengan ulasan karangan.
  */

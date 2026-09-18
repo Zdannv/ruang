@@ -6,7 +6,7 @@ import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { antreanVerifikasi, sayaAdmin } from "@/lib/verifikasi";
 
-export const metadata: Metadata = { title: "Verifikasi lahan, Cari Ruang" };
+export const metadata: Metadata = { title: "Verifikasi lahan · Cari Ruang" };
 
 /**
  * Antrean petugas.

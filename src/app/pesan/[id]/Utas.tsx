@@ -116,9 +116,9 @@ export default function Utas({
             Buka alamat untuk penyewa ini
           </p>
           <p className="mt-1 text-xs leading-relaxed text-muted">
-            Supaya ia bisa datang melihat sebelum memesan. Hanya berlaku untuk orang
-            ini, dan <strong className="text-ink">tidak bisa ditutup lagi</strong> 
-            alamat yang sudah dilihat tidak bisa ditarik kembali.
+            Supaya ia bisa datang melihat sendiri. Hanya berlaku untuk orang ini,
+            dan <strong className="text-ink">tidak bisa ditutup lagi</strong>: alamat
+            yang sudah dilihat tidak bisa ditarik kembali.
           </p>
           <button
             type="button"

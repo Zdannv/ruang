@@ -108,15 +108,20 @@ const ALASAN = [
   {
     gambar: "3-usaha",
     judul: "Boleh menggoreng atau nggak",
-    isi: "Pemilik mencentang usaha apa saja yang boleh. Yang nggak dicentang ditolak sistem sebelum kamu nunggu jawaban.",
+    isi: "Pemilik mencentang usaha apa saja yang boleh di lahannya, jadi kamu tahu sebelum bertanya.",
   },
   {
     gambar: "4-alamat",
     judul: "Alamat kebuka bertahap",
-    isi: "Yang umum lihat cuma kelurahan dan jaraknya. Alamat lengkap kebuka setelah deal, nomor kontak setelah bayar.",
+    isi: "Yang umum lihat cuma kelurahan dan jaraknya. Alamat lengkapnya dibuka pemiliknya sendiri dari chat.",
   },
 ];
 
+/*
+  Empat langkah, bukan lima, dan yang hilang persis yang dibuang 18 September
+  2026: "ajukan sewa" dan "bayar lewat aplikasi". Sewanya disepakati langsung
+  antara pedagang dan pemiliknya. Lihat nomor 43 di CLAUDE.md.
+*/
 const LANGKAH = [
   {
     gambar: "1-cari",
@@ -125,23 +130,18 @@ const LANGKAH = [
   },
   {
     gambar: "2-tanya",
-    judul: "Tanya dulu, gratis",
-    isi: "\u201CBoleh gorengan nggak?\u201D \u201CAda listrik?\u201D Chat dulu, gratis, tanpa isi tanggal.",
-  },
-  {
-    gambar: "3-ajukan",
-    judul: "Ajukan sewa",
-    isi: "Isi tanggal dan barangnya. Dicocokkan dengan aturan pemilik dulu.",
+    judul: "Tanya pemiliknya",
+    isi: "\u201CBoleh gorengan nggak?\u201D \u201CAda listrik?\u201D Chat dulu, gratis.",
   },
   {
     gambar: "4-jawab",
-    judul: "Pemilik terima atau tolak",
-    isi: "Dia berhak menolak. Kalau diterima, alamatnya kebuka.",
+    judul: "Janjian lihat lokasi",
+    isi: "Kalau cocok, pemiliknya kasih alamat lengkap dan kalian ketemuan di sana.",
   },
   {
     gambar: "5-bayar",
-    judul: "Bayar, terus jualan",
-    isi: "Bayar sewanya lewat aplikasi. Habis itu lahannya kamu pakai sesuai tanggal dan jamnya.",
+    judul: "Sepakat langsung",
+    isi: "Harga dan cara bayarnya kalian atur berdua. Aplikasi tidak ikut pegang uang.",
   },
 ];
 
@@ -400,7 +400,7 @@ export default async function Beranda() {
             kolom membuat bagian ini sekitar 1750px, orang berhenti
             menggulir sebelum sampai langkah lima. Bentuk ilustrasinya
             sengaja tegas supaya tetap terbaca di lebar 150px. */}
-        <ol className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-5">
+        <ol className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
           {LANGKAH.map((l, i) => (
             <li
               key={l.judul}

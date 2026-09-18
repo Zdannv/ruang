@@ -253,7 +253,7 @@ permintaan ruang.
 
 | Bagian | Kenapa | Rencana |
 |---|---|---|
-| Pembayaran | butuh payment gateway berlisensi + akun bisnis | model pemesanan dulu; status "sudah dibayar" tidak pernah ditulis tanpa uang sungguhan |
+| Pembayaran | **tidak dipakai di rilis pertama**: aplikasi ini papan iklan, sewanya disepakati langsung antara pemilik dan pedagang | ditunda, bukan dibatalkan. Skemanya masih utuh di database; rute pemesanannya ada di riwayat git |
 | Verifikasi identitas | butuh vendor e-KYC | simpan id rujukan vendor, bukan foto KTP |
 | Notifikasi WhatsApp | butuh WhatsApp Business API provider | in-app + email Supabase lebih dulu |
 
@@ -279,8 +279,9 @@ Daftar lengkap utang teknis ada di CLAUDE.md bagian "Utang yang diketahui".
   perpindahan status lewat fungsi di `04_pesan.sql`, yang memeriksa pemanggil
   dan transisinya. Diuji: host yang meng-UPDATE `pemesanan.status` langsung
   ditolak `permission denied`.
-- **Tidak ada jalan ke status "sudah dibayar".** Alur pesan berhenti di
-  `menunggu_pembayaran`; tidak ada `bayar_pemesanan()` bahkan sebagai simulasi.
+- **Alur pemesanannya tidak dipakai rilis pertama** (18 Sep 2026). Tabel dan
+  fungsinya masih ada dan masih berfungsi; yang dibuang layarnya. Tidak pernah
+  ada `bayar_pemesanan()`, bahkan sebagai simulasi.
 - **Tumpang tindih tanggal mustahil di level database**, lewat constraint
   `exclude using gist` — bukan cuma diperiksa di fungsi, karena pemeriksaan di
   fungsi kalah balapan kalau dua host menekan "Terima" bersamaan.

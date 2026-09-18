@@ -56,7 +56,6 @@ import {
   LABEL_USAHA,
   bulanTahun,
   dimensi,
-  kuotaAkses,
   labelDaftar,
   lebarMuka,
   luas,
@@ -77,7 +76,7 @@ export async function generateMetadata({ params }: PageProps<"/ruang/[id]">) {
   if (!supabaseSiap) return { title: "Cari Ruang" };
   const { id } = await params;
   const data = await ambilDetail(id).catch(() => null);
-  if (!data) return { title: "Lahan tidak ditemukan, Cari Ruang" };
+  if (!data) return { title: "Lahan tidak ditemukan · Cari Ruang" };
 
   const { ruang } = data;
   return {
@@ -398,32 +397,18 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
           {/* ── Kebijakan ──────────────────────────────────────────────────── */}
           <section className="mt-8">
             <h2 className="font-display text-xl font-bold tracking-tight">
-              {terbuka ? "Aturan dari pemilik" : "Aturan dari host"}
+              Aturan dari pemilik
             </h2>
 
             <div className="mt-4 space-y-4 rounded-2xl bg-card p-5 ring-1 ring-line">
-              {terbuka ? (
-                <p className="text-xs leading-relaxed text-muted">
-                  Saat memesan kamu memilih satu jenis usaha dari daftar di atas.
-                  Pilihannya dicocokkan sistem sebelum permintaanmu sampai ke pemilik,
-                  jadi kamu tidak menunggu jawaban untuk sesuatu yang sudah pasti
-                  ditolak.
-                </p>
-              ) : (
-                <>
-                  <DaftarChip
-                    ikon={Package}
-                    judul="Barang yang diterima"
-                    isi={labelDaftar(ruang.kategori_diterima, LABEL_KATEGORI)}
-                    kosong="Host belum menentukan kategori"
-                    rapat
-                  />
-                  <p className="text-xs leading-relaxed text-muted">
-                    Manifes barang wajib diisi saat memesan, dan dicocokkan dengan
-                    daftar ini sebelum permintaanmu diteruskan ke host. Host berhak
-                    menolak barang yang tidak sesuai.
-                  </p>
-                </>
+              {!terbuka && (
+                <DaftarChip
+                  ikon={Package}
+                  judul="Barang yang diterima"
+                  isi={labelDaftar(ruang.kategori_diterima, LABEL_KATEGORI)}
+                  kosong="Pemilik belum menentukan kategori"
+                  rapat
+                />
               )}
 
               <dl className="grid divide-y divide-line border-t border-line pt-1 sm:grid-cols-2 sm:gap-x-8 sm:divide-y-0">
@@ -431,11 +416,6 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
                   ikon={CalendarClock}
                   label={terbuka ? "Jam boleh jualan" : "Jendela akses"}
                   nilai={ruang.jendela_akses}
-                />
-                <BarisRubrik
-                  ikon={DoorOpen}
-                  label={terbuka ? "Kuota kedatangan" : "Kuota kunjungan"}
-                  nilai={kuotaAkses(ruang.kuota_akses_bulanan)}
                 />
                 <BarisRubrik
                   ikon={CalendarClock}
@@ -450,9 +430,8 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
               </dl>
 
               <p className="text-xs leading-relaxed text-muted">
-                {terbuka
-                  ? "Jam di atas yang disepakati; di luar itu lahannya kembali ke pemilik. Kuota \"tanpa batas\" berarti kamu boleh datang setiap hari selama masa sewa."
-                  : "Kunjungan dijanjikan lewat aplikasi, di dalam jendela akses di atas. Setiap kunjungan tercatat di log akses, itu yang menggantikan segel pada penitipan biasa."}
+                Semua ini ditulis pemiliknya sendiri. Cocokkan lagi waktu kamu
+                chat dan waktu datang ke lokasinya.
               </p>
             </div>
           </section>
@@ -505,8 +484,8 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
                 <p className="mt-2 flex items-start gap-2 text-xs leading-relaxed text-muted">
                   <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
                   {ruang.terbuka_alamat
-                    ? "Ruang komersial, alamat lengkap dan patokannya dibuka begitu kamu mengajukan sewa."
-                    : "Ruang di rumah tinggal. Titik di peta digeser sekitar 200 m. Alamat lengkapnya bisa dibuka host lewat percakapan, atau terbuka sendiri setelah pembayaran."}
+                    ? "Tempat komersial, alamat lengkap dan patokannya dibuka pemiliknya lewat chat."
+                    : "Di rumah tinggal. Titik di peta digeser sekitar 200 m, dan alamat lengkapnya dibuka pemiliknya sendiri lewat chat."}
                 </p>
               )}
               {/* TODO: peta. Butuh penyedia tile; yang diplot nanti
@@ -516,7 +495,13 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
 
           <PemutarVideo video={video} />
 
-          {/* ── Ulasan ─────────────────────────────────────────────────────── */}
+          {/* ── Ulasan ───────────────────────────────────────────────────────
+              Disembunyikan seluruhnya kalau kosong, dan sejak alur pemesanan
+              dibuang (18 Sep 2026) ia praktis selalu kosong: `boleh_ulas()`
+              mensyaratkan pemesanan lewat aplikasi. Judul "Ulasan penyewa"
+              dengan keterangan "hanya bisa ditulis penyewa yang sewanya sudah
+              selesai" menjanjikan sesuatu yang tidak akan pernah datang. */}
+          {ulasan.length > 0 && (
           <section className="mt-8">
             <div className="flex flex-wrap items-baseline justify-between gap-x-4">
               <h2 className="font-display text-xl font-bold tracking-tight">
@@ -529,13 +514,7 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
               )}
             </div>
 
-            {ulasan.length === 0 ? (
-              <p className="mt-4 rounded-2xl bg-card p-5 text-sm text-muted ring-1 ring-line">
-                Belum ada ulasan. Ulasan hanya bisa ditulis penyewa yang sewanya sudah
-                selesai, jadi jumlahnya memang bertambah lambat.
-              </p>
-            ) : (
-              <ul className="mt-4 space-y-3">
+            <ul className="mt-4 space-y-3">
                 {ulasan.map((u) => (
                   <li key={u.id} className="rounded-2xl bg-card p-5 ring-1 ring-line">
                     <div className="flex items-center justify-between gap-3">
@@ -554,9 +533,9 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
                     </p>
                   </li>
                 ))}
-              </ul>
-            )}
+            </ul>
           </section>
+          )}
         </div>
 
         {/* ── Panel harga ──────────────────────────────────────────────────── */}
@@ -578,10 +557,6 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
                 <dt className="text-muted">Sewa minimum</dt>
                 <dd className="font-medium">{ruang.durasi_min_hari} hari</dd>
               </div>
-              <div className="flex justify-between gap-3">
-                <dt className="text-muted">{terbuka ? "Kuota kedatangan" : "Kuota kunjungan"}</dt>
-                <dd className="font-medium">{kuotaAkses(ruang.kuota_akses_bulanan, true)}</dd>
-              </div>
             </dl>
 
             {tersewaSampai ? (
@@ -594,24 +569,16 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
               </p>
             )}
 
-            {/* Halaman /pesan yang mengurus "belum masuk": ia mengalihkan ke
-                /masuk dengan `lanjut`, jadi orang kembali ke formulir ini setelah
-                login. Tombolnya tidak perlu tahu keadaan sesi, dan halaman ini
-                tetap bisa dirender tanpa membaca cookie. */}
-            <Link
-              href={`/ruang/${ruang.id}/pesan`}
-              className="mt-4 block w-full rounded-full bg-brand px-5 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
-            >
-              Ajukan sewa
-            </Link>
-            <TanyaHost ruangId={ruang.id} />
-            <p className="mt-3 text-center text-xs text-muted">
-              Belum ada pembayaran di langkah ini. Host menerima atau menolak dulu.
-            </p>
+            {/* Chat adalah satu-satunya tombol utama sekarang. Sewanya
+                disepakati langsung antara pedagang dan pemiliknya, di luar
+                aplikasi, jadi tidak ada tahap "ajukan" yang bisa ditekan di
+                sini. Lihat nomor 43 di CLAUDE.md. */}
+            <TanyaHost ruangId={ruang.id} utama />
 
             <p className="mt-4 border-t border-line pt-4 text-xs leading-relaxed text-muted">
-              Platform menengahi kalau ada sengketa, tapi tidak memberi ganti rugi.
-              Tidak ada asuransi barang.
+              Harga dan cara bayarnya kamu bicarakan langsung dengan pemiliknya.
+              Aplikasi ini cuma mempertemukan, tidak ikut memegang uang dan tidak
+              memberi ganti rugi.
             </p>
           </div>
 
@@ -636,8 +603,8 @@ export default async function HalamanRuang({ params }: PageProps<"/ruang/[id]">)
                 </div>
               </div>
               <p className="mt-3 text-xs leading-relaxed text-muted">
-                Nomor kontak host baru terbuka setelah pembayaran. Sebelum itu, semua
-                komunikasi lewat aplikasi.
+                Mulai dari chat di aplikasi. Nomor dan alamat lengkapnya dibuka
+                pemiliknya sendiri kalau ia sudah cocok.
               </p>
             </div>
           )}

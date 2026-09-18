@@ -137,7 +137,7 @@ export default function FormProfil({
           value={isi.telepon}
           onChange={(e) => setIsi((v) => ({ ...v, telepon: e.target.value }))}
           placeholder="08xxxxxxxxxx"
-          bantuan="Belum diverifikasi, dan hanya dibuka ke pihak lain setelah pembayaran."
+          bantuan="Belum diverifikasi, dan tidak pernah tampil di listing."
         />
       </Bagian>
 

@@ -258,7 +258,7 @@ export default function FormDaftar() {
           value={telepon}
           onChange={(e) => setTelepon(e.target.value)}
           placeholder="08xxxxxxxxxx"
-          bantuan="Opsional. Belum diverifikasi, dan hanya dibuka ke pihak lain setelah pembayaran."
+          bantuan="Opsional. Belum diverifikasi, dan tidak pernah tampil di listing."
         />
         <KolomIsian
           id="sandi"

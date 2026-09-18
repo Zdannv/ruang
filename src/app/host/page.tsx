@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { BadgeCheck, Camera, Inbox, Plus, Store, TrendingUp } from "lucide-react";
+import { BadgeCheck, Camera, Plus, Store, TrendingUp } from "lucide-react";
 import LencanaStatus from "@/components/LencanaStatus";
 import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { daftarRuangSaya } from "@/lib/host";
 import { LABEL_TIPE, luas, pakaiLuas, rupiah, volume } from "@/lib/label";
 
-export const metadata: Metadata = { title: "Dasbor host, Cari Ruang" };
+export const metadata: Metadata = { title: "Dasbor host · Cari Ruang" };
 
 /**
  * Dasbor host.
@@ -31,7 +31,6 @@ export default async function DasborHost() {
     jumlah: number;
   }[];
 
-  const totalPermintaan = ruang.reduce((t, r) => t + r.permintaan_baru, 0);
   const tanpaFoto = ruang.filter((r) => r.jumlah_foto === 0);
   /*
     Lahan terbuka yang tayang tapi belum menuliskan jenis usaha yang boleh.
@@ -71,28 +70,8 @@ export default async function DasborHost() {
         </Link>
       </div>
 
-      {(totalPermintaan > 0 ||
-        tanpaUsaha.length > 0 ||
-        tanpaFoto.length > 0 ||
-        wilayah.length > 0) && (
+      {(tanpaUsaha.length > 0 || tanpaFoto.length > 0 || wilayah.length > 0) && (
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          {totalPermintaan > 0 && (
-            <Link
-              href="/pemesanan"
-              className="flex items-start gap-3 rounded-2xl bg-brand-soft p-4 transition-transform hover:-translate-y-0.5"
-            >
-              <Inbox className="mt-0.5 h-5 w-5 shrink-0 text-brand-dark" />
-              <span>
-                <span className="angka block text-sm font-semibold text-brand-dark">
-                  {totalPermintaan} permintaan menunggu jawabanmu
-                </span>
-                <span className="mt-0.5 block text-xs text-brand-dark/80">
-                  Buka daftar pemesanan untuk menerima atau menolak.
-                </span>
-              </span>
-            </Link>
-          )}
-
           {tanpaUsaha.length > 0 && (
             <Link
               href={`/host/ruang/${tanpaUsaha[0].id}`}
@@ -207,12 +186,6 @@ export default async function DasborHost() {
                     {rupiah(r.harga_bulanan)}/bulan
                   </span>
                   <span>{r.jumlah_foto} foto</span>
-                  {r.permintaan_baru > 0 && (
-                    <span className="font-semibold text-brand">
-                      {r.permintaan_baru} permintaan baru
-                    </span>
-                  )}
-                  {r.sedang_terpakai > 0 && <span>sedang tersewa</span>}
                 </div>
               </Link>
             </li>

@@ -36,8 +36,8 @@ export default function Footer() {
               <Link href="/permintaan" className="block text-ink hover:text-brand">
                 Titipkan permintaan
               </Link>
-              <Link href="/pemesanan" className="block text-ink hover:text-brand">
-                Pemesanan saya
+              <Link href="/pesan" className="block text-ink hover:text-brand">
+                Pesan saya
               </Link>
               <Link href="/pesan" className="block text-ink hover:text-brand">
                 Pesan
@@ -62,15 +62,16 @@ export default function Footer() {
 
         <div className="mt-8 space-y-1.5 border-t border-line pt-6 text-xs leading-relaxed text-muted">
           <p>
-            Alamat lengkap sebuah ruang dibuka bertahap: kelurahan dan jarak persis
-            untuk semua orang, alamat setelah pembayaran, nomor kontak setelah itu.
+            Alamat lengkap sebuah lahan dibuka bertahap: kelurahan dan jarak persis
+            untuk semua orang, alamat dan nomor kontaknya dibuka pemiliknya sendiri
+            lewat chat.
           </p>
           <p>
-            Lahan disewakan langsung oleh pemiliknya. Kalau ada sengketa, platform
-            menengahi dan memutuskan siapa yang benar, tapi tidak membayar ganti
-            rugi. Tidak ada asuransi barang.
+            Cari Ruang mempertemukan pemilik lahan dengan pedagang. Sewanya
+            disepakati langsung di antara kalian berdua: aplikasi ini tidak ikut
+            memegang uang, tidak menengahi, dan tidak memberi ganti rugi. Lihat
+            dulu lahannya sebelum menyerahkan uang apa pun.
           </p>
-          <p className="pt-2">Pembayaran belum aktif; menunggu payment gateway berlisensi.</p>
         </div>
       </div>
     </footer>

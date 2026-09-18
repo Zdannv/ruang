@@ -7,14 +7,20 @@ import { klienBrowser } from "@/lib/supabase/browser";
 import { mulaiPercakapan } from "@/lib/percakapan";
 
 /**
- * Membuka percakapan dengan host dari halaman detail ruang.
+ * Membuka percakapan dengan pemilik dari halaman detail lahan.
  *
- * Sengaja tidak menuntut tanggal atau manifes lebih dulu. Rubrik kondisi
- * menjawab banyak hal, tapi tidak menjawab "muat motor saya nggak" atau "boleh
- * lihat dulu" — dan memaksa orang mengisi formulir pemesanan hanya untuk
- * bertanya membuat sebagian besar dari mereka pergi, bukan memesan.
+ * Sejak 18 September 2026 ini SATU-SATUNYA jalan dari listing ke pemiliknya:
+ * alur pemesanan dibuang, dan sewanya disepakati langsung di luar aplikasi.
+ * Lihat nomor 43 di CLAUDE.md.
  */
-export default function TanyaHost({ ruangId }: { ruangId: string }) {
+export default function TanyaHost({
+  ruangId,
+  utama = false,
+}: {
+  ruangId: string;
+  /** Tampil sebagai tombol utama, bukan pendamping tombol lain. */
+  utama?: boolean;
+}) {
   const router = useRouter();
   const [proses, setProses] = useState(false);
   const [galat, setGalat] = useState<string | null>(null);
@@ -53,14 +59,18 @@ export default function TanyaHost({ ruangId }: { ruangId: string }) {
         type="button"
         onClick={buka}
         disabled={proses}
-        className="mt-3 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-line bg-card px-5 py-3 text-sm font-semibold text-ink transition-colors hover:bg-paper disabled:cursor-not-allowed disabled:opacity-60"
+        className={`mt-4 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+          utama
+            ? "bg-brand text-white hover:bg-brand-dark"
+            : "border border-line bg-card text-ink hover:bg-paper"
+        }`}
       >
         {proses ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
           <MessageCircle className="h-4 w-4" />
         )}
-        Tanya host
+        {utama ? "Tanya pemiliknya" : "Tanya host"}
       </button>
       {galat && <p className="mt-2 text-center text-xs text-warn">{galat}</p>}
     </>

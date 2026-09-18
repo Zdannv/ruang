@@ -12,7 +12,6 @@ import {
 } from "@/components/host/Kolom";
 import PilihWilayah from "@/components/host/PilihWilayah";
 import { klienBrowser } from "@/lib/supabase/browser";
-import { bulanDari } from "@/lib/pemesanan";
 import { buatRuang, hapusRuang, ubahRuang, type IsiRuang } from "@/lib/host";
 import {
   LABEL_AKSES,
@@ -28,6 +27,7 @@ import {
   LABEL_PENGUNCIAN,
   LABEL_POSISI,
   LABEL_TIPE,
+  bulanDari,
   luas,
   rupiah,
   volume,

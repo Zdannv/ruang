@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CalendarClock, ClipboardList, MapPin, Star } from "lucide-react";
+import { BadgeCheck, ClipboardList, MapPin, Star } from "lucide-react";
 import type { UlasanSorotan } from "@/lib/ringkasan";
 
 /**
@@ -17,10 +17,11 @@ import type { UlasanSorotan } from "@/lib/ringkasan";
  * bohong. Yang tersisa adalah menjawabnya dengan mekanismenya — dan
  * mekanisme itu memang sudah ada dan bisa diperiksa.
  *
- * `boleh_ulas()` mensyaratkan pemesanan yang sudah dibayar, jadi daftar ini
- * akan kosong sampai jalur pembayaran jalan. Itu bukan kegagalan yang perlu
- * ditutupi — justru itu yang membuat ulasannya berarti nanti, dan kalimat di
- * keadaan kosong menyebutkannya apa adanya.
+ * `boleh_ulas()` mensyaratkan pemesanan lewat aplikasi, dan sejak alur itu
+ * dibuang (18 Sep 2026) tidak ada satu pun ulasan yang bisa masuk. Jadi
+ * keadaan kosong ini bukan sementara, ia satu-satunya keadaan yang ada, dan
+ * kalimatnya menyebut itu apa adanya. Yang menggantikannya sebagai alasan
+ * percaya: verifikasi petugas, alamat bertahap, dan jejak chat.
  */
 export default function SuaraPenyewa({
   ulasan,
@@ -46,14 +47,14 @@ export default function SuaraPenyewa({
 
 const JAMINAN = [
   {
-    ikon: ClipboardList,
-    judul: "Barangnya tercatat",
-    isi: "Manifes berfoto: nama, jumlah, dan nilai taksiran tiap barang. Versi baru tiap kali berubah, yang lama tidak ditimpa.",
+    ikon: BadgeCheck,
+    judul: "Lahan bisa diverifikasi",
+    isi: "Pemilik boleh minta petugas kami datang. Yang lolos dapat lencana Terverifikasi: keterangannya cocok dengan keadaan di lokasi hari itu.",
   },
   {
-    ikon: CalendarClock,
-    judul: "Kedatangan tercatat",
-    isi: "Jam akses disepakati di aplikasi, dan setiap kedatangan masuk log. Bukan ingatan siapa-siapa.",
+    ikon: ClipboardList,
+    judul: "Chatnya jadi catatan",
+    isi: "Yang dijanjikan pemilik tertulis di percakapan, dan pesan tidak bisa dihapus atau diubah setelah terkirim.",
   },
   {
     ikon: MapPin,
@@ -69,14 +70,14 @@ function Kosong() {
         Ulasan penyewa
       </p>
       <h2 className="mt-3 font-display text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl">
-        Belum ada ulasan, dan memang belum bisa ada
+        Belum ada ulasan di sini
       </h2>
       <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/85 sm:text-base">
-        Ulasan di sini cuma bisa ditulis penyewa yang sewanya sudah{" "}
-        <strong className="text-white">selesai</strong>, dan yang dinilai bukan
-        cuma bintang, ia menilai seberapa tepat keterangan yang ditulis pemilik
-        dibanding kenyataannya. Tidak ada cara menambahnya dari luar, jadi
-        jumlahnya akan bertambah lambat. Itu memang maksudnya.
+        Sewanya disepakati langsung antara kamu dan pemiliknya, di luar aplikasi,
+        jadi kami tidak tahu sewa mana yang benar-benar terjadi dan tidak bisa
+        memastikan sebuah ulasan datang dari orang yang memang pernah menyewa.
+        Daripada mengisinya dengan bintang yang tidak ada orangnya, kami
+        kosongkan.
       </p>
 
       <div className="mt-8 grid gap-4 text-left sm:grid-cols-3">
@@ -93,10 +94,10 @@ function Kosong() {
           bagian keputusan produk yang dikunci. Justru di bagian yang gunanya
           membangun kepercayaan, menyembunyikannya paling merugikan. */}
       <p className="mx-auto mt-8 max-w-2xl border-t border-white/20 pt-6 text-xs leading-relaxed text-white/70">
-        Yang <strong className="text-white/90">tidak</strong> kami janjikan: ganti
-        rugi. Lahan disewakan langsung oleh pemiliknya, dan tidak ada asuransi
-        barang. Kalau ada sengketa, kami memutuskan siapa yang benar berdasarkan
-        catatan di atas, bukan membayar kerugiannya.
+        Yang <strong className="text-white/90">tidak</strong> kami lakukan: ikut
+        memegang uangnya, menengahi kalau kalian bersengketa, dan memberi ganti
+        rugi. Lahan disewakan langsung oleh pemiliknya. Datangi dulu lahannya dan
+        temui orangnya sebelum menyerahkan uang apa pun.
       </p>
 
       <Link

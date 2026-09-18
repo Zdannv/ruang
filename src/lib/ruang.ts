@@ -302,7 +302,7 @@ export type DetailRuang = {
   /**
    * Alamat lengkap — hanya terisi kalau RLS mengizinkan pemanggil membacanya:
    * host ruangnya, penyewa yang alamatnya dibuka lewat percakapan (tingkat 2),
-   * atau penyewa yang pemesanannya sudah dibayar (tingkat 3). Kalau tidak,
+   * lewat percakapan (tingkat 2). Kalau tidak,
    * hasilnya `null` tanpa galat — RLS menyaring baris, bukan menolak kuerinya.
    */
   alamatLengkap: { alamat: string; patokan: string | null } | null;

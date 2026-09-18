@@ -241,6 +241,17 @@ export function kuotaAkses(n: number | null, pendek = false): string {
   return pendek ? `${n}x / bulan` : `${n}x per bulan`;
 }
 
+/**
+ * Jumlah bulan yang ditagih untuk sekian hari, dibulatkan ke atas.
+ *
+ * Pindah ke sini dari `lib/pemesanan.ts` saat alur pemesanan dibuang
+ * (18 Sep 2026). Yang tersisa memakainya cuma keterangan harga di formulir
+ * lahan: "sewa minimum 30 hari berarti Rp sekian".
+ */
+export function bulanDari(hari: number): number {
+  return hari > 0 ? Math.ceil(hari / 30) : 0;
+}
+
 /** Terjemahkan isi kolom array; yang tidak dikenal dirapikan, bukan dibuang. */
 export function labelDaftar(nilai: string[], peta: Record<string, string>): string[] {
   return nilai.map((v) => peta[v] ?? v.replace(/_/g, " "));
@@ -297,24 +308,25 @@ export const LABEL_FREKUENSI: Record<string, string> = {
   harian: "Hampir setiap hari",
 };
 
+/**
+ * Status LISTING, bukan status pemesanan.
+ *
+ * Kesepuluh status pemesanan dibuang 18 September 2026 bersama alurnya; yang
+ * tersisa cuma keadaan tayang sebuah lahan, dan itu satu-satunya yang dipakai
+ * `LencanaStatus` sekarang.
+ */
 export const LABEL_STATUS: Record<string, string> = {
   draf: "Draf",
-  menunggu_konfirmasi: "Menunggu konfirmasi host",
-  menunggu_pembayaran: "Menunggu pembayaran",
-  menunggu_serah_terima: "Menunggu serah terima",
-  aktif: "Sewa berjalan",
-  menunggu_serah_terima_keluar: "Menunggu serah terima keluar",
-  selesai: "Selesai",
-  dibatalkan: "Dibatalkan",
-  tunggakan: "Tunggakan",
-  sengketa: "Sengketa",
+  moderasi: "Menunggu moderasi",
+  tayang: "Tayang",
+  ditangguhkan: "Ditangguhkan",
 };
 
 /** Warna lencana status. Hanya yang perlu ditindaki yang diberi warna. */
 export function nadaStatus(status: string): "netral" | "proses" | "baik" | "waspada" {
-  if (status === "aktif") return "baik";
-  if (status === "tunggakan" || status === "sengketa") return "waspada";
-  if (status.startsWith("menunggu")) return "proses";
+  if (status === "tayang") return "baik";
+  if (status === "ditangguhkan") return "waspada";
+  if (status === "moderasi") return "proses";
   return "netral";
 }
 

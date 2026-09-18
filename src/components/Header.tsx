@@ -56,12 +56,6 @@ export default async function Header() {
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Di HP tautan ini sudah ada di bilah bawah; menampilkannya dua
                 kali cuma menyempitkan header yang sama. */}
-            <Link
-              href="/pemesanan"
-              className="hidden rounded-full px-3.5 py-2 text-sm font-semibold text-ink transition-colors hover:bg-paper sm:block"
-            >
-              Pemesanan
-            </Link>
 
             {/* Angka lencana butuh dua kueri; keduanya dikeluarkan dari jalur
                 kritis supaya header tampil lebih dulu dan angkanya menyusul. */}
