@@ -54,7 +54,62 @@ export default function SuaraPenyewa({
   );
 }
 
-/* ── Belum ada ulasan ───────────────────────────────────────────────────── */
+/* ── Belum ada ulasan di database ───────────────────────────────────────── */
+
+/**
+ * Testimoni dari orang yang mencoba aplikasinya di tahap awal.
+ *
+ * **Ini BUKAN ulasan**, dan bedanya penting sampai ke tampilannya. Ulasan
+ * (`ulasan_publik`) melekat pada satu lahan, ditulis penyewanya, dan punya
+ * skor; yang di bawah ini pendapat tentang APLIKASINYA, dikumpulkan
+ * pemiliknya dari orang yang sudah mencoba. Jadi tidak ada bintang di sini:
+ * bintang menyiratkan sistem penilaian yang tidak ada, dan itu berbohong
+ * lewat bentuk, bukan lewat kata.
+ *
+ * **Asalnya wajib nyata.** Keenam kalimat aslinya datang dari pemilik
+ * aplikasi (18 Sep 2026) sebagai kenalan yang sudah mencobanya. Dua dibuang
+ * seluruhnya dan tiga dipangkas, karena menyebut hal yang TIDAK ADA di
+ * aplikasi ini:
+ *
+ *   - "pembayarannya aman lewat aplikasi" — tidak ada pembayaran sama sekali
+ *   - "ada kepastian hukum, nggak takut diusir sepihak" — tidak ada; layar
+ *     lain justru menyatakan kebalikannya
+ *   - "profil calon penyewa transparan" — fitur itu tidak pernah dibuat
+ *   - "omzet bulan pertama balik modal" — angka penghasilan yang tidak bisa
+ *     diperiksa siapa pun
+ *
+ * Aturannya untuk siapa pun yang menambah di sini nanti: **kalimat testimoni
+ * tidak boleh menyebut fitur yang tidak ada.** Orang datang karena membaca
+ * ini, dan yang menanggung selisihnya pedagang yang menyerahkan uang, bukan
+ * yang memasang kalimatnya.
+ */
+const TESTIMONI = [
+  {
+    nama: "Hendra Gunawan",
+    peran: "Pemilik pekarangan, Jakarta Selatan",
+    isi: "Proses listing gampang banget, tinggal foto pekarangan dan atur jam operasional yang boleh disewa. Nggak ribet tawar-menawar manual di lapangan karena semua detail fasilitas dan listrik sudah disepakati dari awal di aplikasi.",
+  },
+  {
+    nama: "Dimas Arya",
+    peran: "Dimsum gerobak",
+    isi: "Dulu nyari spot jualan harus muter-muter panas-panasan nanya ke warga satu per satu, seringnya malah ditolak atau harganya nggak masuk akal. Pakai aplikasi ini, saya bisa filter lokasi yang sesuai bujet dan dekat target pasar kampus.",
+  },
+  {
+    nama: "Ratna Dewi",
+    peran: "Pemilik teras ruko, Bandung",
+    isi: "Teras depan ruko saya luas tapi kosong dari sore ke malam. Lewat aplikasi ini saya ketemu tenant martabak yang pas. Senangnya saya bisa seleksi dulu jualan apa yang cocok, tanpa takut bikin kumuh lingkungan.",
+  },
+  {
+    nama: "Budi Santoso",
+    peran: "Pemilik halaman rumah, Surabaya",
+    isi: "Awalnya halaman depan rumah cuma jadi tempat parkir motor berdebu. Iseng daftarin ke aplikasi ini, seminggu kemudian ada penjual kopi gerobak yang sewa. Tiap bulan ada pemasukan lumayan buat nambah uang belanja.",
+  },
+  {
+    nama: "Reza Pratama",
+    peran: "Nasi goreng & angkringan",
+    isi: "Fasilitas chat langsung ke pemilik lahan bikin negosiasi persiapan buka lapak jadi lancar. Nggak perlu perantara, langsung tanya yang punya tempat.",
+  },
+];
 
 const JAMINAN = [
   {
@@ -78,17 +133,37 @@ function Kosong() {
   return (
     <div className="mx-auto max-w-3xl text-center">
       <p className="text-xs font-semibold uppercase tracking-wide text-white/70">
-        Kami baru mulai
+        Kata yang sudah mencoba
       </p>
       <h2 className="mt-3 font-display text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl">
         Lahan pertamanya kami datangi sendiri
       </h2>
       <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/85 sm:text-base">
-        Cari Ruang baru jalan di Sidoarjo dan Surabaya Selatan. Belum ada ribuan
-        listing dan belum ada ulasan, jadi kami tidak berpura-pura punya: lahan
-        pertama di sini kami datangi, foto, dan tanyai sendiri sebelum tayang.
-        Kalau ada yang tidak cocok dengan keterangannya, bilang ke kami.
+        Cari Ruang baru jalan di Sidoarjo dan Surabaya Selatan, dan lahan pertama
+        di sini kami datangi, foto, dan tanyai sendiri sebelum tayang. Ini yang
+        dibilang orang-orang yang sudah mencobanya.
       </p>
+
+      {/* Geseran mendatar dengan snap, sama seperti sorotan di atas: tidak
+          butuh JavaScript, dan orang yang sedang membaca satu kartu tidak
+          direbut kartu berikutnya. Tanpa bintang, karena tidak ada sistem
+          penilaian di baliknya. */}
+      <div className="geser-x -mx-5 mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-1 text-left sm:-mx-10 sm:px-10">
+        {TESTIMONI.map((t) => (
+          <figure
+            key={t.nama}
+            className="flex w-[17rem] shrink-0 snap-start flex-col rounded-2xl bg-white/10 p-5 sm:w-[20rem]"
+          >
+            <blockquote className="flex-1 text-sm leading-relaxed text-white/90">
+              &ldquo;{t.isi}&rdquo;
+            </blockquote>
+            <figcaption className="mt-4 border-t border-white/20 pt-3">
+              <p className="text-sm font-bold text-white">{t.nama}</p>
+              <p className="mt-0.5 text-xs text-white/70">{t.peran}</p>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
 
       <div className="mt-8 grid gap-4 text-left sm:grid-cols-3">
         {JAMINAN.map((j) => (

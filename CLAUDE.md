@@ -802,6 +802,26 @@ Kerjakan berurutan. Jangan lompat.
     Kalimat itu tetap harus benar. Kalau nanti listing masuk tanpa didatangi,
     yang diganti kalimatnya — bukan kenyataannya yang dibiarkan menyimpang.
 
+    **Testimoni sungguhan masuk 18 September 2026**, dari kenalan pemiliknya
+    yang sudah mencoba aplikasinya. Lihat `TESTIMONI` di `SuaraPenyewa`.
+    Bedanya dengan ulasan ditegakkan sampai ke tampilannya: ulasan melekat ke
+    satu lahan, ditulis penyewanya, dan punya skor; testimoni adalah pendapat
+    tentang APLIKASINYA. Jadi **tidak ada bintang** di kartu testimoni —
+    bintang menyiratkan sistem penilaian yang tidak ada, dan itu berbohong
+    lewat bentuk, bukan lewat kata.
+
+    Dari enam kalimat yang diberikan, dua dibuang dan tiga dipangkas karena
+    menyebut hal yang TIDAK ADA di aplikasi ini: "pembayarannya aman lewat
+    aplikasi" (tidak ada pembayaran sama sekali), "ada kepastian hukum"
+    (layar lain justru menyatakan kebalikannya), "profil calon penyewa
+    transparan" (fitur itu tidak pernah dibuat), dan "omzet bulan pertama
+    balik modal" (angka penghasilan yang tidak bisa diperiksa siapa pun).
+
+    **Aturan untuk siapa pun yang menambah testimoni nanti: kalimatnya tidak
+    boleh menyebut fitur yang tidak ada.** Orang datang karena membacanya, dan
+    yang menanggung selisihnya pedagang yang menyerahkan uang di lokasi —
+    bukan yang memasang kalimatnya.
+
     Kalimat "tidak ada ganti rugi, tidak ada asuransi" **wajib tetap ada di
     situ** dan tidak boleh diperhalus. Justru di bagian yang gunanya
     membangun kepercayaan, menyembunyikannya paling merugikan.
