@@ -14,9 +14,11 @@ ruang penyimpanan, tapi model data dan penamaan harus tetap netral supaya bisa
 meluas nanti — sewa ruang untuk keperluan lain, atau jual-beli. Hindari kata
 "titip" di nama tabel, rute, dan komponen.
 
-**Nama aplikasi: Cari Ruang** (diputuskan 8 September 2026, sebelumnya
-`Ruang`). Slogannya *lahan nganggur jadi cuan*, dan judul halaman depannya
-*"Halaman depan nganggur? Jadikan cuan."*
+**Nama aplikasi: Ada Tempat** (diputuskan 19 September 2026, sebelumnya
+`Cari Ruang`, sebelumnya lagi `Ruang`). Domainnya `adatempat.com`. Slogannya
+**sewa tempat usaha jadi gampang**, menggantikan *lahan nganggur jadi cuan*
+yang masih boleh dipakai sebagai kalimat ajakan ke pemilik lahan, tapi bukan
+lagi slogan utama.
 
 Catatan penamaan: nama tabel `ruang` tetap. Di kode aplikasi
 pakai istilah yang lebih spesifik untuk tipe dan rute — `Listing` / `/ruang/[id]`
@@ -1555,6 +1557,65 @@ Kerjakan berurutan. Jangan lompat.
     kedua tidak butuh migrasi data sama sekali, karena `url` disimpan per
     baris sehingga berkas lama dan baru boleh tinggal di tempat berbeda. Itu
     sudah diantisipasi sejak `18_video.sql`.
+
+
+51. **Nama jadi Ada Tempat** (19 Sep 2026), menggantikan Cari Ruang. Slogannya
+    **sewa tempat usaha jadi gampang**. Domain `adatempat.com`.
+
+    Kandidat yang ditolak di jalan, beserta alasannya, karena ketiganya bisa
+    muncul lagi:
+
+    - **`caricuan.app`**: "cuan" cuma bicara ke pemilik lahan, nadanya
+      berlawanan dengan seluruh sikap keamanan aplikasi ini (tidak memegang
+      uang, tidak menengahi, datangi dulu lahannya), dan ruang digital kata itu
+      sudah penuh pinjol serta sinyal trading. Ditambah `caricuan.com` sudah
+      dipegang orang lain sejak 2021, jadi nama yang disebut lewat telepon
+      bocor ke alamat yang tidak kita kuasai.
+    - **`carilapak.com`**: kata "lapak" tepat, tapi mengingatkan ke Bukalapak.
+    - **`bukaruang.com`**: justru LEBIH mengingatkan ke Bukalapak, karena yang
+      khas dari merek itu awalan "Buka-" beserta keluarga sub-mereknya
+      (BukaPengadaan, BukaGlobal, BukaEmas), bukan kata "lapak" yang umum.
+      Ditambah "ruang" adalah kata yang sudah ditinggalkan produk ini sejak
+      migrasi 17.
+    - **`mukajalan.com`**: paling ownable, tapi "muka jalan" bahasa pemilik
+      properti, bukan bahasa pedagang. Pedagang gerobak tidak mencari "muka
+      jalan".
+
+    **Kenapa Ada Tempat menang: ia sekaligus pertanyaan dan jawaban.** Pedagang
+    bertanya "ada tempat nggak buat jualan?", pemilik lahan menjawab "ada
+    tempat". Satu nama melayani dua sisi pasar tanpa memihak, dan itu yang
+    gagal dilakukan hampir semua kandidat lain.
+
+    Kelemahannya diketahui dan ditanggung: **namanya tidak menjelaskan apa-apa
+    sendirian.** Karena itu ia WAJIB selalu tampil bersama slogannya, di judul
+    halaman, gambar pratinjau, dan manifest. Kalau suatu saat ada yang
+    memakai "Ada Tempat" tanpa kalimat pendamping, yang hilang bukan kerapian
+    melainkan satu-satunya keterangan tentang produknya.
+
+    **Wordmark lama tergambar DI DALAM kedua ilustrasi banner**, dan itu tidak
+    bisa diperbaiki dari kode. Keduanya dibersihkan per piksel: latarnya diukur
+    dulu (putih 254 dan gelap 29,23,20), batas sudut peta diukur per baris,
+    lalu wordmark-nya ditambal tanpa menyentuh gambarnya. Sumber JPEG aslinya
+    tetap ada di `desain/sorotan/`, jadi kalau nanti ilustrasinya dibuat ulang
+    dengan nama baru, yang diganti cuma hasil akhirnya.
+
+    **Berkasnya berganti nama jadi `-v2`, dan itu wajib.** `minimumCacheTTL`
+    baru dinaikkan ke 31 hari (nomor 50), dan dokumentasi Next menyebutnya
+    sendiri: cache gambar tidak bisa dibatalkan. Menimpa berkas di alamat yang
+    sama berarti versi lama tetap disajikan sebulan penuh. Terbukti langsung
+    saat mengujinya: gambar lama masih muncul meski berkasnya sudah diganti.
+
+    Aturan turunannya: **mengganti isi sebuah gambar berarti mengganti nama
+    berkasnya.**
+
+    Satu kalimat di `SuaraPenyewa` ikut diubah: ia menyebut "baru jalan di
+    Sidoarjo dan Surabaya Selatan", dan itu bertabrakan dengan titik bawaan
+    yang sekarang Jakarta (nomor 49). Sekarang cuma "baru mulai", yang tetap
+    benar dari sisi mana pun.
+
+    Yang TIDAK ikut berubah: lambang kanopi warung (masih benar artinya untuk
+    nama ini), nama tabel `ruang`, dan rute `/ruang/[id]`. Ketiganya memang
+    sengaja dipisah dari nama produk sejak awal.
 
 
 ### Berikutnya

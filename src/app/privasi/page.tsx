@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { DOMISILI, EMAIL_KONTAK, KETENTUAN_BERLAKU } from "@/lib/situs";
 
 export const metadata: Metadata = {
-  title: "Kebijakan privasi · Cari Ruang",
+  title: "Kebijakan privasi · Ada Tempat",
   description:
-    "Data apa yang disimpan Cari Ruang, kenapa, ke mana perginya, dan bagaimana cara menghapusnya.",
+    "Data apa yang disimpan Ada Tempat, kenapa, ke mana perginya, dan bagaimana cara menghapusnya.",
 };
 
 /**
@@ -258,7 +258,7 @@ export default function KebijakanPrivasi() {
 
         <Bagian judul="Menghubungi kami">
           <p>
-            Cari Ruang dijalankan dari {DOMISILI}.{" "}
+            Ada Tempat dijalankan dari {DOMISILI}.{" "}
             {EMAIL_KONTAK ? (
               <>
                 Untuk pertanyaan soal data pribadimu, kirim email ke{" "}

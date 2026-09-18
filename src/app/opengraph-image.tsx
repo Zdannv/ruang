@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Cari Ruang, lahan nganggur jadi cuan";
+export const alt = "Ada Tempat, sewa tempat usaha jadi gampang";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -48,7 +48,7 @@ export default function GambarOg() {
             <rect x="10.9" y="43" width="42.2" height="3.8" fill="#a93b20" />
           </svg>
           <span style={{ fontSize: 40, fontWeight: 700, color: "#fff" }}>
-            Cari Ruang
+            Ada Tempat
           </span>
         </div>
 
@@ -62,7 +62,7 @@ export default function GambarOg() {
               letterSpacing: -2,
             }}
           >
-            Halaman depan nganggur?
+            Sewa tempat usaha
           </span>
           <span
             style={{
@@ -73,12 +73,12 @@ export default function GambarOg() {
               letterSpacing: -2,
             }}
           >
-            Jadikan cuan.
+            jadi gampang.
           </span>
         </div>
 
         <span style={{ fontSize: 30, color: "#fdeee8" }}>
-          Sewa lahan usaha pinggir jalan, bulanan, langsung dari pemiliknya.
+          Halaman depan, teras, atau lahan kosong. Bulanan, langsung dari pemiliknya.
         </span>
       </div>
     ),

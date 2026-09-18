@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { DOMISILI, EMAIL_KONTAK, KETENTUAN_BERLAKU } from "@/lib/situs";
 
 export const metadata: Metadata = {
-  title: "Syarat pemakaian · Cari Ruang",
+  title: "Syarat pemakaian · Ada Tempat",
   description:
-    "Aturan pemakaian Cari Ruang: aplikasi mempertemukan pemilik lahan dengan pedagang, sewanya disepakati langsung di antara keduanya.",
+    "Aturan pemakaian Ada Tempat: aplikasi mempertemukan pemilik lahan dengan pedagang, sewanya disepakati langsung di antara keduanya.",
 };
 
 /**
@@ -28,18 +28,18 @@ export default function SyaratPemakaian() {
         Syarat pemakaian
       </h1>
       <p className="mt-3 text-sm text-muted">
-        Berlaku sejak {KETENTUAN_BERLAKU}. Dengan memakai Cari Ruang, kamu setuju
+        Berlaku sejak {KETENTUAN_BERLAKU}. Dengan memakai Ada Tempat, kamu setuju
         dengan yang tertulis di halaman ini.
       </p>
 
       <div className="mt-10 space-y-9 text-sm leading-relaxed text-ink">
-        <Pasal nomor={1} judul="Cari Ruang itu papan iklan">
+        <Pasal nomor={1} judul="Ada Tempat itu papan iklan">
           <p>
             Aplikasi ini mempertemukan orang yang punya lahan nganggur dengan orang
             yang butuh tempat jualan. Itu saja.
           </p>
           <p>
-            <strong>Cari Ruang bukan pihak dalam perjanjian sewa kalian.</strong>{" "}
+            <strong>Ada Tempat bukan pihak dalam perjanjian sewa kalian.</strong>{" "}
             Kami tidak menerima pembayaran, tidak menahan uang jaminan, tidak
             menengahi kalau kalian berselisih, dan tidak memberi ganti rugi dalam
             bentuk apa pun. Sewanya kalian sepakati berdua, di luar aplikasi.
@@ -136,7 +136,7 @@ export default function SyaratPemakaian() {
           </p>
           <p>
             Kalau kalian membuat perjanjian sewa, itu perjanjian antara kalian
-            berdua. Cari Ruang tidak menyimpan salinannya dan tidak bisa
+            berdua. Ada Tempat tidak menyimpan salinannya dan tidak bisa
             menegakkannya.
           </p>
         </Pasal>
@@ -182,7 +182,7 @@ export default function SyaratPemakaian() {
 
         <Pasal nomor={10} judul="Aplikasinya masih baru">
           <p>
-            Cari Ruang disediakan apa adanya. Kami tidak menjanjikan aplikasinya
+            Ada Tempat disediakan apa adanya. Kami tidak menjanjikan aplikasinya
             selalu bisa dibuka, selalu bebas galat, atau selalu menampilkan
             keterangan yang mutakhir.
           </p>
@@ -195,7 +195,7 @@ export default function SyaratPemakaian() {
 
         <Pasal nomor={11} judul="Batas tanggung jawab">
           <p>
-            Sejauh diizinkan hukum, Cari Ruang tidak bertanggung jawab atas
+            Sejauh diizinkan hukum, Ada Tempat tidak bertanggung jawab atas
             kerugian yang timbul dari sewa yang kalian sepakati, dari keterangan
             listing yang ternyata tidak sesuai, dari perbuatan pengguna lain, atau
             dari uang yang berpindah di luar aplikasi.
@@ -211,14 +211,14 @@ export default function SyaratPemakaian() {
         <Pasal nomor={12} judul="Hukum yang berlaku">
           <p>
             Halaman ini tunduk pada hukum Republik Indonesia. Kalau ada perselisihan
-            antara kamu dan Cari Ruang, kita selesaikan dengan musyawarah lebih
+            antara kamu dan Ada Tempat, kita selesaikan dengan musyawarah lebih
             dulu.
           </p>
         </Pasal>
 
         <Pasal nomor={13} judul="Menghubungi kami">
           <p>
-            Cari Ruang dijalankan dari {DOMISILI}.{" "}
+            Ada Tempat dijalankan dari {DOMISILI}.{" "}
             {EMAIL_KONTAK ? (
               <>
                 Kirim email ke{" "}

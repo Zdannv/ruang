@@ -16,10 +16,10 @@ export default function Footer() {
           <div className="max-w-sm">
             <div className="flex items-center gap-2">
               <Lambang className="h-8 w-8 text-brand" />
-              <span className="font-display text-xl font-bold tracking-tight">Cari Ruang</span>
+              <span className="font-display text-xl font-bold tracking-tight">Ada Tempat</span>
             </div>
             <p className="mt-3 text-sm leading-relaxed text-muted">
-              <strong className="text-ink">Lahan nganggur jadi cuan.</strong> Punya
+              <strong className="text-ink">Sewa tempat usaha jadi gampang.</strong> Punya
               halaman depan yang cuma jadi tempat parkir motor tamu? Sewakan bulanan.
               Butuh tempat jualan di pinggir jalan? Sewa dari tetangga sendiri.
             </p>
@@ -78,7 +78,7 @@ export default function Footer() {
             digeser sekitar 200 m. Nomor pemiliknya bisa dilihat yang punya akun.
           </p>
           <p>
-            Cari Ruang mempertemukan pemilik lahan dengan pedagang. Sewanya
+            Ada Tempat mempertemukan pemilik lahan dengan pedagang. Sewanya
             disepakati langsung di antara kalian berdua: aplikasi ini tidak ikut
             memegang uang, tidak menengahi, dan tidak memberi ganti rugi. Lihat
             dulu lahannya sebelum menyerahkan uang apa pun.

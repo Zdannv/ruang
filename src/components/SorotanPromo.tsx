@@ -25,14 +25,24 @@ import Image from "next/image";
  *
  * Yang PERTAMA memuat slogan utama, dan itu bukan kebetulan urutan berkas:
  * di layar telepon cuma satu kartu yang terlihat sebelum digeser.
+ *
+ * **Akhiran `-v2` bukan kerapian, ia pembatal cache.** Gambarnya diubah
+ * 19 September 2026 saat namanya berganti dari Cari Ruang jadi Ada Tempat,
+ * dan wordmark lama yang tergambar di dalam ilustrasinya dihapus. Kalau nama
+ * berkasnya tetap, versi lama yang sudah tersimpan tetap disajikan sampai
+ * `minimumCacheTTL` habis, dan itu 31 hari. Dokumentasi Next menyebutnya
+ * sendiri: cache gambar tidak bisa dibatalkan, jadi yang diubah alamatnya.
+ *
+ * Aturan turunannya: **mengganti isi gambar berarti mengganti nama
+ * berkasnya.** Menimpa berkas di alamat yang sama tidak akan terlihat.
  */
 const KARTU = [
   {
-    berkas: "sorotan-1",
+    berkas: "sorotan-1-v2",
     alt: "Halaman depan nganggur? Jadikan cuan, disewakan bulanan ke pedagang di sekitarmu, Rp 600 ribu per bulan",
   },
   {
-    berkas: "sorotan-2",
+    berkas: "sorotan-2-v2",
     alt: "Sewa, bukan beli, punya lahan sendiri ratusan juta, sewa 2 × 3 meter di depan rumah orang ratusan ribu per bulan",
   },
 ];
@@ -214,7 +224,7 @@ export default function SorotanPromo() {
       <div
         ref={wadah}
         className="geser-x -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0 lg:grid lg:grid-cols-2 lg:gap-5 lg:overflow-visible"
-        aria-label="Kenapa Cari Ruang"
+        aria-label="Kenapa Ada Tempat"
         onPointerDown={tunda}
         onKeyDown={tunda}
       >

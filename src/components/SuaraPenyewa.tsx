@@ -139,9 +139,9 @@ function Kosong() {
         Lahan pertamanya kami datangi sendiri
       </h2>
       <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/85 sm:text-base">
-        Cari Ruang baru jalan di Sidoarjo dan Surabaya Selatan, dan lahan pertama
-        di sini kami datangi, foto, dan tanyai sendiri sebelum tayang. Ini yang
-        dibilang orang-orang yang sudah mencobanya.
+        Ada Tempat baru mulai, dan lahan pertama di sini kami datangi, foto, dan
+        tanyai sendiri sebelum tayang. Ini yang dibilang orang-orang yang sudah
+        mencobanya.
       </p>
 
       {/* Geseran mendatar dengan snap, sama seperti sorotan di atas: tidak

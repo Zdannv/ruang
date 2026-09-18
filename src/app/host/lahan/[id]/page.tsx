@@ -14,7 +14,7 @@ import { daftarVideo } from "@/lib/video";
 import { daftarJendela } from "@/lib/jendela";
 import { pakaiLuas } from "@/lib/label";
 
-export const metadata: Metadata = { title: "Kelola lahan · Cari Ruang" };
+export const metadata: Metadata = { title: "Kelola lahan · Ada Tempat" };
 
 export default async function KelolaRuang({ params }: PageProps<"/host/lahan/[id]">) {
   const { id } = await params;

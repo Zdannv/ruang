@@ -1092,7 +1092,7 @@ export default function PencarianRuang() {
             (nomor 43) ia lebih keras: kami bahkan tidak menengahi. */}
         <p className="mt-12 border-t border-line pt-6 text-xs leading-relaxed text-muted">
           Lahan di sini dipasang langsung oleh pemiliknya, dan sewanya kalian
-          sepakati berdua. Cari Ruang tidak ikut memegang uang dan tidak memberi
+          sepakati berdua. Ada Tempat tidak ikut memegang uang dan tidak memberi
           ganti rugi. Datangi dulu lahannya sebelum menyerahkan uang apa pun.
         </p>
       </div>

@@ -5,7 +5,7 @@ import GrafikHarian from "./GrafikHarian";
 import { klienServer } from "@/lib/supabase/server";
 import { statistikHarianSaya, statistikSaya } from "@/lib/kontak";
 
-export const metadata: Metadata = { title: "Ringkasan · Cari Ruang" };
+export const metadata: Metadata = { title: "Ringkasan · Ada Tempat" };
 
 const HARI = 30;
 

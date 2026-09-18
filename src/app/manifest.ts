@@ -14,10 +14,10 @@ import type { MetadataRoute } from "next";
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Cari Ruang · lahan nganggur jadi cuan",
-    short_name: "Cari Ruang",
+    name: "Ada Tempat · sewa tempat usaha jadi gampang",
+    short_name: "Ada Tempat",
     description:
-      "Sewa halaman depan atau lahan kosong di pinggir jalan buat jualan. Bulanan, langsung dari pemiliknya.",
+      "Sewa tempat usaha di pinggir jalan. Bulanan, langsung dari pemiliknya.",
     lang: "id",
     dir: "ltr",
     start_url: "/",

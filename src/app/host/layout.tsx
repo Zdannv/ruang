@@ -42,7 +42,7 @@ export default async function TataLetakHost({
           <Link href="/" className="flex items-center gap-2">
             <Lambang className="h-7 w-7" />
             <span className="font-display text-base font-bold tracking-tight">
-              Cari Ruang
+              Ada Tempat
             </span>
             <span className="rounded-full bg-ink px-2 py-0.5 text-[11px] font-semibold text-paper">
               Pemilik

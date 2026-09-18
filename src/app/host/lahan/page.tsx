@@ -6,7 +6,7 @@ import { klienServer } from "@/lib/supabase/server";
 import { daftarRuangSaya } from "@/lib/host";
 import { LABEL_TIPE, luas, pakaiLuas, rupiah, volume } from "@/lib/label";
 
-export const metadata: Metadata = { title: "Lahan saya · Cari Ruang" };
+export const metadata: Metadata = { title: "Lahan saya · Ada Tempat" };
 
 /**
  * Daftar lahan milik pemanggilnya, beserta yang perlu ditindaki.

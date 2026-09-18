@@ -19,9 +19,9 @@ const serif = Source_Serif_4({
   display: "swap",
 });
 
-const JUDUL = "Cari Ruang · lahan nganggur jadi cuan";
+const JUDUL = "Ada Tempat · sewa tempat usaha jadi gampang";
 const RINGKASAN =
-  "Sewa halaman depan atau lahan kosong di pinggir jalan buat jualan. Bulanan, langsung dari pemiliknya. Punya lahan nganggur? Sewakan.";
+  "Sewa tempat usaha di pinggir jalan: halaman depan rumah, teras, lahan kosong, atau kios. Bulanan, langsung dari pemiliknya. Punya lahan nganggur? Sewakan.";
 
 export const metadata: Metadata = {
   /*
@@ -38,10 +38,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl("/") || "http://localhost:3000"),
   title: JUDUL,
   description: RINGKASAN,
-  applicationName: "Cari Ruang",
+  applicationName: "Ada Tempat",
   openGraph: {
     type: "website",
-    siteName: "Cari Ruang",
+    siteName: "Ada Tempat",
     locale: "id_ID",
     title: JUDUL,
     description: RINGKASAN,
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   icons: { apple: "/apple-touch-icon.png" },
   appleWebApp: {
     capable: true,
-    title: "Cari Ruang",
+    title: "Ada Tempat",
     // Bilah status iOS memakai warna latar halaman, bukan warna merek —
     // "black-translucent" akan membuat isi halaman menyusup ke belakang jam.
     statusBarStyle: "default",

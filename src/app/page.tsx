@@ -11,9 +11,9 @@ import { klienServer } from "@/lib/supabase/server";
 import { supabaseSiap } from "@/lib/supabase/env";
 
 export const metadata: Metadata = {
-  title: "Cari Ruang · sewa lahan usaha pinggir jalan",
+  title: "Ada Tempat · sewa tempat usaha jadi gampang",
   description:
-    "Cari lahan pinggir jalan buat jualan: halaman depan rumah, teras, lahan kosong, dan kios. Bulanan, langsung dari pemiliknya. Punya lahan nganggur? Sewakan.",
+    "Sewa tempat usaha di pinggir jalan: halaman depan rumah, teras, lahan kosong, dan kios. Bulanan, langsung dari pemiliknya. Punya lahan nganggur? Sewakan.",
 };
 
 /**
@@ -161,7 +161,7 @@ export default async function Beranda() {
       <section className="border-b border-line bg-card py-5 sm:py-7">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h1 className="sr-only">
-            Sewa lahan usaha pinggir jalan di Sidoarjo dan Surabaya
+            Ada Tempat: sewa tempat usaha di pinggir jalan
           </h1>
           <SorotanPromo />
         </div>
@@ -379,7 +379,7 @@ function KerangkaPencarian() {
 function PetunjukPemasangan() {
   return (
     <div className="mx-auto w-full max-w-xl px-4 py-16">
-      <h1 className="text-xl font-bold">Cari Ruang belum tersambung ke Supabase</h1>
+      <h1 className="text-xl font-bold">Ada Tempat belum tersambung ke Supabase</h1>
       <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-muted">
         <li>
           Salin <code className="font-mono text-ink">.env.example</code> menjadi{" "}

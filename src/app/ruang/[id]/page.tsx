@@ -76,14 +76,14 @@ import {
 const ambilDetail = cache(async (id: string) => getDetailRuang(await klienServer(), id));
 
 export async function generateMetadata({ params }: PageProps<"/ruang/[id]">) {
-  if (!supabaseSiap) return { title: "Cari Ruang" };
+  if (!supabaseSiap) return { title: "Ada Tempat" };
   const { id } = await params;
   const data = await ambilDetail(id).catch(() => null);
-  if (!data) return { title: "Lahan tidak ditemukan · Cari Ruang" };
+  if (!data) return { title: "Lahan tidak ditemukan · Ada Tempat" };
 
   const { ruang } = data;
   return {
-    title: `${ruang.judul}, ${ruang.kecamatan}, ${ruang.kota} · Cari Ruang`,
+    title: `${ruang.judul}, ${ruang.kecamatan}, ${ruang.kota} · Ada Tempat`,
     // Satuannya ikut tipenya, sama seperti di layar: "18 m³" untuk halaman
     // depan rumah adalah angka yang benar dan tidak berarti apa-apa — dan di
     // sini ia masuk ke cuplikan hasil pencarian Google.
