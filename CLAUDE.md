@@ -1355,6 +1355,81 @@ Kerjakan berurutan. Jangan lompat.
     ditutup-tutupi.
 
 
+47. **Yang dibutuhkan untuk tayang ke publik** (18 Sep 2026). Bukan fitur:
+    empat hal yang tidak pernah terasa kurang selama aplikasinya cuma dibuka
+    sendiri, dan langsung terasa begitu tautannya disebar.
+
+    **`/syarat` dan `/privasi`.** Aplikasi ini mengumpulkan nama, email, nomor
+    telepon, alamat lahan, koordinat, foto, video, isi percakapan, dan
+    langganan push, tanpa satu pun halaman yang menyatakan apa yang disimpan
+    dan buat apa. UU PDP 27/2022 berlaku untuk itu, dan bagi kita sendiri
+    halaman syarat adalah perlindungan: ia yang menyatakan hitam di atas putih
+    bahwa aplikasi tidak memegang uang dan tidak menengahi.
+
+    **Keduanya ditulis dari cara aplikasinya bekerja, bukan dari templat**, dan
+    itu aturan yang harus dijaga. Templat privasi yang beredar menyebut cookie
+    analitik, mitra periklanan, dan pelacakan lintas situs yang tidak satu pun
+    ada di sini. Menyalinnya berarti halaman yang seharusnya paling bisa
+    dipercaya justru berisi hal yang tidak benar. Yang ditulis malah
+    kebalikannya, karena kebetulan benar dan kebetulan jarang: tidak ada
+    analytics sama sekali, satu-satunya cookie adalah cookie sesi, dan EXIF
+    foto dibuang di peramban sebelum terkirim.
+
+    Aturan turunannya: **siapa pun yang menambahkan analitik, pelacak, atau
+    layanan pihak ketiga baru mengubah `/privasi` di commit yang sama.** Kalau
+    tidak, halaman itu berubah dari keterangan jadi kebohongan tanpa ada yang
+    menyadarinya.
+
+    Halaman syaratnya juga tidak menjanjikan yang tidak ada. Tidak ada pasal
+    pembayaran, tidak ada pasal pengembalian dana, tidak ada pasal sengketa
+    yang diputus platform. Ketiganya standar di syarat marketplace, dan
+    ketiganya akan jadi bukti yang memberatkan kita sendiri di sini.
+
+    **Email kontaknya dari `NEXT_PUBLIC_EMAIL_KONTAK` dan boleh kosong**
+    (`src/lib/situs.ts`). Alamat email yang belum tentu ada di halaman privasi
+    lebih buruk daripada tidak ada: orang yang mau menghapus datanya akan
+    mengirim ke sana dan tidak pernah dijawab. Selama kosong, kedua halaman
+    menunjuk percakapan di dalam aplikasi.
+
+    **Gambar pratinjau tautan** (`src/app/opengraph-image.tsx`, `next/og`).
+    Sebelum ini `layout.tsx` tidak punya `openGraph` maupun `metadataBase`
+    sama sekali, jadi tautan yang dibagikan ke grup WhatsApp tampil sebagai
+    satu baris teks kecil. Untuk aplikasi yang belum punya iklan dan belum
+    punya SEO, grup WA adalah satu-satunya jalur masuk yang tersedia.
+
+    `metadataBase` wajib ada: tanpa itu Next memancarkan `og:image` relatif,
+    dan WhatsApp maupun Facebook mengabaikan yang relatif **tanpa mengeluh**,
+    jadi gejalanya sama persis dengan tidak punya gambar sama sekali. Lambang
+    di dalamnya digambar ulang sebagai elemen `<svg>`, bukan diimpor dari
+    `public/ikon.svg` — satori merender di server tanpa memuat berkas luar.
+    Jadi geometri lambang sekarang hidup di **empat** tempat, bukan tiga
+    (lihat nomor 29).
+
+    **`sitemap.ts` dan `robots.ts`.** Yang penting bukan halaman depannya
+    melainkan halaman lahannya: orang tidak mencari "aplikasi sewa lahan", ia
+    mencari "sewa tempat jualan Waru". Tanpa peta situs, halaman lahan cuma
+    bisa ditemukan lewat `/cari`, yang dirender di peramban dan tidak
+    menyediakan satu pun tautan untuk diikuti perayap. Gagalnya dijawab daftar
+    statis, bukan galat: peta situs yang menjawab 500 membuat mesin pencari
+    berhenti memintanya. `ruang_publik` tidak punya kolom waktu ubah, jadi
+    `lastModified` memakai `dibuat_pada`.
+
+    Yang di-`disallow` bukan rahasia: `/host`, `/pesan`, `/profil`,
+    `/notifikasi` semuanya bergantung pada siapa yang masuk, jadi yang dilihat
+    perayap selalu halaman masuk, dan anggaran rayapannya habis di salinan
+    halaman yang sama.
+
+    **Delapan `loading.tsx` yang hilang**, termasuk `/masuk` dan `/daftar` —
+    dua layar pertama orang baru. Aturannya sudah ditulis di bagian Stack sejak
+    lama justru karena fungsinya di Singapura; yang terjadi adalah rute baru
+    ditambahkan tanpa ikut membawanya. Halaman yang isinya sepenuhnya statis
+    (`/syarat`, `/privasi`) sengaja tidak diberi: tidak ada kueri yang
+    ditunggu, jadi kerangkanya cuma kedipan.
+
+    Satu bug ikut ketemu saat menambahkan tautan ketentuan: **footer memuat
+    dua tautan ke `/pesan`**, satu berlabel "Pesan saya" dan satu "Pesan".
+
+
 ### Berikutnya
 
 Fokus rilis pertama: **mengumpulkan pemilik lahan dan pedagang**, bukan

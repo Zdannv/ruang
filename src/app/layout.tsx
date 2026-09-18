@@ -7,6 +7,7 @@ import NavBawah from "@/components/NavBawah";
 import TanpaDiHost from "@/components/TanpaDiHost";
 import DaftarSW from "@/components/DaftarSW";
 import { sesiSaya } from "@/lib/auth";
+import { siteUrl } from "@/lib/supabase/env";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
 
@@ -18,11 +19,34 @@ const serif = Source_Serif_4({
   display: "swap",
 });
 
+const JUDUL = "Cari Ruang · lahan nganggur jadi cuan";
+const RINGKASAN =
+  "Sewa halaman depan atau lahan kosong di pinggir jalan buat jualan. Bulanan, langsung dari pemiliknya. Punya lahan nganggur? Sewakan.";
+
 export const metadata: Metadata = {
-  title: "Cari Ruang · lahan nganggur jadi cuan",
-  description:
-    "Sewa halaman depan atau lahan kosong di pinggir jalan buat jualan. Bulanan, langsung dari pemiliknya. Punya lahan nganggur? Sewakan.",
+  /*
+    `metadataBase` menentukan alamat absolut gambar pratinjau. Tanpa itu Next
+    memancarkan `og:image` relatif, dan WhatsApp maupun Facebook mengabaikan
+    yang relatif tanpa mengeluh sama sekali: pratinjaunya cuma tampil tanpa
+    gambar, persis seperti kalau `opengraph-image` tidak pernah dibuat.
+
+    `siteUrl()` bisa mengembalikan string kosong di server yang env-nya belum
+    lengkap, dan `new URL("")` melempar saat build. Jadi ada cadangan
+    localhost: pratinjau yang salah alamat di pengembangan lokal tidak
+    merugikan siapa pun, build yang gagal merugikan.
+  */
+  metadataBase: new URL(siteUrl("/") || "http://localhost:3000"),
+  title: JUDUL,
+  description: RINGKASAN,
   applicationName: "Cari Ruang",
+  openGraph: {
+    type: "website",
+    siteName: "Cari Ruang",
+    locale: "id_ID",
+    title: JUDUL,
+    description: RINGKASAN,
+  },
+  twitter: { card: "summary_large_image", title: JUDUL, description: RINGKASAN },
   // Safari tidak membaca manifest untuk ikon layar utama; ia mencari
   // apple-touch-icon sendiri.
   icons: { apple: "/apple-touch-icon.png" },

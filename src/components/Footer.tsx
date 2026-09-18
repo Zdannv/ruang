@@ -25,7 +25,7 @@ export default function Footer() {
             </p>
           </div>
 
-          <nav className="grid grid-cols-2 gap-x-10 gap-y-2 text-sm sm:gap-x-16">
+          <nav className="grid grid-cols-2 gap-x-10 gap-y-6 text-sm sm:grid-cols-3 sm:gap-x-12">
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">
                 Menyewa
@@ -35,9 +35,6 @@ export default function Footer() {
               </Link>
               <Link href="/permintaan" className="block text-ink hover:text-brand">
                 Titipkan permintaan
-              </Link>
-              <Link href="/pesan" className="block text-ink hover:text-brand">
-                Pesan saya
               </Link>
               <Link href="/pesan" className="block text-ink hover:text-brand">
                 Pesan
@@ -55,6 +52,20 @@ export default function Footer() {
               </Link>
               <Link href="/host/lahan/baru" className="block text-ink hover:text-brand">
                 Sewakan lahan
+              </Link>
+            </div>
+            {/* Ketentuan sengaja di kaki, bukan di navigasi utama: yang
+                mencarinya tahu di mana biasanya ia berada, dan yang tidak
+                mencarinya tidak perlu dihalangi olehnya. */}
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                Ketentuan
+              </p>
+              <Link href="/syarat" className="block text-ink hover:text-brand">
+                Syarat pemakaian
+              </Link>
+              <Link href="/privasi" className="block text-ink hover:text-brand">
+                Kebijakan privasi
               </Link>
             </div>
           </nav>
