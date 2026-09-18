@@ -177,6 +177,16 @@ export default function SorotanPromo() {
       di atas.
     */
     if (document.hidden) return;
+    /*
+      Dari `lg` wadahnya jadi kisi dua kolom: kedua kartu terlihat bersamaan,
+      tidak ada yang perlu digeser, dan titik penunjuknya ikut disembunyikan.
+      Tanpa penjagaan ini pemutarnya tetap berjalan di sana, memanggil
+      `scrollTo` yang tidak melakukan apa-apa dan memicu render ulang tiap
+      lima detik selamanya. Diperiksa dari wadahnya sendiri, bukan dari media
+      query, supaya ia tetap benar kalau tata letaknya diubah lagi.
+    */
+    const el = wadah.current;
+    if (el && el.scrollWidth <= el.clientWidth + 1) return;
 
     const id = window.setTimeout(
       () => geserKe((aktif + 1) % KARTU.length),
@@ -189,18 +199,30 @@ export default function SorotanPromo() {
     <div>
       {/* Geseran mendatar dengan snap. Kartu di sebelahnya sengaja mengintip
           sedikit di layar telepon, itu isyarat pertama bahwa ia bisa
-          digeser. Di laptop kartunya selebar penuh dan tidak ada yang
-          mengintip, dan di sanalah titik penunjuk di bawah menjadi
-          satu-satunya yang memberi tahu bahwa masih ada kartu berikutnya. */}
+          digeser.
+
+          **Dari `lg` ia berhenti jadi pemutar dan jadi kisi dua kolom**, dan
+          itu perubahan 18 September 2026 saat sorotan ini naik jadi banner
+          halaman utama. Alasannya ukuran: gambarnya berasio 1,53 dan tidak
+          boleh dipangkas (lihat CLAUDE.md nomor 32), jadi satu kartu selebar
+          penuh berarti banner setinggi 753px yang mendorong hasil pencarian
+          jauh ke bawah lipatan. Berdampingan, tingginya jadi sekitar 366px.
+
+          Ini sekaligus menjawab keberatan yang dulu melahirkan pemutarnya
+          (nomor 39): di laptop kartu kedua tidak pernah ditemukan orang.
+          Sekarang ia tidak perlu ditemukan, ia sudah kelihatan. */}
       <div
         ref={wadah}
-        className="geser-x -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0"
+        className="geser-x -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0 lg:grid lg:grid-cols-2 lg:gap-5 lg:overflow-visible"
         aria-label="Kenapa Cari Ruang"
         onPointerDown={tunda}
         onKeyDown={tunda}
       >
         {KARTU.map((k, i) => (
-          <div key={k.berkas} className="w-[94%] shrink-0 snap-center sm:w-[96%] lg:w-full">
+          <div
+            key={k.berkas}
+            className="w-[94%] shrink-0 snap-center sm:w-[96%] lg:w-auto lg:shrink"
+          >
             <Image
               src={`/promo/${k.berkas}.webp`}
               alt={k.alt}
@@ -212,7 +234,7 @@ export default function SorotanPromo() {
                  menyerahkannya ke pengubah ukuran menghemat sekitar dua pertiga
                  di HP, dan HP-lah sasaran utamanya. Untuk SVG penghematannya nol
                  (ia bebas resolusi); untuk yang ini nyata. */
-              sizes="(min-width: 1024px) 700px, 94vw"
+              sizes="(min-width: 1024px) 560px, 94vw"
               priority={i === 0}
               className="h-auto w-full rounded-3xl"
             />
@@ -223,7 +245,7 @@ export default function SorotanPromo() {
       {/* Tombolnya jauh lebih besar daripada titiknya: sasaran sentuh 8px
           hampir tidak bisa dikenai jempol, dan titik yang lebih tebal dari
           ini terbaca sebagai kendali yang berat untuk dua kartu. */}
-      <div className="mt-3 flex items-center justify-center gap-1">
+      <div className="mt-3 flex items-center justify-center gap-1 lg:hidden">
         {KARTU.map((k, i) => (
           <button
             key={k.berkas}

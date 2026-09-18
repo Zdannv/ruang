@@ -1430,6 +1430,83 @@ Kerjakan berurutan. Jangan lompat.
     dua tautan ke `/pesan`**, satu berlabel "Pesan saya" dan satu "Pesan".
 
 
+48. **`/cari` digabung ke halaman utama** (18 Sep 2026). Diminta pemiliknya
+    dengan OLX sebagai rujukan: *"di olx atau traveloka halaman cari itu gak
+    ada, dan di landing page sekarang ini kayak di fusion antar halaman
+    landing page sama cari"*.
+
+    Diagnosisnya benar, dan sudah terlihat dari isi kedua halamannya: halaman
+    depan menampilkan kartu listing sungguhan, barisan tipe lahan, dan tombol
+    yang semuanya bermuara ke `/cari`, sementara `/cari` punya kendali dan
+    hasilnya sendiri. Yang ada bukan dua halaman melainkan **satu halaman yang
+    dipotong dua**, dan potongan pertamanya meminta orang menekan sesuatu
+    hanya untuk melihat isinya.
+
+    Urutan `/` sekarang: banner, pencarian lengkap dengan kategori dan
+    hasilnya, lalu penjelasan. Bagian penjelasan **turun ke bawah hasil, tidak
+    dibuang**, dan itu bedanya dari OLX yang disengaja: OLX tidak perlu
+    menjelaskan dirinya karena semua orang sudah tahu apa itu OLX. Yang
+    dipindahkan urutannya, bukan isinya.
+
+    **`/cari` tidak dihapus, ia mengalihkan.** Alamat itu sudah ada di peta
+    situs yang dikirim ke mesin pencari, di pintasan PWA yang terpasang di
+    layar utama orang, dan di tautan yang sudah dibagikan. Parameternya ikut
+    dibawa: `/cari?usaha=makanan` adalah hasil yang sudah disaring seseorang,
+    dan mengantarnya ke halaman depan tanpa penyaringnya sama saja dengan
+    membuangnya.
+
+    **Sorotan jadi kisi dua kolom dari `lg`**, membalik sebagian nomor 39.
+    Alasannya ukuran, bukan selera: gambarnya berasio 1,53 dan tidak boleh
+    dipangkas (nomor 32), jadi satu kartu selebar `max-w-6xl` berarti banner
+    setinggi **753px** yang mendorong hasil pencarian jauh ke bawah lipatan.
+    Berdampingan: 410px, diukur. Ini sekaligus menjawab keberatan yang dulu
+    melahirkan pemutar otomatisnya, yaitu kartu kedua tidak pernah ditemukan
+    orang di laptop. Sekarang ia tidak perlu ditemukan.
+
+    Pemutarnya berhenti sendiri di sana lewat `scrollWidth <= clientWidth`,
+    **bukan media query**: yang menentukan memang bisa-tidaknya digeser, dan
+    pemeriksaan dari wadahnya sendiri tetap benar kalau tata letaknya diubah
+    lagi. Tanpa itu ia memanggil `scrollTo` yang tidak melakukan apa-apa dan
+    memicu render ulang tiap lima detik selamanya.
+
+    **Pita "Hasil di bawah dihitung dari Waru / Aloha" dibuang**, diminta
+    pemiliknya: titik yang sedang dipakai sudah tertulis di kendali tepat di
+    atasnya. Di 375px pita itu memakan sekitar 120px, dan yang terdorong ke
+    bawahnya persis barisan kategori dan hasilnya. Diukur setelah dibuang:
+    judul hasil di **y=676** dan kartu pertama di **y=748** pada 375×812;
+    y=759 dan y=811 pada 1440×900. Keduanya di atas lipatan.
+
+    **"Cari lahan" dibuang dari navigasi header**, karena sekarang ia menunjuk
+    ke tempat yang sama dengan lambang di sebelahnya. Yang tersisa pintu masuk
+    pemilik lahan, dan ia dibuat menonjol mengikuti pola "+ Jual" di OLX:
+    pedagang datang sendiri lewat pencarian, sedangkan pemilik lahan harus
+    disadarkan bahwa halaman depannya bisa disewakan, dan itu tidak terjadi
+    lewat tautan abu-abu.
+
+    **Akunnya tetap satu untuk kedua sisi.** Ditanyakan bersamaan: apakah
+    masuk sebagai pemilik lahan sebaiknya dipisah. Tidak, dan alasannya
+    orangnya sendiri: yang menyewakan halaman depannya bulan ini adalah orang
+    yang bulan depan mencari lapak buat anaknya. Dua akun berarti dua email,
+    dua kotak masuk chat, dan satu pesan yang masuk ke akun yang sedang tidak
+    ia buka. Dari sisi keamanan pemisahan itu juga tidak memberi apa-apa: yang
+    menahan siapa boleh mengubah lahan siapa adalah RLS per profil. Yang
+    dipisah pintu masuknya, dan `/host` memang sudah punya kerangka sendiri.
+
+49. **Titik bawaan pindah ke Jakarta** (18 Sep 2026), diminta pemiliknya,
+    menggantikan Waru/Aloha. Preset Sidoarjo dan Surabaya tidak dibuang, cuma
+    turun urutan.
+
+    **Konsekuensinya harus ditulis terang, karena ia tidak terlihat dari
+    kodenya:** selama belum ada satu pun lahan di Jakarta, pengunjung pertama
+    yang tidak menekan "Lokasiku" mendarat di hasil kosong, dan bagian "di
+    luar radius" pun tidak menolongnya, karena Sidoarjo 660 km dari Jakarta,
+    jauh di luar `RADIUS_LUAS_KM` yang 150 km.
+
+    Jadi urutan preset ini benar HANYA kalau Jakarta ikut diisi. Kalau
+    ternyata lahannya tetap terkumpul di Sidoarjo, yang harus diubah bukan
+    copy melainkan baris pertama `TITIK_PRESET`.
+
+
 ### Berikutnya
 
 Fokus rilis pertama: **mengumpulkan pemilik lahan dan pedagang**, bukan

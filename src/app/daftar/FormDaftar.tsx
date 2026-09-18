@@ -102,8 +102,8 @@ export default function FormDaftar() {
     // benar adalah menunggu orangnya membuka tautan, bukan menganggap sudah
     // masuk. Kalau konfirmasi dimatikan di dashboard, sesinya langsung ada.
     if (data.session) {
-      // Ke `/cari`, alasan sama seperti di `FormMasuk`.
-      router.replace("/cari");
+      // Ke halaman utama, alasan sama seperti di `FormMasuk`.
+      router.replace("/");
       router.refresh();
       return;
     }

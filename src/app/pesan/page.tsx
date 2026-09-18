@@ -55,7 +55,7 @@ export default async function HalamanPesan() {
             belum terjawab di halaman detailnya.
           </p>
           <Link
-            href="/cari"
+            href="/"
             className="mt-1 rounded-full bg-brand px-5 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-brand-dark"
           >
             Cari lahan

@@ -1,22 +1,38 @@
 /**
  * Titik awal pencarian dan pilihan filternya.
  *
- * Patokannya Sidoarjo dan Surabaya Selatan — wilayah tempat aplikasi ini
- * benar-benar akan diisi lebih dulu (diputuskan 7 September 2026, menggantikan
- * preset Malang yang berasal dari data contoh `02_seed.sql` dan sudah dibuang).
+ * **Bawaannya Jakarta sejak 18 September 2026**, diminta pemiliknya,
+ * menggantikan Waru/Aloha. Sidoarjo dan Surabaya TIDAK dibuang, cuma turun
+ * dari urutan pertama: lahan pertama aplikasi ini ada di sana dan pemiliknya
+ * bisa mendatanginya sendiri.
+ *
  * Preset bukan hiasan: ia satu-satunya cara orang memulai pencarian sebelum
  * memberi izin lokasi, jadi kota yang salah di sini berarti hasil kosong pada
- * kunjungan pertama.
+ * kunjungan pertama. Konsekuensinya sekarang harus ditulis terang: selama
+ * belum ada satu pun lahan di Jakarta, pengunjung pertama yang tidak menekan
+ * "Lokasiku" akan mendarat di hasil kosong, dan bagian "di luar radius" pun
+ * tidak menolongnya karena Sidoarjo 660 km dari sini, jauh di luar
+ * `RADIUS_LUAS_KM` yang 150 km.
  *
- * Bobotnya sengaja ke Sidoarjo, bukan dibagi rata dengan Surabaya. Kepadatan
- * yang membuat "1 km dari rumahmu" benar, dan satu wilayah yang terisi lebih
- * berguna daripada dua wilayah yang setengah-setengah.
+ * Jadi urutan ini benar HANYA kalau Jakarta ikut diisi. Kalau tidak, yang
+ * seharusnya diubah bukan copy melainkan baris pertama daftar di bawah.
  *
  * Koordinatnya diambil dari Nominatim, bukan ditebak.
  */
 export type Titik = { id: string; nama: string; lat: number; lng: number };
 
 export const TITIK_PRESET: Titik[] = [
+  // Jakarta
+  { id: "jakarta", nama: "Jakarta", lat: -6.2088, lng: 106.8456 },
+  { id: "jaksel", nama: "Jakarta Selatan", lat: -6.2615, lng: 106.8106 },
+  { id: "jaktim", nama: "Jakarta Timur", lat: -6.2250, lng: 106.9004 },
+  { id: "jakbar", nama: "Jakarta Barat", lat: -6.1683, lng: 106.7588 },
+  { id: "jakut", nama: "Jakarta Utara", lat: -6.1214, lng: 106.8740 },
+  { id: "jakpus", nama: "Jakarta Pusat", lat: -6.1805, lng: 106.8284 },
+  { id: "bekasi", nama: "Bekasi", lat: -6.2383, lng: 106.9756 },
+  { id: "depok", nama: "Depok", lat: -6.4025, lng: 106.7942 },
+  { id: "tangerang", nama: "Tangerang", lat: -6.1783, lng: 106.6319 },
+  // Sidoarjo dan Surabaya, tempat lahan pertamanya benar-benar ada
   { id: "waru", nama: "Waru / Aloha", lat: -7.3527, lng: 112.7294 },
   { id: "gedangan", nama: "Gedangan", lat: -7.389, lng: 112.7286 },
   { id: "sidoarjo", nama: "Kota Sidoarjo", lat: -7.454, lng: 112.6594 },
@@ -28,8 +44,8 @@ export const TITIK_PRESET: Titik[] = [
 export const TITIK_BAWAAN = TITIK_PRESET[0];
 
 /**
- * Radius dalam km. 5 km menutup satu kecamatan beserta tetangganya di
- * Sidoarjo — cukup untuk bawaan, dan masih terasa "dekat rumah".
+ * Radius dalam km. 5 km menutup satu kecamatan beserta tetangganya, cukup
+ * untuk bawaan, dan masih terasa "dekat rumah".
  */
 export const RADIUS_PILIHAN = [1, 3, 5, 10, 15];
 export const RADIUS_BAWAAN = 5;

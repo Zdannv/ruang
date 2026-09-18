@@ -11,6 +11,21 @@ import LencanaHeader, { LencanaKosong } from "@/components/LencanaHeader";
  * Server Component supaya keadaan masuk sudah benar pada render pertama. Kalau
  * sesinya dibaca di klien, tombol "Masuk" sempat berkedip muncul untuk orang
  * yang sebetulnya sudah masuk.
+ *
+ * **Satu akun untuk kedua sisi, bukan dua.** Ditanyakan 18 September 2026:
+ * apakah masuk sebagai pemilik lahan sebaiknya dipisah dari masuk sebagai
+ * pencari. Jawabannya tidak, dan alasannya orangnya sendiri: yang menyewakan
+ * halaman depannya bulan ini adalah orang yang bulan depan mencari lapak buat
+ * anaknya. Dua akun berarti ia punya dua email, dua kotak masuk chat, dan satu
+ * pesan yang masuk ke akun yang sedang tidak ia buka. Itu kerugian yang pasti.
+ *
+ * Yang dipisah PINTU MASUKNYA, bukan akunnya: tombol di bawah, dan seluruh
+ * `/host` yang punya kerangka sendiri tanpa header maupun navigasi publik.
+ * Pola yang sama dipakai OLX ("+ Jual"), Tokopedia, dan Airbnb.
+ *
+ * Dari sisi keamanan pemisahan akun juga tidak memberi apa-apa: yang menahan
+ * siapa boleh mengubah lahan siapa adalah RLS per profil, dan itu sudah
+ * berlaku sama saja apakah akunnya satu atau dua.
  */
 export default async function Header() {
   const sesi = await sesiSaya();
@@ -28,16 +43,26 @@ export default async function Header() {
             </span>
           </Link>
 
+          {/*
+            "Cari lahan" dibuang dari navigasi: sejak 18 September 2026 halaman
+            utamanya SENDIRI adalah halaman pencarian, jadi tautan itu menunjuk
+            ke tempat yang sama dengan lambang di sebelahnya. Dua tautan ke satu
+            halaman bukan kemudahan, ia pertanyaan "bedanya apa" yang tidak
+            dijawab layar.
+
+            Yang tersisa cuma pintu masuk pemilik lahan, dan ia dibuat MENONJOL
+            alih-alih jadi tautan teks biasa, mengikuti pola "+ Jual" di OLX.
+            Alasannya bukan tampilan: dua sisi pasar ini tidak datang dengan
+            niat yang sama beratnya. Pedagang datang sendiri lewat pencarian,
+            sedangkan pemilik lahan harus DISADARKAN bahwa halaman depannya
+            bisa disewakan, dan itu tidak terjadi lewat tautan abu-abu.
+
+            Akunnya tetap SATU, dan itu keputusan. Lihat catatan di bawah.
+          */}
           <nav className="hidden items-center gap-1 sm:flex">
             <Link
-              href="/cari"
-              className="rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-paper hover:text-ink"
-            >
-              Cari lahan
-            </Link>
-            <Link
               href="/host"
-              className="rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-paper hover:text-ink"
+              className="rounded-full px-3.5 py-2 text-sm font-semibold text-brand ring-1 ring-brand/30 transition-colors hover:bg-brand-soft"
             >
               Sewakan lahan
             </Link>

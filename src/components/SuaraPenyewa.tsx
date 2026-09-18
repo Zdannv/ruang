@@ -187,7 +187,7 @@ function Kosong() {
 
       <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
         <Link
-          href="/cari"
+          href="/"
           className="inline-block rounded-full bg-white px-6 py-3 text-sm font-semibold text-brand-dark transition-transform hover:-translate-y-0.5"
         >
           Lihat lahan yang tayang

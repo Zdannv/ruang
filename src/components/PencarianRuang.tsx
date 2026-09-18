@@ -145,7 +145,6 @@ export default function PencarianRuang() {
       return;
     }
     setGalatLokasi(null);
-    setTawarkanLokasi(false);
     navigator.geolocation.getCurrentPosition(
       (pos) =>
         ubah({
@@ -183,10 +182,6 @@ export default function PencarianRuang() {
   const [siapCari, setSiapCari] = useState(
     () => searchParams.has("lat") || searchParams.has("lng")
   );
-  // true hanya di keadaan "benar-benar tidak ada petunjuk": izinnya belum
-  // pernah diberikan, tidak ada titik yang diingat, DAN wilayah pendaftarannya
-  // tidak diketahui.
-  const [tawarkanLokasi, setTawarkanLokasi] = useState(false);
   /*
     Panel filter TERTUTUP secara bawaan, dan itu bukan selera.
 
@@ -232,7 +227,7 @@ export default function PencarianRuang() {
 
     izinLokasiSudahAda().then((ada) => {
       if (!hidup) return;
-      const tanpaLokasi = async (tawarkan: boolean) => {
+      const tanpaLokasi = async () => {
         const ingat = bacaTitik();
         if (ingat) {
           pakai(ingat);
@@ -245,12 +240,11 @@ export default function PencarianRuang() {
           pakai(profil);
           return;
         }
-        if (tawarkan) setTawarkanLokasi(true);
         setSiapCari(true);
       };
 
       if (!ada) {
-        void tanpaLokasi(true);
+        void tanpaLokasi();
         return;
       }
       navigator.geolocation.getCurrentPosition(
@@ -258,10 +252,8 @@ export default function PencarianRuang() {
         () => {
           // Izinnya ada tapi perangkatnya gagal membaca posisi — GPS mati,
           // atau di dalam gedung. Turun ke cadangan, bukan ke layar kosong.
-          // Tawarannya TIDAK dimunculkan di sini: izinnya sudah ada, jadi
-          // menawarkan "pakai lokasiku" cuma mengulang yang baru saja gagal.
           if (!hidup) return;
-          void tanpaLokasi(false);
+          void tanpaLokasi();
         },
         { timeout: 8000, maximumAge: 5 * 60 * 1000 }
       );
@@ -747,30 +739,15 @@ export default function PencarianRuang() {
               ke barisnya sendiri, satu baris terbuang untuk tombol kembar. */}
         </div>
 
-        {/* Peramban tidak boleh dimintai izin lokasi tanpa orangnya menekan
-            apa pun, dialog yang muncul sendiri diredam Chrome, dan
-            penolakannya melekat sehingga tombol "Lokasiku" pun tidak bisa lagi
-            bertanya. Jadi kunjungan pertama tetap butuh satu ketukan; yang
-            bisa diperbaiki adalah membuat ketukan itu terlihat, bukan
-            tersembunyi di antara kendali lain. Sesudahnya izinnya tersimpan di
-            peramban dan halaman ini memakainya sendiri. */}
-        {tawarkanLokasi && (
-          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl bg-brand-soft px-4 py-3">
-            <Crosshair className="h-4 w-4 shrink-0 text-brand-dark" />
-            <p className="min-w-0 flex-1 text-xs leading-relaxed text-brand-dark">
-              Hasil di bawah dihitung dari <strong>{TITIK_BAWAAN.nama}</strong>. Pakai
-              lokasimu sendiri supaya jaraknya benar, cukup sekali, kunjungan
-              berikutnya otomatis.
-            </p>
-            <button
-              type="button"
-              onClick={pakaiLokasiSaya}
-              className="cursor-pointer rounded-full bg-brand px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-brand-dark"
-            >
-              Pakai lokasiku
-            </button>
-          </div>
-        )}
+        {/* Tawaran "Pakai lokasiku" yang berupa pita penuh DIBUANG
+            18 September 2026, atas permintaan pemiliknya: titik yang sedang
+            dipakai sudah tertulis di kendali tepat di atasnya, jadi pita itu
+            mengulanginya dengan kalimat panjang. Di layar 375px ia memakan
+            sekitar 120px, dan yang terdorong ke bawahnya persis barisan
+            kategori dan hasil pencarian.
+
+            Tombol "Lokasiku" tetap ada di baris kendali, jadi tidak ada jalan
+            yang hilang. Yang hilang cuma pengulangannya. */}
 
         {/* Koordinat mentah dulu dicetak di sini ("Memakai lokasimu: -7.3013,
             112.7834"). Itu isi kepala pengembang, bukan keterangan untuk
@@ -1050,7 +1027,7 @@ export default function PencarianRuang() {
             mencari, dan tetap menjawab "terus saya ngapain sekarang" waktu
             radiusnya kosong.
 
-            Semuanya tautan ke `/cari` dengan parameter yang memang sudah
+            Semuanya tautan ke halaman ini sendiri dengan parameter yang memang sudah
             ditangani halaman ini. Tidak ada satu pun yang menjanjikan
             penyaring yang belum ada. */}
         <section className="mt-12 border-t border-line pt-8">
@@ -1066,7 +1043,7 @@ export default function PencarianRuang() {
             {PINTASAN.map((p) => (
               <Link
                 key={p.label}
-                href={`/cari?lat=${lat}&lng=${lng}&radius=${radiusKm}&${p.param}`}
+                href={`/?lat=${lat}&lng=${lng}&radius=${radiusKm}&${p.param}`}
                 className="flex items-center gap-2 rounded-full bg-card px-3.5 py-2.5 text-xs font-medium text-ink ring-1 ring-line transition-colors hover:bg-brand-soft hover:ring-brand/30 sm:inline-flex sm:px-4 sm:text-sm"
               >
                 <p.ikon className="h-4 w-4 shrink-0 text-brand" />

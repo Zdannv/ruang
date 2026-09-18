@@ -46,7 +46,7 @@ export default function manifest(): MetadataRoute.Manifest {
       {
         name: "Cari lahan",
         short_name: "Cari",
-        url: "/cari",
+        url: "/",
         icons: [{ src: "/icon-192.png", sizes: "192x192" }],
       },
       {

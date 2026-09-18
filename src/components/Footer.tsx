@@ -30,7 +30,7 @@ export default function Footer() {
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">
                 Menyewa
               </p>
-              <Link href="/cari" className="block text-ink hover:text-brand">
+              <Link href="/" className="block text-ink hover:text-brand">
                 Cari lahan
               </Link>
               <Link href="/permintaan" className="block text-ink hover:text-brand">

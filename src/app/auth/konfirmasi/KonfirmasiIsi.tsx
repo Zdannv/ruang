@@ -66,7 +66,7 @@ export default function KonfirmasiIsi() {
         <div className="flex flex-col items-center gap-4 text-center">
           <CircleCheck className="h-10 w-10 text-good" />
           <Link
-            href="/cari"
+            href="/"
             className="rounded-full bg-brand px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
           >
             Mulai cari ruang

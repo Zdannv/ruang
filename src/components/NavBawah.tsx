@@ -28,13 +28,13 @@ export default function NavBawah({ masuk }: { masuk: boolean }) {
   */
   const tampil = masuk
     ? [
-        { href: "/cari", label: "Cari", ikon: Search },
+        { href: "/", label: "Cari", ikon: Search },
         { href: "/pesan", label: "Pesan", ikon: MessageCircle },
         { href: "/host", label: "Sewakan", ikon: House },
         { href: "/profil", label: "Akun", ikon: UserRound },
       ]
     : [
-        { href: "/cari", label: "Cari", ikon: Search },
+        { href: "/", label: "Cari", ikon: Search },
         { href: "/pesan", label: "Pesan", ikon: MessageCircle },
         { href: "/host", label: "Sewakan", ikon: House },
         { href: "/masuk", label: "Masuk", ikon: UserRound },

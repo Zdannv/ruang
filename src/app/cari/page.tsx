@@ -1,75 +1,37 @@
-import { Suspense } from "react";
-import { supabaseSiap } from "@/lib/supabase/env";
-import PencarianRuang from "@/components/PencarianRuang";
-
-export const metadata = {
-  title: "Cari lahan usaha · Cari Ruang",
-  description:
-    "Cari lahan pinggir jalan buat jualan: halaman depan rumah, teras, lahan " +
-    "kosong, dan kios. Saring per jenis usaha, lebar muka jalan, dan harga.",
-};
-
-/** Halaman pencarian. Beranda (`/`) adalah landing page yang menaut ke sini. */
-export default function HalamanCari() {
-  if (!supabaseSiap) return <PetunjukPemasangan />;
-
-  return (
-    <Suspense fallback={<Kerangka />}>
-      <PencarianRuang />
-    </Suspense>
-  );
-}
+import { redirect, permanentRedirect } from "next/navigation";
 
 /**
- * Tanpa kredensial Supabase, layar ini yang muncul — bukan layar putih atau
- * error jaringan. Demo ini akan dibuka di laptop lain sebelum presentasi.
- */
-function PetunjukPemasangan() {
-  return (
-    <div className="mx-auto w-full max-w-xl px-4 py-16">
-      <h1 className="text-xl font-bold">Ruang belum tersambung ke Supabase</h1>
-      <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-muted">
-        <li>
-          Salin <code className="font-mono text-ink">.env.example</code> menjadi{" "}
-          <code className="font-mono text-ink">.env.local</code>.
-        </li>
-        <li>
-          Isi <code className="font-mono text-ink">NEXT_PUBLIC_SUPABASE_URL</code> dan{" "}
-          <code className="font-mono text-ink">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> dari
-          Project Settings di Supabase. Wajib anon key, bukan service role.
-        </li>
-        <li>
-          Pastikan seluruh migrasi di <code className="font-mono text-ink">supabase/migrations/</code>{" "}
-          sudah dijalankan berurutan. Lihat SETUP.md.
-        </li>
-        <li>Jalankan ulang server pengembangan.</li>
-      </ol>
-    </div>
-  );
-}
-
-/**
- * Kerangka yang tampil sampai `PencarianRuang` terhidrasi — ia memakai
- * `useSearchParams()`, jadi di server ia selalu tertahan Suspense.
+ * `/cari` digabung ke `/` pada 18 September 2026.
  *
- * Bentuknya harus menyerupai halaman jadinya: bilah kendali dulu, lalu kisi
- * kartu. Versi sebelumnya menaruh bidang gradien biru setinggi 420px di sini,
- * sisa dari tampilan yang sudah diganti 4 September 2026 — jadi setiap kali
- * `/cari` dibuka, hero yang sudah dihapus itu berkelip sekejap lebih dulu.
- * Ia juga menulis sendiri `-mt-[68px]`, angka yang sudah salah sejak tinggi
- * header diukur ulang dan dipindah ke `--tinggi-header`.
+ * Rutenya TIDAK dihapus begitu saja, dan itu penting: alamat ini sudah tersebar
+ * di luar kendali kita. Ia ada di peta situs yang sudah dikirim ke mesin
+ * pencari, di pintasan PWA yang sudah terpasang di layar utama orang, dan di
+ * tautan yang sudah pernah dibagikan. Menghapusnya berarti semua itu mendarat
+ * di 404.
+ *
+ * **Parameternya ikut dibawa.** Tautan seperti
+ * `/cari?usaha=makanan&radius=5` adalah hasil pencarian yang sudah disaring
+ * seseorang, dan mengantarkannya ke halaman depan tanpa penyaringnya sama saja
+ * dengan membuangnya. Halaman utama membaca parameter yang sama persis.
+ *
+ * `permanentRedirect` (308) supaya mesin pencari memindahkan peringkat yang
+ * sudah terkumpul ke alamat barunya, bukan menyimpan dua alamat untuk satu
+ * halaman. Yang berparameter dibiarkan 307: kombinasinya tak terbatas dan
+ * tidak ada gunanya diingat selamanya.
  */
-function Kerangka() {
-  return (
-    <div className="mx-auto w-full max-w-6xl px-4 pt-8 sm:px-6 lg:px-8">
-      <div className="h-7 w-56 max-w-full animate-pulse rounded-lg bg-line" />
-      <div className="mt-6 h-40 animate-pulse rounded-2xl bg-card ring-1 ring-line" />
-      <div className="mt-8 h-7 w-40 max-w-full animate-pulse rounded-lg bg-line" />
-      <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-80 animate-pulse rounded-2xl bg-card ring-1 ring-line" />
-        ))}
-      </div>
-    </div>
-  );
+export default async function CariPindah({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const kueri = new URLSearchParams();
+  for (const [kunci, nilai] of Object.entries(params)) {
+    if (typeof nilai === "string") kueri.set(kunci, nilai);
+    else if (Array.isArray(nilai) && nilai[0]) kueri.set(kunci, nilai[0]);
+  }
+
+  const teks = kueri.toString();
+  if (teks) redirect(`/?${teks}`);
+  permanentRedirect("/");
 }

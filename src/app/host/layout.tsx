@@ -59,7 +59,7 @@ export default async function TataLetakHost({
               <span className="sm:hidden">Pasang</span>
             </Link>
             <Link
-              href="/cari"
+              href="/"
               className="rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-paper hover:text-ink"
             >
               Ke aplikasi

@@ -7,7 +7,6 @@ export const revalidate = 3600;
 
 const STATIS: { path: string; prioritas: number; ubah: "daily" | "weekly" | "monthly" }[] = [
   { path: "/", prioritas: 1, ubah: "daily" },
-  { path: "/cari", prioritas: 0.9, ubah: "daily" },
   { path: "/permintaan", prioritas: 0.6, ubah: "weekly" },
   { path: "/masuk", prioritas: 0.3, ubah: "monthly" },
   { path: "/daftar", prioritas: 0.4, ubah: "monthly" },
@@ -21,7 +20,8 @@ const STATIS: { path: string; prioritas: number; ubah: "daily" | "weekly" | "mon
  * **Halaman lahan yang paling penting ada di sini, bukan halaman depannya.**
  * Orang tidak mencari "aplikasi sewa lahan"; ia mencari "sewa tempat jualan
  * Waru" dan yang menjawabnya adalah listing itu sendiri. Tanpa peta situs,
- * halaman lahan cuma bisa ditemukan lewat `/cari`, yang isinya dirender di
+ * halaman lahan cuma bisa ditemukan lewat pencarian di halaman utama, yang
+ * isinya dirender di
  * peramban dan tidak menyediakan satu pun tautan untuk diikuti perayap.
  *
  * Diambil dari `ruang_publik`, jadi yang masuk hanya yang statusnya tayang,

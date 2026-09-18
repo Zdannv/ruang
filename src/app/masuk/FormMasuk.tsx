@@ -22,7 +22,8 @@ export default function FormMasuk() {
   const [galat, setGalat] = useState<string | null>(searchParams.get("galat"));
 
   /*
-    Setelah masuk, tujuannya `/cari` — bukan halaman depan.
+    Setelah masuk, tujuannya halaman utama, yang sejak 18 September 2026
+    sudah memuat pencariannya sendiri.
 
     Halaman depan tugasnya meyakinkan orang yang belum kenal aplikasinya.
     Orang yang baru saja masuk sudah lewat tahap itu; mendaratkannya di sana
@@ -30,7 +31,7 @@ export default function FormMasuk() {
     hal yang ia datangi. `?lanjut=` tetap menang, karena itu tempat yang
     memang ia tuju sebelum diminta masuk.
   */
-  const lanjut = searchParams.get("lanjut") ?? "/cari";
+  const lanjut = searchParams.get("lanjut") ?? "/";
 
   const masuk = async (e: React.FormEvent) => {
     e.preventDefault();
