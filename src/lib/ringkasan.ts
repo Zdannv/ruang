@@ -64,13 +64,30 @@ export async function getRingkasanPasar(db: SupabaseClient): Promise<RingkasanPa
   supaya pengunjung tahu bentuk isinya sebelum menekan apa pun.
 */
 
+/** Hasil `ruangContoh`, beserta wilayah mana yang akhirnya dipakai. */
+export type ContohLahan = {
+  daftar: RuangDenganFoto[];
+  /** Nama wilayah yang cocok, atau null kalau isinya dari seluruh kota. */
+  wilayah: string | null;
+};
+
 /**
  * Beberapa lahan tayang untuk dipamerkan di halaman depan.
  *
- * Diambil acak, dan itu memang keputusan sementara: nanti pilihannya dikelola
- * dari CMS lewat kolom `unggulan`. Sampai itu ada, acak lebih baik daripada
- * "terbaru" — dengan lima belas lahan pertama, "terbaru" berarti halaman
- * depan menampilkan tiga lahan yang sama sepanjang minggu.
+ * **Diutamakan yang sewilayah dengan pengunjungnya**, turun bertahap:
+ * kelurahan, lalu kecamatan, lalu tanpa penyaring sama sekali. Wilayahnya
+ * dari profil, yang memang sudah ditanyakan saat mendaftar, jadi tidak ada
+ * izin lokasi yang perlu diminta dan tidak ada kueri tambahan.
+ *
+ * Turun bertahap itu yang penting: dengan lima belas lahan pertama, sebagian
+ * besar kelurahan masih kosong, dan halaman depan yang kosong jauh lebih
+ * merugikan daripada halaman depan yang isinya sekecamatan.
+ *
+ * Yang tersisa setelah penyaringnya habis diambil acak, dan itu memang
+ * keputusan sementara: nanti pilihannya dikelola dari CMS lewat kolom
+ * `unggulan`. Sampai itu ada, acak lebih baik daripada "terbaru", karena
+ * "terbaru" berarti halaman depan menampilkan lahan yang sama sepanjang
+ * minggu.
  *
  * Diacaknya di sini, bukan di database: PostgREST tidak punya `order by
  * random()`, dan menambah fungsi RPC demi ini berarti satu migrasi untuk
@@ -82,21 +99,45 @@ export async function getRingkasanPasar(db: SupabaseClient): Promise<RingkasanPa
  */
 export async function ruangContoh(
   db: SupabaseClient,
-  jumlah = 4
-): Promise<RuangDenganFoto[]> {
+  jumlah = 4,
+  wilayah?: { kelurahan?: string | null; kecamatan?: string | null }
+): Promise<ContohLahan> {
   try {
-    const { data, error } = await db
-      .from("ruang_publik")
-      .select(
-        "id, judul, tipe, kecamatan, kota, lat_publik, lng_publik, " +
-          "luas_m2, volume_m3, harga_bulanan, akses_masuk, riwayat_banjir, " +
-          "penguncian, kategori_diterima"
-      )
-      .order("dibuat_pada", { ascending: false })
-      // Ambil sekumpulan dulu, baru diacak — supaya yang tampil tidak selalu
-      // lahan terlama di database.
-      .limit(24);
-    if (error || !data || data.length === 0) return [];
+    const kolom =
+      "id, judul, tipe, kelurahan, kecamatan, kota, lat_publik, lng_publik, " +
+      "luas_m2, lebar_m, volume_m3, harga_bulanan, akses_masuk, riwayat_banjir, " +
+      "penguncian, kategori_diterima";
+
+    // Dicoba berurutan sampai ada yang berisi. Yang terakhir tanpa penyaring,
+    // jadi selalu ada jalan keluar.
+    const percobaan: { kolom: "kelurahan" | "kecamatan" | null; nilai: string | null }[] = [
+      { kolom: "kelurahan", nilai: wilayah?.kelurahan?.trim() || null },
+      { kolom: "kecamatan", nilai: wilayah?.kecamatan?.trim() || null },
+      { kolom: null, nilai: null },
+    ];
+
+    let data: unknown[] | null = null;
+    let cocok: string | null = null;
+    for (const c of percobaan) {
+      if (c.kolom && !c.nilai) continue;
+      const kueri = db
+        .from("ruang_publik")
+        .select(kolom)
+        .order("dibuat_pada", { ascending: false })
+        // Ambil sekumpulan dulu, baru diacak, supaya yang tampil tidak selalu
+        // lahan terlama di database.
+        .limit(24);
+      const { data: hasil, error } = c.kolom
+        ? await kueri.eq(c.kolom, c.nilai as string)
+        : await kueri;
+      if (error) return { daftar: [], wilayah: null };
+      if (hasil && hasil.length > 0) {
+        data = hasil;
+        cocok = c.nilai;
+        break;
+      }
+    }
+    if (!data || data.length === 0) return { daftar: [], wilayah: null };
 
     const acak = [...(data as unknown as Omit<RuangDenganFoto, "foto" | "jarak_km">[])];
     for (let i = acak.length - 1; i > 0; i -= 1) {
@@ -106,15 +147,19 @@ export async function ruangContoh(
     const dipilih = acak.slice(0, jumlah);
 
     const foto = await fotoPertama(db, dipilih.map((r) => r.id));
-    return dipilih.map((r) => ({
-      ...r,
-      luas_m2: r.luas_m2 ?? 0,
-      kategori_diterima: r.kategori_diterima ?? [],
-      jarak_km: 0,
-      foto: foto.get(r.id) ?? null,
-    })) as RuangDenganFoto[];
+    return {
+      daftar: dipilih.map((r) => ({
+        ...r,
+        luas_m2: r.luas_m2 ?? 0,
+        lebar_m: r.lebar_m ?? 0,
+        kategori_diterima: r.kategori_diterima ?? [],
+        jarak_km: 0,
+        foto: foto.get(r.id) ?? null,
+      })) as RuangDenganFoto[],
+      wilayah: cocok,
+    };
   } catch {
-    return [];
+    return { daftar: [], wilayah: null };
   }
 }
 export type UlasanSorotan = {

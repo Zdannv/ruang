@@ -77,7 +77,7 @@ export default function DaftarRuangBaru({ hostId }: { hostId: string }) {
               nanti; semua yang di atas sudah tersimpan.
             </p>
             <Link
-              href={`/host/ruang/${ruangId}`}
+              href={`/host/lahan/${ruangId}`}
               className="mt-4 inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
             >
               Selesai, buka halaman kelola

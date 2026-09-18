@@ -22,7 +22,6 @@ import type {
   TipeRuang,
 } from "@/lib/ruang";
 import { AKHIRAN_KECIL } from "@/lib/ruang";
-import type { StatusVerifikasi } from "@/lib/verifikasi";
 
 export type StatusRuang = "draf" | "moderasi" | "tayang" | "ditangguhkan";
 
@@ -119,12 +118,6 @@ export type RuangSaya = Omit<
   jumlah_foto: number;
   permintaan_baru: number;
   sedang_terpakai: number;
-  /* Migrasi 20. Kolomnya tidak pernah bisa ditulis dari sini — lihat
-     `src/lib/verifikasi.ts`. */
-  verifikasi: StatusVerifikasi;
-  verifikasi_diajukan_pada: string | null;
-  verifikasi_pada: string | null;
-  verifikasi_catatan: string | null;
 };
 
 export async function daftarRuangSaya(db: SupabaseClient): Promise<RuangSaya[]> {

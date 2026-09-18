@@ -8,6 +8,7 @@ import SuaraPenyewa from "@/components/SuaraPenyewa";
 import { IKON_TIPE } from "@/components/IkonTipe";
 import { LABEL_TIPE } from "@/lib/label";
 import { getRingkasanPasar, ruangContoh, ulasanSorotan } from "@/lib/ringkasan";
+import { sesiSaya } from "@/lib/auth";
 import { klienServer } from "@/lib/supabase/server";
 import { supabaseSiap } from "@/lib/supabase/env";
 import type { TipeRuang } from "@/lib/ruang";
@@ -147,12 +148,22 @@ const LANGKAH = [
 
 export default async function Beranda() {
   const db = supabaseSiap ? await klienServer() : null;
+  const sesi = supabaseSiap ? await sesiSaya() : null;
   // Sorotan tidak lagi mengambil foto ruang dari database — lihat
   // `SorotanPromo`. Satu kueri lebih sedikit di jalur kritis halaman depan.
   const [ringkas, contoh, ulasan] = db
     ? await Promise.all([
         getRingkasanPasar(db),
-        ruangContoh(db, 4),
+        /*
+          Wilayah pengunjungnya dari profil, yang memang sudah ditanyakan saat
+          mendaftar. Tidak ada izin lokasi yang diminta di halaman depan:
+          dialog izin yang muncul tanpa interaksi diredam Chrome, dan
+          penolakannya melekat (lihat nomor 24).
+        */
+        ruangContoh(db, 4, {
+          kelurahan: sesi?.profil?.kelurahan,
+          kecamatan: sesi?.profil?.kecamatan,
+        }),
         ulasanSorotan(db, 6),
       ])
     : [
@@ -163,7 +174,7 @@ export default async function Beranda() {
           jumlahPencari: 0,
           kecamatanTeratas: [],
         },
-        [],
+        { daftar: [], wilayah: null },
         { daftar: [], rata: null, jumlahTotal: 0 },
       ];
 
@@ -206,7 +217,7 @@ export default async function Beranda() {
                 Cari lahan
               </Link>
               <Link
-                href="/host/ruang/baru"
+                href="/host/lahan/baru"
                 className="inline-flex items-center gap-2 rounded-full bg-card px-6 py-3 text-sm font-semibold text-ink ring-1 ring-line transition-colors hover:bg-paper"
               >
                 Sewakan lahanku
@@ -235,11 +246,11 @@ export default async function Beranda() {
           Disembunyikan seluruhnya kalau belum ada isinya: bagian berjudul
           "Contoh lahan yang tayang" dengan nol kartu di bawahnya lebih
           merugikan daripada tidak ada bagiannya sama sekali. */}
-      {contoh.length > 0 && (
+      {contoh.daftar.length > 0 && (
         <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <h2 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-              Yang sedang tayang
+              {contoh.wilayah ? `Yang tayang di ${contoh.wilayah}` : "Yang sedang tayang"}
             </h2>
             <Link
               href="/cari"
@@ -251,7 +262,7 @@ export default async function Beranda() {
           </div>
 
           <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-            {contoh.map((r) => (
+            {contoh.daftar.map((r) => (
               /* `tanpaJarak`: halaman depan tidak tahu di mana pengunjungnya,
                  dan "0 m" adalah angka yang salah, bukan yang kosong. */
               <KartuRuang key={r.id} ruang={r} tanpaJarak />
@@ -460,7 +471,7 @@ export default async function Beranda() {
 
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
-                href="/host/ruang/baru"
+                href="/host/lahan/baru"
                 className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-ink transition-transform hover:-translate-y-0.5"
               >
                 Sewakan lahanku

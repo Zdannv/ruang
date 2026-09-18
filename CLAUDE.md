@@ -1192,6 +1192,76 @@ Kerjakan berurutan. Jangan lompat.
     pun galat di konsol. Sekarang `getDetailRuang` mundur ke `lat_publik`/
     `lng_publik`, yang memang selalu ada.
 
+45. **Verifikasi dibuang, rekomendasi sewilayah, dan area pemilik sendiri**
+    (18 Sep 2026). Lihat `22_statistik.sql`.
+
+    **Verifikasi petugas (nomor 40) dibuang dari layar.** Alasannya satu
+    kalimat dari pemiliknya, dan tidak terbantahkan: belum ada karyawan
+    lapangan yang bisa datang memeriksa. Lencana "terverifikasi" tanpa siapa
+    pun di belakangnya adalah persis jenis kebohongan yang dilarang di bagian
+    atas berkas ini — cuma lebih meyakinkan, karena terlihat institusional.
+
+    Yang dibuang: `/admin/verifikasi`, `KelolaVerifikasi`, lencana di kartu
+    dan halaman detail, tautan petugas di header, dan kolom `admin` dari
+    `ProfilSaya`. Tabel dan fungsinya di migrasi 20 **tetap ada**, alasan yang
+    sama dengan nomor 43: ini penundaan, bukan pembatalan, dan migrasi
+    penghapus kolom tidak bisa dibatalkan.
+
+    Semua orang tetap bebas memasang listing. Tidak pernah ada moderasi.
+
+    **Halaman depan mendahulukan lahan sewilayah pengunjungnya**, turun
+    bertahap: kelurahan → kecamatan → tanpa penyaring. Wilayahnya dari profil,
+    yang memang sudah ditanyakan saat mendaftar, jadi tidak ada izin lokasi
+    yang diminta di halaman depan (lihat nomor 24 kenapa itu penting).
+
+    Turun bertahapnya yang menentukan: dengan lima belas lahan pertama
+    sebagian besar kelurahan masih kosong, dan halaman depan yang kosong jauh
+    lebih merugikan daripada halaman depan yang isinya sekecamatan. Judulnya
+    ikut menyebut wilayah yang akhirnya dipakai, supaya tidak ada yang
+    mengira "Yang tayang di Waru" berarti cuma itu isinya.
+
+    **Area pemilik lahan dipisah**, `/host` dengan kerangkanya sendiri:
+    header gelap berlencana "Pemilik", bilah samping, tanpa header publik,
+    footer, maupun navigasi bawah. Yang membuka `/cari` sedang melihat-lihat;
+    yang membuka `/host` sedang bekerja. Rutenya ikut dirapikan —
+    `/host` (Ringkasan), `/host/lahan`, `/host/lahan/[id]`,
+    `/host/lahan/baru`.
+
+    Penyembunyian kerangka publiknya lewat `TanpaDiHost`, komponen klien yang
+    membaca pathname — **bukan** route group `(publik)`, yang berarti
+    memindahkan lima belas direktori rute demi satu perbedaan tampilan.
+    Isinya tetap dirender server dan dioper sebagai `children`, dan
+    `sesiSaya()` dibungkus `cache()` per request, jadi header yang tidak jadi
+    tampil tidak menambah satu pun kueri.
+
+    **Statistik: tiga angka, dan ketiganya peristiwa yang benar-benar
+    terjadi** — listing dibuka, nomor dilihat, chat dimulai. Tidak ada
+    "impresi" dan tidak ada jangkauan perkiraan; angka karangan di dasbor
+    sama saja dengan ulasan karangan, hanya saja terlihat lebih teknis.
+
+    Empat keputusan di baliknya:
+
+    1. **Agregat harian, bukan satu baris per kunjungan.** Satu baris per
+       kunjungan berarti tabel yang tumbuh selamanya untuk data yang cuma
+       dibaca sebagai jumlah per hari.
+    2. **Kunjungan pemiliknya sendiri tidak dihitung.** Pemilik yang membuka
+       listingnya sepuluh kali sehari untuk memeriksa fotonya akan melihat
+       angkanya naik sendiri, lalu berhenti memercayainya sama sekali.
+    3. **Pencatatnya dipanggil dari server, dan tabelnya tanpa policy sama
+       sekali.** Kalau bisa dipanggil peramban, satu perulangan `fetch`
+       menaikkan hitungannya seribu dalam semenit, dan angka yang bisa
+       dikarang pemiliknya sendiri lebih buruk daripada tidak ada angka.
+    4. **Kunjungan unik TIDAK dihitung, dan layar mengatakannya**: "satu
+       orang yang membuka listingmu tiga kali terhitung tiga". Menghitung
+       unik butuh penanda per peramban, dan penanda itu punya harganya
+       sendiri.
+
+    Grafiknya SVG yang disusun sendiri, bukan pustaka: satu deret tanpa sumbu,
+    tanpa tooltip, tanpa zoom. Pustaka grafik mana pun berarti puluhan
+    kilobyte JavaScript di halaman yang isinya tiga angka. Hari kosong diisi
+    nol **di layar**, bukan di database — hanya layar yang tahu rentang mana
+    yang sedang digambar.
+
 ### Berikutnya
 
 Fokus rilis pertama: **mengumpulkan pemilik lahan dan pedagang**, bukan

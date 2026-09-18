@@ -53,7 +53,7 @@ export default function Footer() {
               <Link href="/host" className="block text-ink hover:text-brand">
                 Dasbor host
               </Link>
-              <Link href="/host/ruang/baru" className="block text-ink hover:text-brand">
+              <Link href="/host/lahan/baru" className="block text-ink hover:text-brand">
                 Sewakan lahan
               </Link>
             </div>

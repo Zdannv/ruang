@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, MessageCircle } from "lucide-react";
 import { klienBrowser } from "@/lib/supabase/browser";
 import { mulaiPercakapan } from "@/lib/percakapan";
+import { catatStatistik } from "@/lib/kontak";
 
 /**
  * Membuka percakapan dengan pemilik dari halaman detail lahan.
@@ -29,7 +30,11 @@ export default function TanyaHost({
     setProses(true);
     setGalat(null);
     try {
-      const id = await mulaiPercakapan(klienBrowser(), ruangId);
+      const db = klienBrowser();
+      const id = await mulaiPercakapan(db, ruangId);
+      // Dicatat SETELAH percakapannya benar-benar terbuka, jadi yang terhitung
+      // cuma chat yang jadi. Galatnya ditelan di `catatStatistik`.
+      await catatStatistik(db, ruangId, "chat");
       router.push(`/pesan/${id}`);
     } catch (e: unknown) {
       setProses(false);

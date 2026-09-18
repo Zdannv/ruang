@@ -1,24 +1,15 @@
-/**
- * Kerangka saat halaman ini sedang disiapkan server.
- *
- * Tanpa berkas ini, menekan tautan tidak menghasilkan apa-apa di layar sampai
- * seluruh kueri servernya selesai — dan di situlah rasa "ada jeda" muncul.
- * Dengan kerangka, perpindahan halaman terasa langsung: bentuknya tampil
- * seketika, isinya menyusul.
- */
-
+/** Kerangka; setiap rute punya satu, lihat aturan region di CLAUDE.md. */
 export default function Memuat() {
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
-      <div className="h-8 w-56 max-w-full animate-pulse rounded-lg bg-line" />
-      <div className="mt-6 space-y-3">
+    <>
+      <div className="h-8 w-40 animate-pulse rounded-lg bg-line" />
+      <div className="mt-5 grid grid-cols-3 gap-3 sm:gap-4">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-24 animate-pulse rounded-2xl border border-line bg-card"
-          />
+          <div key={i} className="h-28 animate-pulse rounded-2xl bg-card ring-1 ring-line" />
         ))}
       </div>
-    </div>
+      <div className="mt-4 h-40 animate-pulse rounded-2xl bg-card ring-1 ring-line" />
+      <div className="mt-8 h-48 animate-pulse rounded-2xl bg-card ring-1 ring-line" />
+    </>
   );
 }

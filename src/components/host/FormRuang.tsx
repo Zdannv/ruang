@@ -317,7 +317,7 @@ export default function FormRuang({
           // Di sini `kirim` sengaja dibiarkan menyala: halamannya benar-benar
           // berpindah, dan pemintalnya adalah satu-satunya tanda bahwa
           // perpindahan itu sedang berjalan.
-          router.replace(`/host/ruang/${id}`);
+          router.replace(`/host/lahan/${id}`);
           router.refresh();
         }
       }

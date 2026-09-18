@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Sewakan lahan · Cari Ruang" };
 
 export default async function RuangBaru() {
   const sesi = await sesiSaya();
-  if (!sesi) redirect("/masuk?lanjut=/host/ruang/baru");
+  if (!sesi) redirect("/masuk?lanjut=/host/lahan/baru");
   if (!sesi.profil) redirect("/host");
 
   return (

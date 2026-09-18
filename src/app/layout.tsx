@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NavBawah from "@/components/NavBawah";
+import TanpaDiHost from "@/components/TanpaDiHost";
 import DaftarSW from "@/components/DaftarSW";
 import { sesiSaya } from "@/lib/auth";
 
@@ -58,11 +59,15 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} ${serif.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans">
-        <Header />
+        <TanpaDiHost>
+          <Header />
+        </TanpaDiHost>
         {/* Ruang bawah untuk bilah navigasi mobile yang melayang di atas isi. */}
         <main className="flex-1 pb-16 sm:pb-0">{children}</main>
-        <Footer />
-        <NavBawah masuk={sesi !== null} />
+        <TanpaDiHost>
+          <Footer />
+          <NavBawah masuk={sesi !== null} />
+        </TanpaDiHost>
         <DaftarSW />
       </body>
     </html>

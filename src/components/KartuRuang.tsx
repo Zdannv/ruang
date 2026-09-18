@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BadgeCheck, MapPin, TriangleAlert } from "lucide-react";
+import { MapPin, TriangleAlert } from "lucide-react";
 import { IKON_TIPE } from "@/components/IkonTipe";
 import { sudahDiperkecil, type RuangDenganFoto } from "@/lib/ruang";
 import {
@@ -99,19 +99,6 @@ export default function KartuRuang({
           {LABEL_TIPE[ruang.tipe]}
         </span>
 
-        {/* Lencana verifikasi di kanan atas — sisi berlawanan dari lencana
-            tipe, karena keduanya bisa muncul bersamaan dan di kartu selebar
-            166px tidak ada ruang untuk berdampingan. Ikon saja tanpa teks di
-            layar telepon, dengan alasan yang sama. */}
-        {ruang.tempat_terverifikasi && (
-          <span
-            title="Petugas sudah datang dan mencocokkan keterangannya"
-            className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-good px-1.5 py-0.5 text-[11px] font-semibold text-white shadow-sm sm:right-3 sm:top-3 sm:px-2.5 sm:py-1"
-          >
-            <BadgeCheck className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Terverifikasi</span>
-          </span>
-        )}
 
         {/* Riwayat banjir naik ke atas foto: di pinggir jalan Sidoarjo ia
             pertanyaan pertama orang, bukan detail teknis, dan di kartu dua

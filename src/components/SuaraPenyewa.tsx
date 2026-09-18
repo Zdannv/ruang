@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BadgeCheck, ClipboardList, MapPin, Star } from "lucide-react";
+import { ClipboardList, MapPin, MapPinned, Star } from "lucide-react";
 import type { UlasanSorotan } from "@/lib/ringkasan";
 
 /**
@@ -21,7 +21,7 @@ import type { UlasanSorotan } from "@/lib/ringkasan";
  * dibuang (18 Sep 2026) tidak ada satu pun ulasan yang bisa masuk. Jadi
  * keadaan kosong ini bukan sementara, ia satu-satunya keadaan yang ada, dan
  * kalimatnya menyebut itu apa adanya. Yang menggantikannya sebagai alasan
- * percaya: verifikasi petugas, alamat bertahap, dan jejak chat.
+ * percaya: peta dan alamat di listing, dan jejak chat yang tidak bisa diubah.
  */
 export default function SuaraPenyewa({
   ulasan,
@@ -47,9 +47,9 @@ export default function SuaraPenyewa({
 
 const JAMINAN = [
   {
-    ikon: BadgeCheck,
-    judul: "Lahan bisa diverifikasi",
-    isi: "Pemilik boleh minta petugas kami datang. Yang lolos dapat lencana Terverifikasi: keterangannya cocok dengan keadaan di lokasi hari itu.",
+    ikon: MapPinned,
+    judul: "Lokasinya di peta",
+    isi: "Tiap listing punya peta dan tautan ke Google Maps, jadi kamu bisa cek dulu jalannya seramai apa sebelum berangkat.",
   },
   {
     ikon: ClipboardList,
