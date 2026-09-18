@@ -15,26 +15,42 @@
 --  penyaring jenis usaha. Jadi keduanya tidak cuma tidak berguna, mereka
 --  memang tidak bisa dipakai.
 --
---  URUTANNYA BUKAN SELERA. `pemesanan.ruang_id` adalah satu-satunya rujukan
---  ke `ruang` yang TIDAK cascade (lihat 01_schema.sql baris 107), jadi
---  menghapus ruangnya lebih dulu akan ditolak Postgres kalau kebetulan ada
---  barisnya. Sisanya (foto, video, jendela akses, percakapan, statistik)
---  ikut terhapus sendiri.
+--  CARA MENJALANKANNYA: DUA LANGKAH, BUKAN SATU.
 --
---  Jalankan di SQL Editor Supabase. Satu transaksi: kalau ada yang gagal,
---  tidak ada yang terhapus separuh.
+--  SQL Editor Supabase menjalankan seluruh isi editor sekaligus dan cuma
+--  menampilkan hasil pernyataan terakhir. Jadi `select` pemeriksa yang
+--  ditaruh sebelum `delete` di berkas yang sama tidak pernah sempat dibaca
+--  siapa pun, dan pemeriksaan yang tidak terbaca bukan pemeriksaan.
+--
+--  Tempel LANGKAH 1 dulu, lihat hasilnya, hapus isinya, baru tempel
+--  LANGKAH 2.
 -- ============================================================
 
-begin;
 
--- Lihat dulu apa yang akan hilang. Kalau baris yang tampil bukan dua lahan
--- "test" itu, JANGAN lanjutkan: batalkan dengan `rollback;`.
+-- ---------- LANGKAH 1: lihat dulu apa yang akan hilang ----------
+--
+-- Harus muncul TEPAT DUA baris, keduanya berjudul "test". Kalau yang
+-- muncul bukan itu, berhenti di sini dan jangan jalankan langkah 2.
+
 select id, judul, kecamatan, kota, status
 from ruang
 where id in (
   '7d043283-9db9-43df-8eec-84758604069c',
   'deef8d3d-63dc-48ec-b158-cad3eb8a7eec'
 );
+
+
+-- ---------- LANGKAH 2: hapus ----------
+--
+-- URUTANNYA BUKAN SELERA. `pemesanan.ruang_id` adalah satu-satunya rujukan
+-- ke `ruang` yang TIDAK cascade (lihat 01_schema.sql baris 107), jadi
+-- menghapus ruangnya lebih dulu akan ditolak Postgres kalau kebetulan ada
+-- barisnya. Sisanya (foto, video, jendela akses, percakapan, statistik)
+-- ikut terhapus sendiri.
+--
+-- Satu transaksi: kalau salah satu gagal, tidak ada yang terhapus separuh.
+
+begin;
 
 delete from pemesanan
 where ruang_id in (
