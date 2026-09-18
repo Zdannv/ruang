@@ -19,9 +19,20 @@ import type { UlasanSorotan } from "@/lib/ringkasan";
  *
  * `boleh_ulas()` mensyaratkan pemesanan lewat aplikasi, dan sejak alur itu
  * dibuang (18 Sep 2026) tidak ada satu pun ulasan yang bisa masuk. Jadi
- * keadaan kosong ini bukan sementara, ia satu-satunya keadaan yang ada, dan
- * kalimatnya menyebut itu apa adanya. Yang menggantikannya sebagai alasan
- * percaya: peta dan alamat di listing, dan jejak chat yang tidak bisa diubah.
+ * keadaan kosong ini bukan sementara, ia satu-satunya keadaan yang ada.
+ *
+ * **Ulasan karangan diminta 18 September 2026** ("untuk landing page aja,
+ * yang penting gak berlebihan") dan tetap tidak ditulis. Testimoni bernama
+ * orang yang tidak ada, di halaman yang tugasnya meyakinkan orang menyerahkan
+ * uang ke orang asing, adalah penipuan berapa pun jumlahnya, dan yang
+ * menanggung akibatnya pedagang yang rugi, bukan yang memasangnya.
+ *
+ * Yang dipakai sebagai gantinya: keadaan yang sebenarnya. Untuk produk yang
+ * baru mulai itu justru lebih meyakinkan daripada bintang, karena "lahan
+ * pertamanya kami datangi sendiri" BISA DIPERIKSA orangnya, dan pembacanya
+ * tahu persis sedang berhadapan dengan apa. Kalimat itu tetap harus benar:
+ * kalau nanti listing masuk tanpa didatangi, kalimatnya yang diganti, bukan
+ * kenyataannya yang dibiarkan menyimpang.
  */
 export default function SuaraPenyewa({
   ulasan,
@@ -67,17 +78,16 @@ function Kosong() {
   return (
     <div className="mx-auto max-w-3xl text-center">
       <p className="text-xs font-semibold uppercase tracking-wide text-white/70">
-        Ulasan penyewa
+        Kami baru mulai
       </p>
       <h2 className="mt-3 font-display text-2xl font-bold leading-tight tracking-tight text-white sm:text-3xl">
-        Belum ada ulasan di sini
+        Lahan pertamanya kami datangi sendiri
       </h2>
       <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/85 sm:text-base">
-        Sewanya disepakati langsung antara kamu dan pemiliknya, di luar aplikasi,
-        jadi kami tidak tahu sewa mana yang benar-benar terjadi dan tidak bisa
-        memastikan sebuah ulasan datang dari orang yang memang pernah menyewa.
-        Daripada mengisinya dengan bintang yang tidak ada orangnya, kami
-        kosongkan.
+        Cari Ruang baru jalan di Sidoarjo dan Surabaya Selatan. Belum ada ribuan
+        listing dan belum ada ulasan, jadi kami tidak berpura-pura punya: lahan
+        pertama di sini kami datangi, foto, dan tanyai sendiri sebelum tayang.
+        Kalau ada yang tidak cocok dengan keterangannya, bilang ke kami.
       </p>
 
       <div className="mt-8 grid gap-4 text-left sm:grid-cols-3">
@@ -100,12 +110,20 @@ function Kosong() {
         temui orangnya sebelum menyerahkan uang apa pun.
       </p>
 
-      <Link
-        href="/cari"
-        className="mt-7 inline-block rounded-full bg-white px-6 py-3 text-sm font-semibold text-brand-dark transition-transform hover:-translate-y-0.5"
-      >
-        Lihat lahan yang tayang
-      </Link>
+      <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+        <Link
+          href="/cari"
+          className="inline-block rounded-full bg-white px-6 py-3 text-sm font-semibold text-brand-dark transition-transform hover:-translate-y-0.5"
+        >
+          Lihat lahan yang tayang
+        </Link>
+        <Link
+          href="/host/lahan/baru"
+          className="inline-block rounded-full px-6 py-3 text-sm font-semibold text-white ring-1 ring-white/40 transition-colors hover:bg-white/10"
+        >
+          Pasang lahanku
+        </Link>
+      </div>
     </div>
   );
 }

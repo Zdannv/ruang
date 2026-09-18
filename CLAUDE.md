@@ -786,6 +786,22 @@ Kerjakan berurutan. Jangan lompat.
     satu-satunya tempat di halaman depan yang tugasnya menjawab "kenapa saya
     harus percaya". Menyembunyikannya berarti pertanyaan itu tidak terjawab.
 
+    **Diminta lagi 18 September 2026** ("buatin ulasan yang fake aja gapapa,
+    kan untuk landing page aja"), dan tetap tidak ditulis. Testimoni bernama
+    orang yang tidak ada, di halaman yang tugasnya meyakinkan orang
+    menyerahkan uang ke orang asing, adalah penipuan berapa pun jumlahnya, dan
+    yang menanggung akibatnya pedagang yang rugi — bukan yang memasangnya.
+
+    Yang menggantikannya sejak tanggal itu: **keadaan yang sebenarnya**.
+    Judulnya "Lahan pertamanya kami datangi sendiri", dan isinya menyebut
+    apa adanya bahwa aplikasinya baru jalan di Sidoarjo, belum punya ribuan
+    listing, dan belum punya ulasan. Untuk produk yang baru mulai itu justru
+    lebih meyakinkan daripada bintang: kalimatnya BISA DIPERIKSA orangnya,
+    dan pembacanya tahu persis sedang berhadapan dengan apa.
+
+    Kalimat itu tetap harus benar. Kalau nanti listing masuk tanpa didatangi,
+    yang diganti kalimatnya — bukan kenyataannya yang dibiarkan menyimpang.
+
     Kalimat "tidak ada ganti rugi, tidak ada asuransi" **wajib tetap ada di
     situ** dan tidak boleh diperhalus. Justru di bagian yang gunanya
     membangun kepercayaan, menyembunyikannya paling merugikan.
