@@ -40,29 +40,6 @@ const PIL_AKTIF = "border border-brand bg-brand text-white";
 const PIL_MATI =
   "border border-line bg-card text-ink hover:border-brand/40 hover:bg-brand-soft";
 
-/*
-  Urutan pilihan tipe, dan keempat lahan terbuka ada di DEPAN.
-
-  Sebelum ini daftarnya cuma memuat delapan tipe tertutup — sisa dari
-  masa sebelum migrasi 17 — jadi halaman depan rumah, lahan kosong, teras, dan
-  kios tidak bisa dipilih sama sekali di halaman pencarian. Keempatnya justru
-  yang jadi fokus aplikasi, dan sudah bisa didaftarkan host sejak migrasi 17.
-*/
-const TIPE_URUT: TipeRuang[] = [
-  "halaman_depan",
-  "teras",
-  "lahan_kosong",
-  "kios",
-  "lantai_ruko",
-  "kamar",
-  "garasi",
-  "gudang",
-  "mezanin",
-  "bawah_tangga",
-  "loteng",
-  "kontainer",
-];
-
 /**
  * Kategori yang selalu tampil di bilah pintasan.
  *
@@ -336,17 +313,6 @@ export default function PencarianRuang() {
     [semua, tipe, kategori, usaha, mukaMin]
   );
 
-  // Tipe yang memang ada isinya dalam radius sekarang. Menawarkan "Kontainer"
-  // padahal tidak ada satu pun di sekitar situ cuma memancing hasil kosong.
-  const tipeTersedia = useMemo(() => {
-    const ada = new Set(semua.map((r) => r.tipe));
-    // Tipe yang sedang dipilih ikut ditampilkan meski tidak ada hasilnya di
-    // radius ini. Kalau tidak, filternya aktif tapi tombol untuk mematikannya
-    // hilang dari layar.
-    if (tipe) ada.add(tipe);
-    return TIPE_URUT.filter((t) => ada.has(t));
-  }, [semua, tipe]);
-
   // Kategori yang benar-benar diterima seseorang dalam radius sekarang, dengan
   // alasan yang sama seperti `tipeTersedia`. Ia sekaligus menahan keadaan
   // "13_umkm.sql belum dijalankan": di database itu `kategori_diterima`
@@ -551,14 +517,15 @@ export default function PencarianRuang() {
           </div>
         )}
 
-        {(!preset || galatLokasi) && (
+        {/* Koordinat mentah dulu dicetak di sini ("Memakai lokasimu: -7.3013,
+            112.7834"). Itu isi kepala pengembang, bukan keterangan untuk
+            orang: tidak ada satu pun keputusan yang bisa diambil pedagang dari
+            empat angka di belakang koma. Nama titiknya sudah tertulis di
+            kendali di atas, jadi barisnya dibuang; yang tersisa cuma galat
+            lokasi, yang memang perlu dibaca. */}
+        {galatLokasi && (
           <div className="mx-auto max-w-6xl px-4 pb-3 sm:px-6 lg:px-8">
-            {!preset && (
-              <p className="angka text-xs text-muted">
-                Memakai lokasimu: {lat.toFixed(4)}, {lng.toFixed(4)}
-              </p>
-            )}
-            {galatLokasi && <p className="text-xs text-warn">{galatLokasi}</p>}
+            <p className="text-xs text-warn">{galatLokasi}</p>
           </div>
         )}
       </section>
@@ -629,6 +596,21 @@ export default function PencarianRuang() {
             sesekali dipakai, tapi "saya cuma mau lihat kios" adalah niat yang
             dibawa orang sejak sebelum halaman ini terbuka. */}
         <div className="geser-x -mx-4 flex gap-2 overflow-x-auto px-4 pt-3 pb-1 sm:mx-0 sm:px-0">
+          {/* "Semua" cuma muncul saat ada tipe yang sedang dipilih. Petak
+              reset yang selalu ada memakan satu slot di baris yang muat enam,
+              dan saat tidak ada yang dipilih ia tidak mereset apa pun. */}
+          {tipe && (
+            <button
+              type="button"
+              onClick={() => ubah({ tipe: null })}
+              className="flex w-[4.6rem] shrink-0 cursor-pointer flex-col items-center gap-1.5 rounded-2xl px-1.5 py-2.5 text-center text-[11px] font-semibold leading-tight text-muted transition-colors hover:bg-card sm:w-20 sm:text-xs"
+            >
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-card ring-1 ring-line sm:h-11 sm:w-11">
+                <Search className="h-5 w-5" />
+              </span>
+              Semua
+            </button>
+          )}
           {KATEGORI.map((t) => {
             const Ikon = IKON_TIPE[t];
             const aktif = tipe === t;
@@ -654,74 +636,6 @@ export default function PencarianRuang() {
             );
           })}
         </div>
-
-        <section
-          aria-label="Tipe lahan"
-          hidden={!bukaFilter}
-          className="pt-3 sm:pt-4"
-        >
-          {/* Judulnya dulu "Mau menyimpan apa?" — pertanyaan tentang barang yang
-              dijawab dengan bentuk ruang. Sejak penyaring kategori barang ada di
-              bawah, keduanya bertabrakan: dua judul menanyakan hal yang sama dan
-              cuma satu yang benar-benar menyaring barang. Sekarang ia menanyakan
-              BENTUK tempatnya, dan pertanyaan "mau jualan apa" ada di panel
-              filter, di sana ia menyaring `usaha_diizinkan`, bukan bentuk. */}
-          <h2 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
-            Tempat seperti apa?
-          </h2>
-
-          {memuat ? (
-            <div className="geser-x -mx-4 mt-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-              <div className="flex w-max gap-3 pb-1">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-24 w-24 shrink-0 animate-pulse rounded-2xl border border-line bg-card"
-                  />
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="geser-x -mx-4 mt-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-              <div className="flex w-max gap-3 pb-1">
-                <button
-                  type="button"
-                  aria-pressed={!tipe}
-                  onClick={() => ubah({ tipe: null })}
-                  className={`flex h-24 w-24 shrink-0 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl text-xs font-semibold transition-colors ${
-                    tipe
-                      ? "naik border border-line bg-card text-ink hover:border-brand/40 hover:bg-brand-soft"
-                      : "border border-brand bg-brand text-white"
-                  }`}
-                >
-                  <Search className="h-6 w-6" />
-                  Semua
-                </button>
-
-                {tipeTersedia.map((t) => {
-                  const Ikon = IKON_TIPE[t];
-                  const aktif = tipe === t;
-                  return (
-                    <button
-                      key={t}
-                      type="button"
-                      aria-pressed={aktif}
-                      onClick={() => ubah({ tipe: aktif ? null : t })}
-                      className={`flex h-24 w-24 shrink-0 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl px-2 text-center text-xs font-semibold leading-tight transition-colors ${
-                        aktif
-                          ? "bg-brand text-white"
-                          : "bg-card text-ink ring-1 ring-line hover:bg-brand-soft"
-                      }`}
-                    >
-                      <Ikon className="h-6 w-6" />
-                      {LABEL_TIPE[t]}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </section>
 
         {/* ── Filter lain ────────────────────────────────────────────────── */}
         <section

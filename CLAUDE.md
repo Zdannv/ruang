@@ -1542,6 +1542,23 @@ alat kerja tidak punya hero" yang sudah berlaku di sini.
    kisi dua kolom memakan dua baris penuh di 375px dan mendorong bagian
    berikutnya jauh ke bawah.
 
+**Penyaring tipe yang lama DIBUANG bersamaan, dan itu perbaikan atas cacat
+yang sempat tayang.** Baris kategori ditambahkan tanpa membuang blok "Tempat
+seperti apa?" di dalam panel Filter, jadi begitu panelnya dibuka ada DUA
+pemilih tipe di satu layar — dan yang di dalam panel cuma menyisakan satu
+petak "Semua" sendirian kalau radiusnya kosong, karena isinya diturunkan dari
+hasil. Terlihat seketika di layar, tidak terlihat sama sekali dari kodenya.
+
+Pelajarannya: **menambah pintasan untuk sesuatu yang sudah punya penyaring
+berarti salah satunya harus pergi.** Dua kendali untuk satu kolom bukan
+kemudahan, ia pertanyaan "yang mana yang berlaku" yang tidak dijawab layar.
+Tombol reset "Semua" sekarang cuma muncul saat ada tipe yang sedang dipilih.
+
+Baris koordinat mentah di bawah kendali titik (`Memakai lokasimu: -7,3013,
+112,7834`) ikut dibuang. Itu isi kepala pengembang: tidak ada satu pun
+keputusan yang bisa diambil pedagang dari empat angka di belakang koma, dan
+nama titiknya sudah tertulis di kendali tepat di atasnya.
+
 **Aturan lipatan tetap dijaga, dan diukur ulang**: kartu hasil pertama di
 y=401 di laptop (sebelumnya 419 — baris kategori justru menggantikan ruang
 yang lebih boros) dan y=513 di 375×812. Keduanya masih di atas lipatan.
