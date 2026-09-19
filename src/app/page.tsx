@@ -158,7 +158,11 @@ export default async function Beranda() {
           justru dibuka untuk melihat hasilnya. Aturan yang sama sudah berlaku
           di `/cari` sejak 8 September 2026, dan sekarang berlaku di sini
           karena ini halaman yang sama. */}
-      <section className="border-b border-line bg-card py-5 sm:py-7">
+      {/* Latar KERTAS, bukan kartu putih. Kartu sorotan pertama berlatar
+          nyaris putih; di atas bagian yang juga putih ia tidak punya tepi
+          sama sekali, sementara kartu kedua blok gelap pekat. Berdampingan di
+          laptop, keduanya terbaca sebagai dua jenis benda yang berbeda. */}
+      <section className="border-b border-line bg-paper py-5 sm:py-7">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h1 className="sr-only">
             Ada Tempat: sewa tempat usaha di pinggir jalan

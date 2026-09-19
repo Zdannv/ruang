@@ -42,7 +42,7 @@ const KARTU = [
     alt: "Halaman depan nganggur? Jadikan cuan, disewakan bulanan ke pedagang di sekitarmu, Rp 600 ribu per bulan",
   },
   {
-    berkas: "sorotan-2-v2",
+    berkas: "sorotan-2-v3",
     alt: "Sewa, bukan beli, punya lahan sendiri ratusan juta, sewa 2 × 3 meter di depan rumah orang ratusan ribu per bulan",
   },
 ];
@@ -246,7 +246,9 @@ export default function SorotanPromo() {
                  (ia bebas resolusi); untuk yang ini nyata. */
               sizes="(min-width: 1024px) 560px, 94vw"
               priority={i === 0}
-              className="h-auto w-full rounded-3xl"
+              /* Garis tipis supaya kartu yang latarnya putih tetap
+                 punya tepi. Tanpa ini ia melebur ke halaman. */
+              className="h-auto w-full rounded-3xl ring-1 ring-line"
             />
           </div>
         ))}

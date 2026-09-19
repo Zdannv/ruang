@@ -1608,6 +1608,24 @@ Kerjakan berurutan. Jangan lompat.
     Aturan turunannya: **mengganti isi sebuah gambar berarti mengganti nama
     berkasnya.**
 
+    **Dua cacat lagi ketemu setelah dilihat di layar, bukan dari kodenya:**
+
+    1. **Baji putih di pojok kiri bawah sorotan-2.** Ilustrasi aslinya punya
+       sudut membulat sendiri, dan kartunya juga dibulatkan lewat CSS. Dua
+       pembulatan yang tidak sejajar terbaca sebagai pojok yang sompel.
+       Diratakan per piksel di kotak yang sudah diukur, bukan ditambal kotak
+       polos, supaya isi gambar yang gelap di situ tetap utuh. Seam-nya
+       diperiksa: meleset paling jauh satu unit, tidak terlihat.
+    2. **Kedua kartu terbaca sebagai dua jenis benda yang berbeda.** Sorotan
+       pertama berlatar nyaris putih dan bagian banner-nya `bg-card` yang juga
+       putih, jadi ia tidak punya tepi sama sekali, sementara sorotan kedua
+       blok gelap pekat. Berdampingan di laptop, yang satu kartu dan yang satu
+       cuma gambar yang melayang. Bagiannya sekarang `bg-paper` dan tiap kartu
+       dapat `ring-1 ring-line`.
+
+       Aturan turunannya: **kartu bergambar yang latarnya mendekati latar
+       halaman butuh garis tepi**, kalau tidak ia hilang sebagai bentuk.
+
     Satu kalimat di `SuaraPenyewa` ikut diubah: ia menyebut "baru jalan di
     Sidoarjo dan Surabaya Selatan", dan itu bertabrakan dengan titik bawaan
     yang sekarang Jakarta (nomor 49). Sekarang cuma "baru mulai", yang tetap
